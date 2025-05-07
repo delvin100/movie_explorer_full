@@ -194,15 +194,17 @@
         .dropdown-content {
             display: none;
             position: absolute;
-            top: 60px;
+            top: 100%;
             right: 0;
             background: #232325;
-            min-width: 270px;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-            z-index: 2000;
+            min-width: 280px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
             padding: 1.2rem 1rem;
-            animation: fadeIn 0.2s;
         }
         .profile-dropdown.open .dropdown-content {
             display: block;
@@ -340,6 +342,84 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        /* Add these styles to your existing styles */
+        .dashboard-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .dashboard-text:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dashboard-text i {
+            transition: transform 0.3s ease;
+        }
+
+        .profile-dropdown.open .dashboard-text i {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #232325;
+            min-width: 280px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .dropdown-content.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Update avatar container styles */
+        .avatar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .avatar-container img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ff0000;
+        }
+        
+        .avatar-container button {
+            width: fit-content;
+            padding: 0.5rem 1rem;
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .avatar-container button:hover {
+            background: #cc0000;
+        }
     </style>
 </head>
 <body>
@@ -349,7 +429,10 @@
             <span>WELCOME TO METFLIX</span>
         </div>
         <div class="profile-dropdown" id="profileDropdown">
-            <img src="images/default-avatar.png" alt="Profile" class="profile-avatar-navbar" id="navbarAvatar">
+            <div class="dashboard-text" id="dashboardText">
+                <span>Dashboard</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
             <div class="dropdown-content" id="dropdownContent">
                 <div class="dropdown-header">
                     <img src="images/default-avatar.png" alt="Profile" class="dropdown-avatar" id="dropdownAvatar">
@@ -378,8 +461,10 @@
             <form id="editProfileForm">
                 <div class="form-group">
                     <label>Avatar</label>
-                    <img id="avatarPreview" src="images/default-avatar.png" alt="Avatar Preview" style="display:block;margin:1rem auto 0 auto;width:100px;height:100px;border-radius:50%;object-fit:cover;border:2px solid #ff0000;">
-                    <button type="button" id="randomAvatarBtn" class="save-btn" style="margin-top:0.5rem;">Random Movie Avatar</button>
+                    <div class="avatar-container">
+                        <img id="avatarPreview" src="images/default-avatar.png" alt="Avatar Preview" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:2px solid #ff0000;">
+                        <button type="button" id="randomAvatarBtn" class="save-btn">Random Movie Avatar</button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="editUsername">Username</label>
@@ -388,10 +473,6 @@
                 <div class="form-group">
                     <label for="editBio">Bio</label>
                     <textarea id="editBio" maxlength="150"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="editGenres">Favorite Genres (comma separated)</label>
-                    <input type="text" id="editGenres">
                 </div>
                 <div class="modal-actions">
                     <button type="submit" class="save-btn">Save</button>
@@ -477,9 +558,6 @@
             <img src="https://cer.iitk.ac.in/olt_img/top.png" alt="Go to Top">
         </button>
     </div>
-    <button id="goToHomeBtn" class="logo-button">
-        <img src="https://cdn3.iconfinder.com/data/icons/basic-ui-5/48/home-512.png" alt="Go to Home">
-    </button>
 
     <script src="script.js"></script>
     <script>
@@ -645,11 +723,11 @@
             }
         }
 
-        // --- Profile Dropdown Logic ---
+        // Updated Profile Dropdown Logic
         const token = localStorage.getItem('metflix_jwt');
         const profileDropdown = document.getElementById('profileDropdown');
+        const dashboardText = document.getElementById('dashboardText');
         const dropdownContent = document.getElementById('dropdownContent');
-        const navbarAvatar = document.getElementById('navbarAvatar');
         const dropdownAvatar = document.getElementById('dropdownAvatar');
         const dropdownUsername = document.getElementById('dropdownUsername');
         document.getElementById('dropdownEmail').textContent = '';
@@ -666,12 +744,10 @@
                 const data = await res.json();
                 dropdownUsername.textContent = data.username;
                 document.getElementById('dropdownEmail').textContent = data.email;
-                navbarAvatar.src = data.profile.avatar || randomAvatarUrl(data.username);
                 dropdownAvatar.src = data.profile.avatar || randomAvatarUrl(data.username);
                 // Prefill edit modal
                 document.getElementById('editUsername').value = data.username;
                 document.getElementById('editBio').value = data.profile.bio || '';
-                document.getElementById('editGenres').value = (data.profile.favoriteGenres || []).join(', ');
             } catch (e) { console.error('Profile fetch error', e); }
         }
 
@@ -690,12 +766,33 @@
             } catch (e) { console.error('Stats fetch error', e); }
         }
 
-        // Dropdown open/close
-        navbarAvatar.onclick = () => {
+        // Dropdown open/close with animation
+        dashboardText.onclick = () => {
             profileDropdown.classList.toggle('open');
+            if (profileDropdown.classList.contains('open')) {
+                dropdownContent.style.display = 'block';
+                setTimeout(() => {
+                    dropdownContent.style.opacity = '1';
+                    dropdownContent.style.transform = 'translateY(0)';
+                }, 10);
+            } else {
+                dropdownContent.style.opacity = '0';
+                dropdownContent.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    dropdownContent.style.display = 'none';
+                }, 300);
+            }
         };
+
         document.addEventListener('click', (e) => {
-            if (!profileDropdown.contains(e.target)) profileDropdown.classList.remove('open');
+            if (!profileDropdown.contains(e.target)) {
+                profileDropdown.classList.remove('open');
+                dropdownContent.style.opacity = '0';
+                dropdownContent.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    dropdownContent.style.display = 'none';
+                }, 300);
+            }
         });
 
         // --- Edit Profile Modal Logic ---
@@ -711,7 +808,7 @@
         editProfileDropdown.onclick = async (e) => {
             e.preventDefault();
             await fetchProfileDropdown(); // Ensure latest data
-            avatarPreview.src = navbarAvatar.src || currentAvatarUrl;
+            avatarPreview.src = dropdownAvatar.src || currentAvatarUrl;
             editProfileModal.classList.add('active');
             profileDropdown.classList.remove('open');
         };
@@ -735,7 +832,6 @@
             e.preventDefault();
             const username = document.getElementById('editUsername').value.trim();
             const bio = document.getElementById('editBio').value.trim();
-            const genres = document.getElementById('editGenres').value.split(',').map(g => g.trim()).filter(Boolean);
             let avatarUrl = avatarPreview.src;
             try {
                 const res = await fetch('http://localhost:5000/api/profile', {
@@ -747,14 +843,12 @@
                     body: JSON.stringify({
                         bio,
                         avatar: avatarUrl,
-                        favoriteGenres: genres,
                         username
                     })
                 });
                 if (res.ok) {
                     editProfileModal.classList.remove('active');
                     await fetchProfileDropdown();
-                    navbarAvatar.src = avatarUrl;
                     dropdownAvatar.src = avatarUrl;
                 } else {
                     alert('Failed to update profile');

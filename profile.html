@@ -256,16 +256,60 @@
         .dropdown-links a:active { background: none !important; color: #ff0000 !important; }
         .edit-review-btn { background: #232325; color: #ff0000; border: 1px solid #ff0000; border-radius: 5px; padding: 0.3rem 0.8rem; margin-left: 1rem; cursor: pointer; font-weight: bold; transition: background 0.2s, color 0.2s; }
         .edit-review-btn:hover { background: #ff0000; color: #fff; }
+        .back-to-movies-btn {
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .back-to-movies-btn:hover {
+            background: #cc0000;
+        }
+        .avatar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .avatar-container img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ff0000;
+        }
+        .avatar-container button {
+            width: fit-content;
+            padding: 0.5rem 1rem;
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .avatar-container button:hover {
+            background: #cc0000;
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <a href="index.html" class="logo">METFLIX</a>
+    <div class="navbar">
+        <div class="logo">Metflix</div>
         <div class="nav-links">
-            <a href="movie.html">Movies</a>
-            <a href="#" id="logoutBtn">Logout</a>
+            <span>MY PROFILE</span>
         </div>
-    </nav>
+        <button class="back-to-movies-btn" onclick="window.location.href='movie.html'">
+            <i class="fas fa-arrow-left"></i> Back
+        </button>
+    </div>
 
     <div class="container">
         <div class="profile-header">
@@ -281,10 +325,6 @@
                     <div class="stat-item">
                         <div class="stat-value" id="reviewsCount">0</div>
                         <div class="stat-label">Reviews</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="watchTime">0</div>
-                        <div class="stat-label">Hours Watched</div>
                     </div>
                 </div>
             </div>
@@ -319,8 +359,10 @@
             <form id="editProfileForm">
                 <div class="form-group">
                     <label>Avatar</label>
-                    <img id="avatarPreview" src="images/default-avatar.png" alt="Avatar Preview" style="display:block;margin:1rem auto 0 auto;width:100px;height:100px;border-radius:50%;object-fit:cover;border:2px solid #ff0000;">
-                    <button type="button" id="randomAvatarBtn" class="save-btn" style="margin-top:0.5rem;">Random Movie Avatar</button>
+                    <div class="avatar-container">
+                        <img id="avatarPreview" src="images/default-avatar.png" alt="Avatar Preview">
+                        <button type="button" id="randomAvatarBtn" class="save-btn">Random Movie Avatar</button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="editUsername">Username</label>
@@ -387,7 +429,6 @@
                 document.getElementById('avatarPreview').src = currentAvatarUrl;
                 document.getElementById('editUsername').value = data.username;
                 document.getElementById('editBio').value = data.profile.bio || '';
-                document.getElementById('watchTime').textContent = data.profile.watchTime || 0;
             } catch (error) {
                 console.error('Error fetching profile:', error);
             }
@@ -545,12 +586,6 @@
             }
         };
 
-        // Logout button click handler
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            localStorage.removeItem('metflix_jwt');
-            window.location.href = 'login.html';
-        });
-
         // Edit Review Modal Logic
         const editReviewForm = document.getElementById('editReviewForm');
         const cancelEditReview = document.getElementById('cancelEditReview');
@@ -593,4 +628,4 @@
         fetchReviews();
     </script>
 </body>
-</html> 
+</html>

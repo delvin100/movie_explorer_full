@@ -12,24 +12,26 @@
             50% { transform: scale(1.05); box-shadow: 0 0 32px #ff0000, 0 0 16px #fff; }
             100% { transform: scale(1); box-shadow: 0 0 24px #ff0000, 0 0 8px #fff; }
         }
-        @keyframes glow {
-            0% { box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37), 0 0 24px 4px #ff0000, 0 0 0 1.5px #fff2; }
-            50% { box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37), 0 0 32px 8px #ff0000, 0 0 0 1.5px #fff2; }
-            100% { box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37), 0 0 24px 4px #ff0000, 0 0 0 1.5px #fff2; }
-        }
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
             100% { transform: translateY(0px); }
         }
-        .logo-img {
-            animation: pulse 3s infinite ease-in-out;
+        @keyframes floatParticle {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-110vh); }
         }
-        #form-container {
-            animation: glow 3s infinite ease-in-out;
+        @keyframes tabScale {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .logo-img {
+            box-shadow: none;
         }
         .form-title {
-            animation: float 4s infinite ease-in-out;
+            color: #fff;
+            text-shadow: none;
         }
         .switch-link {
             color: #ff0000;
@@ -58,9 +60,14 @@
         }
         .input-field {
             transition: all 0.3s ease;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
         }
         .input-field:hover {
             transform: translateY(-2px);
+        }
+        .input-field:focus {
+            border-color: #ff0000;
+            box-shadow: 0 0 8px rgba(255, 0, 0, 0.3);
         }
         .submit-btn {
             transition: all 0.3s ease;
@@ -68,6 +75,56 @@
         .submit-btn:hover {
             transform: translateY(-2px) scale(1.02);
             box-shadow: 0 0 24px #ff0000;
+        }
+        .tab-btn {
+            position: relative;
+        }
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #ff0000;
+            display: none;
+        }
+        .tab-btn.active::after {
+            display: block;
+        }
+        .tab-btn.active {
+            color: #ff0000;
+            font-weight: 800;
+            animation: tabScale 0.4s ease-in-out;
+        }
+        .tab-btn.inactive {
+            color: #fff;
+            font-weight: 600;
+        }
+        @keyframes floatParticleEnhanced {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 0.18;
+                filter: blur(0px);
+            }
+            10% {
+                opacity: 0.28;
+                filter: blur(1px);
+            }
+            50% {
+                transform: translateY(-55vh) scale(1.2);
+                opacity: 0.32;
+                filter: blur(2px);
+            }
+            90% {
+                opacity: 0.18;
+                filter: blur(1px);
+            }
+            100% {
+                transform: translateY(-110vh) scale(1);
+                opacity: 0;
+                filter: blur(2px);
+            }
         }
     </style>
 </head>
@@ -77,32 +134,31 @@
     <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;">
         <!-- Logo/Icon -->
         <div style="text-align:center;margin-bottom:18px;">
-            <img src="images/logo_circle.png" alt="Metflix Logo" class="logo-img" style="height:60px;width:60px;border-radius:50%;box-shadow:0 0 24px #ff0000,0 0 8px #fff;object-fit:cover;">
+            <img src="images/logo_circle.png" alt="Metflix Logo" class="logo-img" style="height:80px;width:80px;border-radius:50%;box-shadow:0 0 24px #ff0000,0 0 8px #fff;object-fit:cover;">
         </div>
         <div style="text-align:center;margin-bottom:18px;">
-            <span class="form-title" style="font-size:2.5rem;font-weight:bold;color:#fff;text-shadow:0 0 20px #ff0000,0 0 40px #fff;letter-spacing:2px;">METFLIX</span>
+            <span class="form-title" style="font-size:2.5rem;font-weight:900;color:#fff;letter-spacing:3px;">METFLIX</span>
             <div style="margin-top:8px;color:#ff0000;font-size:1.15rem;font-style:italic;letter-spacing:1px;">Your Perfect Movie Explorer</div>
         </div>
-        <div id="form-container" style="background:rgba(30,30,32,0.92);backdrop-filter:blur(14px);border-radius:28px;box-shadow:0 8px 32px 0 rgba(31,38,135,0.37),0 0 24px 4px #ff0000,0 0 0 1.5px #fff2;max-width:390px;width:100%;padding:44px 36px 36px 36px;position:relative;transition:box-shadow 0.3s,transform 0.4s;overflow:hidden;">
-            <!-- Tab Switcher with Animated Underline -->
+        <div id="form-container" style="background:rgba(30,30,32,0.92);backdrop-filter:blur(14px);border-radius:28px;box-shadow:0 8px 32px 0 rgba(31,38,135,0.37), 0 0 8px rgba(255, 0, 0, 0.2);max-width:390px;width:100%;padding:44px 36px 36px 36px;position:relative;transition:box-shadow 0.3s,transform 0.4s;overflow:hidden;">
+            <!-- Tab Switcher -->
             <div style="display:flex;justify-content:center;margin-bottom:32px;position:relative;">
-                <button id="loginTab" class="tab-btn" style="background:none;color:#fff;border:none;padding:12px 36px 12px 36px;border-radius:20px 0 0 20px;font-size:1.13rem;cursor:pointer;outline:none;position:relative;z-index:2;font-weight:600;transition:color 0.3s;">Login</button>
-                <button id="registerTab" class="tab-btn" style="background:none;color:#fff;border:none;padding:12px 36px 12px 36px;border-radius:0 20px 20px 0;font-size:1.13rem;cursor:pointer;outline:none;position:relative;z-index:2;font-weight:600;transition:color 0.3s;">Register</button>
-                <span id="tab-underline" style="position:absolute;bottom:0;left:0;height:4px;width:50%;background:linear-gradient(90deg,#ff0000 60%,#fff 100%);border-radius:2px;box-shadow:0 0 12px #ff0000;transition:left 0.4s cubic-bezier(.77,0,.18,1),width 0.4s;z-index:1;"></span>
+                <button id="loginTab" class="tab-btn active" style="background:none;border:none;padding:12px 36px;border-radius:20px;font-size:1.13rem;cursor:pointer;outline:none;">Login</button>
+                <button id="registerTab" class="tab-btn inactive" style="background:none;border:none;padding:12px 36px;border-radius:20px;font-size:1.13rem;cursor:pointer;outline:none;">Register</button>
             </div>
             <!-- Login Form -->
             <form id="loginForm" autocomplete="off" style="display:block;animation:fadeInRight 0.6s;">
                 <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
                     <i class="fa fa-user" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
-                    <input type="text" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <input type="text" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
                     <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Username</label>
                 </div>
                 <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
                     <i class="fa fa-lock" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
-                    <input type="password" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <input type="password" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
                     <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Password</label>
                 </div>
-                <button type="submit" class="submit-btn" style="width:100%;padding:13px 0;background:linear-gradient(90deg,#ff0000 60%,#fff 100%);color:#18181a;font-weight:bold;font-size:1.13rem;border:none;border-radius:12px;box-shadow:0 0 16px #ff0000;cursor:pointer;transition:transform 0.2s,box-shadow 0.3s;letter-spacing:1px;">Login <i class="fa fa-arrow-right"></i></button>
+                <button type="submit" class="submit-btn" style="width:100%;padding:13px 0;background:#ff0000;color:#18181a;font-weight:bold;font-size:1.13rem;border:none;border-radius:12px;box-shadow:0 0 16px #ff0000;cursor:pointer;transition:transform 0.2s,box-shadow 0.3s;letter-spacing:1px;">Login <i class="fa fa-arrow-right"></i></button>
                 <div style="margin-top:20px;text-align:center;color:#fff;font-size:1rem;">
                     Don't have an account? <span id="switchToRegister" class="switch-link">Register</span>
                 </div>
@@ -111,20 +167,20 @@
             <form id="registerForm" autocomplete="off" style="display:none;animation:fadeInLeft 0.6s;">
                 <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
                     <i class="fa fa-user-plus" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
-                    <input type="text" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <input type="text" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
                     <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Username</label>
                 </div>
                 <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
                     <i class="fa fa-envelope" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
-                    <input type="email" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <input type="email" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
                     <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Email</label>
                 </div>
                 <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
                     <i class="fa fa-lock" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
-                    <input type="password" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <input type="password" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
                     <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Password</label>
                 </div>
-                <button type="submit" class="submit-btn" style="width:100%;padding:13px 0;background:linear-gradient(90deg,#ff0000 60%,#fff 100%);color:#18181a;font-weight:bold;font-size:1.13rem;border:none;border-radius:12px;box-shadow:0 0 16px #ff0000;cursor:pointer;transition:transform 0.2s,box-shadow 0.3s;letter-spacing:1px;">Register <i class="fa fa-user-plus"></i></button>
+                <button type="submit" class="submit-btn" style="width:100%;padding:13px 0;background:#ff0000;color:#18181a;font-weight:bold;font-size:1.13rem;border:none;border-radius:12px;box-shadow:0 0 16px #ff0000;cursor:pointer;transition:transform 0.2s,box-shadow 0.3s;letter-spacing:1px;">Register <i class="fa fa-user-plus"></i></button>
                 <div style="margin-top:20px;text-align:center;color:#fff;font-size:1rem;">
                     Already have an account? <span id="switchToLogin" class="switch-link">Login</span>
                 </div>
@@ -139,27 +195,29 @@
     </div>
     <script>
     // Animated background (floating red dots)
-    const bg = document.getElementById('bg-anim');
-    for(let i=0;i<30;i++){
-        let d=document.createElement('div');
-        let size=Math.random()*18+8;
-        d.style.cssText=`position:absolute;border-radius:50%;background:radial-gradient(circle,#ff0000 60%,#fff0 100%);opacity:0.18;left:${Math.random()*100}vw;top:${Math.random()*100}vh;width:${size}px;height:${size}px;animation:float${i} 12s linear infinite;`;
-        bg.appendChild(d);
-        let keyframes = `@keyframes float${i}{0%{transform:translateY(0);}100%{transform:translateY(-${Math.random()*60+40}px);}}`;
-        let styleSheet = document.createElement("style");
-        styleSheet.type = "text/css";
-        styleSheet.innerText = keyframes;
-        document.head.appendChild(styleSheet);
-    }
-    // Tab underline animation
-    function moveUnderline(activeTab) {
-        const underline = document.getElementById('tab-underline');
-        if (activeTab === 'login') {
-            underline.style.left = '0';
-        } else {
-            underline.style.left = '50%';
+    document.addEventListener('DOMContentLoaded', function() {
+        let bg = document.getElementById('bg-anim');
+        if (!bg) {
+            bg = document.createElement('div');
+            bg.id = 'bg-anim';
+            bg.style.position = 'fixed';
+            bg.style.top = '0';
+            bg.style.left = '0';
+            bg.style.width = '100vw';
+            bg.style.height = '100vh';
+            bg.style.zIndex = '-1';
+            bg.style.pointerEvents = 'none';
+            document.body.appendChild(bg);
         }
-    }
+        for(let i=0;i<30;i++){
+            let d=document.createElement('div');
+            let size=Math.random()*18+8;
+            let left=Math.random()*100;
+            let delay=Math.random()*-20; // random negative delay for continuous effect
+            d.style.cssText=`position:absolute;border-radius:50%;background:radial-gradient(circle,#ff0000 60%,#fff0 100%);opacity:0.18;left:${left}vw;bottom:-${size}px;width:${size}px;height:${size}px;animation:floatParticleEnhanced 30s linear infinite;animation-delay:${delay}s;`;
+            bg.appendChild(d);
+        }
+    });
     // Tab switching with stylish animation
     function switchForm(showLogin) {
         const loginForm = $('#loginForm');
@@ -175,15 +233,13 @@
         }
     }
     $('#loginTab').click(function(){
-        $(this).css({'color':'#ff0000'});
-        $('#registerTab').css({'color':'#fff'});
-        moveUnderline('login');
+        $(this).removeClass('inactive').addClass('active');
+        $('#registerTab').removeClass('active').addClass('inactive');
         switchForm(true);
     });
     $('#registerTab').click(function(){
-        $(this).css({'color':'#ff0000'});
-        $('#loginTab').css({'color':'#fff'});
-        moveUnderline('register');
+        $(this).removeClass('inactive').addClass('active');
+        $('#loginTab').removeClass('active').addClass('inactive');
         switchForm(false);
     });
     $('#switchToRegister').click(function(){ $('#registerTab').click(); });
@@ -194,7 +250,7 @@
         $(this).css({'border-color':'#ff0000','box-shadow':'0 0 8px #ff0000'});
     }).on('blur',function(){
         if(!$(this).val()) $(this).next('label').css({'top':'16px','font-size':'1rem','color':'#aaa','background':'transparent','padding':'0 4px'});
-        $(this).css({'border-color':'#ff0000','box-shadow':'0 0 0 0 #ff0000'});
+        $(this).css({'border-color':'rgba(255,255,255,0.2)','box-shadow':'0 0 0 0 #ff0000'});
     });
     // Button animation
     $('button[type=submit]').on('mousedown',function(){
@@ -207,8 +263,6 @@
         function(){ $(this).css({'box-shadow':'0 0 8px #ff0000'}); },
         function(){ if(!$(this).is(':focus')) $(this).css({'box-shadow':'0 0 0 0 #ff0000'}); }
     );
-    // Tab underline initial position
-    moveUnderline('login');
     $('#backBtn').hover(
         function(){
             $(this).css({'background':'#ff0000','color':'#fff','box-shadow':'0 0 16px #ff0000'});
@@ -287,4 +341,4 @@
     });
     </script>
 </body>
-</html> 
+</html>
