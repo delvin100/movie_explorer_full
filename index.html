@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/index_styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Metflix - Movie Explorer</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">Metflix</div>
+        <div class="nav-links">
+            <span><i>"The name's Pool... Deadpool..."</i></span>
+        </div>
+        <div class="logo">
+            <img id="adminLogo" src="images/logo.png" alt="Metflix Logo" style="height:65px;">
+        </div>
+    </div>
+    
+    <div class="container">
+        <h1 class="title">METFLIX</h1>
+        <div class="image-wrapper">
+            <img id="image" src="images/deadpool1.png" alt="Deadpool" data-hover="images/deadpool2.png">
+        </div>
+    </div>
+
+    <div class="contact-bar">
+        <a href="https://github.com/delvin100" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+        <a href="https://www.linkedin.com/in/delvin-varghese-1811342b8?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        <a href="https://www.instagram.com/_delvin_varghese_?utm_source=qr&igsh=bXBseTk0dGF1aHpr" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="/cdn-cgi/l/email-protection#25510009130c0b130417020d0016005755575d255806044b040f06004b0c0b" title="Email Us"><i class="fas fa-envelope"></i></a>
+    </div>
+
+    <div class="fixed-buttons">
+        <button class="btn btn-red" id="getStartedBtn">Get Started</button>
+        <button class="btn btn-white" id="aboutBtn">About</button>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal" id="aboutModal">
+        <div class="modal-content">
+            <h2>About Metflix</h2>
+            <p>Welcome to <span class="highlight">Metflix</span>—a cutting-edge microproject crafted to redefine movie discovery! Designed as an intelligent movie companion, Metflix merges creativity, technical prowess, and user-centric design to deliver a seamless and exhilarating cinematic experience tailored for movie enthusiasts.</p>
+            <p><strong>Purpose & Vision:</strong> Metflix is my showcase of modern web development skills and API integration mastery. It's not just a tool—it's a bold proof of concept that reimagines how users explore and engage with movies, bridging the gap between technology and entertainment with flair.</p>
+            <p><strong>Powered By:</strong></p>
+            <div class="tech-stack">
+                <div class="tech-item">HTML5/CSS3/JS</div>
+                <div class="tech-item">TMDB API</div>
+                <div class="tech-item">YouTube API</div>
+                <div class="tech-item">Telegram API</div>
+            </div>
+            <p><strong>Standout Features:</strong><br>
+                ⭐ <em>Smart Search:</em> Instantly find films by title, genre, actor, or even mood—powered by intuitive algorithms.<br>
+                ⭐ <em>Movie Insights:</em> Dive into detailed ratings, summaries, cast info, and reviews, all in one sleek interface.<br>
+                ⭐ <em>Trailer Integration:</em> Watch high-quality previews seamlessly via YouTube API without leaving the app.<br>
+                ⭐ <em>Interactive UI:</em> Enjoy dynamic image swaps and a responsive design optimized for all devices.</p>
+            <p><strong>Development Journey:</strong> Creating Metflix was a thrilling challenge! I tackled API rate limits, optimized data fetching for speed, and ensured cross-browser compatibility—all while maintaining a visually stunning black-and-red theme inspired by cinematic vibes. The result? A robust, efficient app that's as fun to use as it was to build.</p>
+            <p><strong>Unique Edge:</strong> Unlike generic movie sites, Metflix integrates Telegram API for real-time user feedback and notifications—a feature I pioneered to enhance interactivity. This microproject also leverages asynchronous JavaScript for smooth performance, showcasing my ability to handle complex logic under tight deadlines.</p>
+            <p><strong>Impact & Future Potential:</strong> Metflix isn't just for today—it's a foundation for tomorrow. With plans to add AI-driven recommendations and a personalized watchlist, it could evolve into a full-fledged movie platform. For now, it's a testament to what's possible with passion and code.</p>
+            <p>Developed by <span class="highlight">Delvin Varghese</span>, Metflix reflects my dedication to technical excellence, creative problem-solving, and delivering user delight.</p>
+            <button class="close-btn" id="closeBtn">Close</button>
+        </div>
+    </div>
+
+    <!-- Admin Modal -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content">
+            <h2>Admin Panel</h2>
+            <i class="fas fa-times admin-close-icon" id="adminCloseIcon"></i>
+            <div id="adminLogin" class="admin-login">
+                <input type="password" id="adminPassword" placeholder="Enter Admin Password">
+                <button id="submitAdminPassword">Login</button>
+            </div>
+            <div id="adminContent" class="admin-content" style="display: none;">
+                <h3>User Requests</h3>
+                <div id="requestList"></div>
+                <button class="close-btn" id="closeAdminBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Get Started Button
+            $('#getStartedBtn').click(function() {
+                window.location.href = 'login.html';
+            });
+
+            // About Modal
+            $('#aboutBtn').click(function() {
+                $('#aboutModal').addClass('active').fadeIn(300);
+            });
+
+            $('#closeBtn').click(function() {
+                $('#aboutModal').fadeOut(300, function() {
+                    $(this).removeClass('active');
+                });
+            });
+
+            $(window).click(function(event) {
+                if (event.target === $('#aboutModal')[0]) {
+                    $('#aboutModal').fadeOut(300, function() {
+                        $(this).removeClass('active');
+                    });
+                }
+            });
+
+            // Image Hover
+            const $image = $('#image');
+            const defaultImage = $image.attr('src');
+            const hoverImage = $image.data('hover');
+
+            $image.hover(
+                function() { $(this).attr('src', hoverImage || 'images/deadpool2.png'); },
+                function() { $(this).attr('src', defaultImage || 'images/deadpool1.png'); }
+            );
+
+            $.get(defaultImage).fail(() => console.error('Default image not found:', defaultImage));
+            $.get(hoverImage).fail(() => console.error('Hover image not found:', hoverImage));
+
+            // Admin Panel Logic
+            const $adminModal = $('#adminModal');
+            const $adminPasswordInput = $('#adminPassword');
+            const $adminLogin = $('#adminLogin');
+            const $adminContent = $('#adminContent');
+            const $requestList = $('#requestList');
+            const $adminCloseIcon = $('#adminCloseIcon');
+            const ADMIN_PASSWORD = 'admin123';
+
+            // Function to reset modal state
+            function resetAdminModal() {
+                $adminModal.fadeOut(300, function() {
+                    $(this).removeClass('active');
+                    $adminContent.hide();
+                    $adminLogin.show();
+                    $adminCloseIcon.show();
+                });
+            }
+
+            $('#adminLogo').dblclick(function() {
+                $adminModal.addClass('active').fadeIn(300);
+                $adminPasswordInput.focus();
+                $adminCloseIcon.show();
+            });
+
+            $('#submitAdminPassword').click(function() {
+                const enteredPassword = $adminPasswordInput.val().trim();
+                $.ajax({
+                    url: '/admin-login',
+                    method: 'POST',
+                    data: { password: enteredPassword },
+                    success: function(response) {
+                        if (enteredPassword === ADMIN_PASSWORD) {
+                            $adminLogin.hide();
+                            $adminContent.show();
+                            $adminCloseIcon.hide();
+                            displayUserRequests();
+                        } else {
+                            alert('Incorrect password!');
+                        }
+                    },
+                    error: function() {
+                        if (enteredPassword === ADMIN_PASSWORD) {
+                            $adminLogin.hide();
+                            $adminContent.show();
+                            $adminCloseIcon.hide();
+                            displayUserRequests();
+                        } else {
+                            alert('Incorrect password!');
+                        }
+                    }
+                });
+                $adminPasswordInput.val('');
+            });
+
+            $adminPasswordInput.keypress(function(event) {
+                if (event.key === 'Enter') {
+                    $('#submitAdminPassword').click();
+                }
+            });
+
+            // Close Admin Modal (Bottom Button)
+            $('#closeAdminBtn').click(function() {
+                resetAdminModal();
+            });
+
+            // Close Admin Modal (X Icon)
+            $adminCloseIcon.click(function() {
+                resetAdminModal();
+            });
+
+            $(window).click(function(event) {
+                if (event.target === $adminModal[0]) {
+                    resetAdminModal();
+                }
+            });
+
+            // Utility function to format timestamp
+            function formatTimestamp(timestamp) {
+                const date = new Date(timestamp);
+                return date.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+            }
+
+            // Display user requests
+            function displayUserRequests() {
+                const requests = JSON.parse(localStorage.getItem('userRequests') || '[]');
+                $requestList.empty();
+                if (requests.length === 0) {
+                    $requestList.html('<p>No user requests found.</p>');
+                } else {
+                    requests.forEach((req, index) => {
+                        const formattedTimestamp = req.timestamp ? formatTimestamp(req.timestamp) : 'Unknown';
+                        $requestList.append(`
+                            <div class="request-item">
+                                <p><strong>Request #${index + 1}</strong></p>
+                                <p>Name: ${req.name || 'N/A'}</p>
+                                <p>Email: ${req.email || 'N/A'}</p>
+                                <p>Phone: ${req.phone || 'N/A'}</p>
+                                <p>Movie: ${req.movie || 'N/A'}</p>
+                                <p>Language: ${req.language || 'N/A'}</p>
+                                <p>Quality: ${req.quality || 'N/A'}</p>
+                                <p>Timestamp: ${formattedTimestamp}</p>
+                                <button class="complete-btn" data-index="${index}">✔ Complete</button>
+                            </div>
+                        `);
+                    });
+
+                    $('.complete-btn').click(function() {
+                        const index = $(this).data('index');
+                        let requests = JSON.parse(localStorage.getItem('userRequests') || '[]');
+                        requests.splice(index, 1);
+                        localStorage.setItem('userRequests', JSON.stringify(requests));
+                        displayUserRequests();
+                    });
+                }
+            }
+
+            // Example function to add a request (for testing)
+            function addSampleRequest() {
+                const sampleRequest = {
+                    name: "John Doe",
+                    email: "john@example.com",
+                    phone: "123-456-7890",
+                    movie: "Deadpool",
+                    language: "English",
+                    quality: "1080p",
+                    timestamp: Date.now()
+                };
+                const requests = JSON.parse(localStorage.getItem('userRequests') || '[]');
+                requests.push(sampleRequest);
+                localStorage.setItem('userRequests', JSON.stringify(requests));
+            }
+
+            // Uncomment to add a sample request for testing
+            // addSampleRequest();
+        });
+    </script>
+</body>
+</html>

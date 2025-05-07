@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metflix - Login/Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body style="margin:0; padding:0; min-height:100vh; background:linear-gradient(135deg, #18181a 0%, #232325 100%); overflow:hidden; font-family:'Segoe UI',Arial,sans-serif;">
+    <!-- Animated Background -->
+    <div id="bg-anim" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></div>
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;">
+        <!-- Logo/Icon -->
+        <div style="text-align:center;margin-bottom:18px;">
+            <img src="images/logo_circle.png" alt="Metflix Logo" style="height:60px;width:60px;border-radius:50%;box-shadow:0 0 24px #ff0000,0 0 8px #fff;object-fit:cover;">
+        </div>
+        <div style="text-align:center;margin-bottom:18px;">
+            <span style="font-size:2.5rem;font-weight:bold;color:#fff;text-shadow:0 0 20px #ff0000,0 0 40px #fff;letter-spacing:2px;">METFLIX</span>
+            <div style="margin-top:8px;color:#ff0000;font-size:1.15rem;font-style:italic;letter-spacing:1px;">Your Perfect Movie Explorer</div>
+        </div>
+        <div id="form-container" style="background:rgba(30,30,32,0.92);backdrop-filter:blur(14px);border-radius:28px;box-shadow:0 8px 32px 0 rgba(31,38,135,0.37),0 0 24px 4px #ff0000,0 0 0 1.5px #fff2;max-width:390px;width:100%;padding:44px 36px 36px 36px;position:relative;transition:box-shadow 0.3s,transform 0.4s;overflow:hidden;">
+            <!-- Tab Switcher with Animated Underline -->
+            <div style="display:flex;justify-content:center;margin-bottom:32px;position:relative;">
+                <button id="loginTab" class="tab-btn" style="background:none;color:#fff;border:none;padding:12px 36px 12px 36px;border-radius:20px 0 0 20px;font-size:1.13rem;cursor:pointer;outline:none;position:relative;z-index:2;font-weight:600;transition:color 0.3s;">Login</button>
+                <button id="registerTab" class="tab-btn" style="background:none;color:#fff;border:none;padding:12px 36px 12px 36px;border-radius:0 20px 20px 0;font-size:1.13rem;cursor:pointer;outline:none;position:relative;z-index:2;font-weight:600;transition:color 0.3s;">Register</button>
+                <span id="tab-underline" style="position:absolute;bottom:0;left:0;height:4px;width:50%;background:linear-gradient(90deg,#ff0000 60%,#fff 100%);border-radius:2px;box-shadow:0 0 12px #ff0000;transition:left 0.4s cubic-bezier(.77,0,.18,1),width 0.4s;z-index:1;"></span>
+            </div>
+            <!-- Login Form -->
+            <form id="loginForm" autocomplete="off" style="display:block;animation:fadeInRight 0.6s;">
+                <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
+                    <i class="fa fa-user" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
+                    <input type="text" placeholder=" " required style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Username</label>
+                </div>
+                <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
+                    <i class="fa fa-lock" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
+                    <input type="password" placeholder=" " required style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Password</label>
+                </div>
+                <button type="submit" style="width:100%;padding:13px 0;background:linear-gradient(90deg,#ff0000 60%,#fff 100%);color:#18181a;font-weight:bold;font-size:1.13rem;border:none;border-radius:12px;box-shadow:0 0 16px #ff0000;cursor:pointer;transition:transform 0.2s,box-shadow 0.3s;letter-spacing:1px;">Login <i class="fa fa-arrow-right"></i></button>
+                <div style="margin-top:20px;text-align:center;color:#fff;font-size:1rem;">
+                    Don't have an account? <span id="switchToRegister" style="color:#ff0000;cursor:pointer;text-decoration:underline;">Register</span>
+                </div>
+            </form>
+            <!-- Register Form -->
+            <form id="registerForm" autocomplete="off" style="display:none;animation:fadeInLeft 0.6s;">
+                <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
+                    <i class="fa fa-user-plus" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
+                    <input type="text" placeholder=" " required style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Username</label>
+                </div>
+                <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
+                    <i class="fa fa-envelope" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
+                    <input type="email" placeholder=" " required style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Email</label>
+                </div>
+                <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
+                    <i class="fa fa-lock" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
+                    <input type="password" placeholder=" " required style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Password</label>
+                </div>
+                <button type="submit" style="width:100%;padding:13px 0;background:linear-gradient(90deg,#ff0000 60%,#fff 100%);color:#18181a;font-weight:bold;font-size:1.13rem;border:none;border-radius:12px;box-shadow:0 0 16px #ff0000;cursor:pointer;transition:transform 0.2s,box-shadow 0.3s;letter-spacing:1px;">Register <i class="fa fa-user-plus"></i></button>
+                <div style="margin-top:20px;text-align:center;color:#fff;font-size:1rem;">
+                    Already have an account? <span id="switchToLogin" style="color:#ff0000;cursor:pointer;text-decoration:underline;">Login</span>
+                </div>
+            </form>
+            <!-- Add Back Button -->
+            <div style="margin-top:28px;text-align:center;">
+                <button id="backBtn" onclick="window.location.href='index.html'" style="padding:10px 32px;background:rgba(30,30,32,0.92);border:2px solid #ff0000;color:#ff0000;font-weight:600;font-size:1.08rem;border-radius:24px;box-shadow:0 0 8px #ff0000;cursor:pointer;transition:background 0.2s, color 0.2s, box-shadow 0.2s;outline:none;display:inline-flex;align-items:center;gap:8px;">
+                    <i class='fa fa-arrow-left'></i> Back
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+    // Animated background (floating red dots)
+    const bg = document.getElementById('bg-anim');
+    for(let i=0;i<30;i++){
+        let d=document.createElement('div');
+        let size=Math.random()*18+8;
+        d.style.cssText=`position:absolute;border-radius:50%;background:radial-gradient(circle,#ff0000 60%,#fff0 100%);opacity:0.18;left:${Math.random()*100}vw;top:${Math.random()*100}vh;width:${size}px;height:${size}px;animation:float${i} 12s linear infinite;`;
+        bg.appendChild(d);
+        let keyframes = `@keyframes float${i}{0%{transform:translateY(0);}100%{transform:translateY(-${Math.random()*60+40}px);}}`;
+        let styleSheet = document.createElement("style");
+        styleSheet.type = "text/css";
+        styleSheet.innerText = keyframes;
+        document.head.appendChild(styleSheet);
+    }
+    // Tab underline animation
+    function moveUnderline(activeTab) {
+        const underline = document.getElementById('tab-underline');
+        if (activeTab === 'login') {
+            underline.style.left = '0';
+        } else {
+            underline.style.left = '50%';
+        }
+    }
+    // Tab switching with stylish animation
+    function switchForm(showLogin) {
+        const loginForm = $('#loginForm');
+        const registerForm = $('#registerForm');
+        if (showLogin) {
+            registerForm.fadeOut(200, function() {
+                loginForm.css({display:'block',opacity:0,transform:'translateX(60px)'}).animate({opacity:1}, 350).css('transform','translateX(0)');
+            });
+        } else {
+            loginForm.fadeOut(200, function() {
+                registerForm.css({display:'block',opacity:0,transform:'translateX(-60px)'}).animate({opacity:1}, 350).css('transform','translateX(0)');
+            });
+        }
+    }
+    $('#loginTab').click(function(){
+        $(this).css({'color':'#ff0000'});
+        $('#registerTab').css({'color':'#fff'});
+        moveUnderline('login');
+        switchForm(true);
+    });
+    $('#registerTab').click(function(){
+        $(this).css({'color':'#ff0000'});
+        $('#loginTab').css({'color':'#fff'});
+        moveUnderline('register');
+        switchForm(false);
+    });
+    $('#switchToRegister').click(function(){ $('#registerTab').click(); });
+    $('#switchToLogin').click(function(){ $('#loginTab').click(); });
+    // Floating label effect
+    $('input').on('focus input',function(){
+        $(this).next('label').css({'top':'2px','font-size':'0.6rem','color':'#ff0000','background':'#232325','padding':'0 4px'});
+        $(this).css({'border-color':'#ff0000','box-shadow':'0 0 8px #ff0000'});
+    }).on('blur',function(){
+        if(!$(this).val()) $(this).next('label').css({'top':'16px','font-size':'1rem','color':'#aaa','background':'transparent','padding':'0 4px'});
+        $(this).css({'border-color':'#ff0000','box-shadow':'0 0 0 0 #ff0000'});
+    });
+    // Button animation
+    $('button[type=submit]').on('mousedown',function(){
+        $(this).css('transform','scale(0.97)');
+    }).on('mouseup mouseleave',function(){
+        $(this).css('transform','scale(1)');
+    });
+    // Input hover effect
+    $('input').hover(
+        function(){ $(this).css({'box-shadow':'0 0 8px #ff0000'}); },
+        function(){ if(!$(this).is(':focus')) $(this).css({'box-shadow':'0 0 0 0 #ff0000'}); }
+    );
+    // Tab underline initial position
+    moveUnderline('login');
+    $('#backBtn').hover(
+        function(){
+            $(this).css({'background':'#ff0000','color':'#fff','box-shadow':'0 0 16px #ff0000'});
+        },
+        function(){
+            $(this).css({'background':'rgba(30,30,32,0.92)','color':'#ff0000','box-shadow':'0 0 8px #ff0000'});
+        }
+    );
+    // Helper to ensure message is always centered
+    function showMsg(form, id, text, color) {
+        let wrapper = form.find('#msgWrapper');
+        if (!wrapper.length) {
+            wrapper = $('<div id="msgWrapper" style="width:100%;display:flex;justify-content:center;align-items:center;"></div>');
+            form.append(wrapper);
+        }
+        let msgBox = wrapper.find('#' + id);
+        if (!msgBox.length) {
+            msgBox = $('<div id="' + id + '" style="display:inline-block;text-align:center;margin-top:14px;font-size:1rem;font-weight:500;letter-spacing:0.5px;"></div>');
+            wrapper.append(msgBox);
+        }
+        msgBox.text(text).css('color', color);
+    }
+    // Backend integration for Register
+    $('#registerForm').submit(async function(e) {
+        e.preventDefault();
+        const username = $(this).find('input[type=text]').val().trim();
+        const email = $(this).find('input[type=email]').val().trim();
+        const password = $(this).find('input[type=password]').val().trim();
+        const btn = $(this).find('button[type=submit]');
+        btn.prop('disabled', true).html("<i class='fa fa-spinner fa-spin'></i> Registering...");
+        showMsg($(this), 'registerMsg', 'Please wait...', '#ff0000');
+        try {
+            const res = await fetch('http://localhost:5000/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showMsg($(this), 'registerMsg', data.message, '#0f0');
+                setTimeout(()=>{ $('#loginTab').click(); }, 1200);
+            } else {
+                showMsg($(this), 'registerMsg', data.message || 'Registration failed.', '#ff0000');
+            }
+        } catch {
+            showMsg($(this), 'registerMsg', 'Server error.', '#ff0000');
+        }
+        btn.prop('disabled', false).html("Register <i class='fa fa-user-plus'></i>");
+    });
+    // Backend integration for Login
+    $('#loginForm').submit(async function(e) {
+        e.preventDefault();
+        const username = $(this).find('input[type=text]').val().trim();
+        const password = $(this).find('input[type=password]').val().trim();
+        const btn = $(this).find('button[type=submit]');
+        btn.prop('disabled', true).html("<i class='fa fa-spinner fa-spin'></i> Logging in...");
+        showMsg($(this), 'loginMsg', 'Please wait...', '#ff0000');
+        try {
+            const res = await fetch('http://localhost:5000/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showMsg($(this), 'loginMsg', data.message, '#0f0');
+                localStorage.setItem('metflix_jwt', data.token);
+                setTimeout(()=>{ window.location.href = 'movie.html'; }, 1200);
+            } else {
+                showMsg($(this), 'loginMsg', data.message || 'Login failed.', '#ff0000');
+            }
+        } catch {
+            showMsg($(this), 'loginMsg', 'Server error.', '#ff0000');
+        }
+        btn.prop('disabled', false).html("Login <i class='fa fa-arrow-right'></i>");
+    });
+    </script>
+</body>
+</html> 

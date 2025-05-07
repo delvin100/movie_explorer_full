@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/movie_styles.css">
+    <title>Metflix - Movie Explorer</title>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">Metflix</div>
+        <div class="nav-links">
+            <span>WELCOME TO METFLIX</span>
+        </div>
+        <div class="logo">
+            <img src="images/logo.png" alt="Metflix Logo" style="height:65px;">
+        </div>
+    </div>
+
+    <form id="form" class="search-form">
+        <input type="text" id="search" placeholder="Search for movies...">
+        <button type="submit">Search</button>
+    </form>
+
+    <main class="home-main">
+        <p>Discover the latest and most popular movies effortlessly. Start searching above!</p>
+        <div class="language-buttons">
+            <button class="language-button" onclick="scrollToSection('malayalamSection')">Malayalam</button>
+            <button class="language-button" onclick="scrollToSection('tamilSection')">Tamil</button>
+            <button class="language-button" onclick="scrollToSection('hindiSection')">Hindi</button>
+            <button class="language-button" onclick="scrollToSection('englishSection')">English</button>
+        </div>
+        <!-- Search Results Section -->
+        <div id="main"></div>
+        <!-- Watchlist Section -->
+        <div id="watchlistSection" class="watchlist-section"></div>
+        <!-- Trending Movies Section (Centered on Page) -->
+        <div id="trendingSection">
+            <div id="spinner" class="spinner"></div>
+            <div id="trendingMovies"></div>
+        </div>
+        <!-- Language Sections with Genre Buttons Under Titles -->
+        <div class="language-section" id="malayalamSection">
+            <h2 class="language-heading">Malayalam Movies</h2>
+            <div id="malayalamGenres"></div>
+            <div class="featured-grid" id="malayalamMovies"></div>
+        </div>
+        <div class="language-section" id="tamilSection">
+            <h2 class="language-heading">Tamil Movies</h2>
+            <div id="tamilGenres"></div>
+            <div class="featured-grid" id="tamilMovies"></div>
+        </div>
+        <div class="language-section" id="hindiSection">
+            <h2 class="language-heading">Hindi Movies</h2>
+            <div id="hindiGenres"></div>
+            <div class="featured-grid" id="hindiMovies"></div>
+        </div>
+        <div class="language-section" id="englishSection">
+            <h2 class="language-heading">English Movies</h2>
+            <div id="englishGenres"></div>
+            <div class="featured-grid" id="englishMovies"></div>
+        </div>
+    </main>
+
+    <div class="fixed-buttons">
+        <button id="helpButton" class="help-button">
+            <img src="images/help.png" alt="Help" class="help-icon"> Help
+        </button>
+        <button id="goToTopBtn" class="nav-button">
+            <img src="https://cer.iitk.ac.in/olt_img/top.png" alt="Go to Top">
+        </button>
+    </div>
+    <button id="goToHomeBtn" class="logo-button">
+        <img src="https://cdn3.iconfinder.com/data/icons/basic-ui-5/48/home-512.png" alt="Go to Home">
+    </button>
+
+    <script src="script.js"></script>
+    <script>
+        // Function to smoothly scroll to a section
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/form_styles.css">
+    <title>Metflix - Movie Experience</title>
+    <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+    <h1>Metflix - Movie Experience</h1>
+    <div id="mediaSection">
+        <div class="video-container" id="trailerContainer">
+            <div class="media-label">Trailer</div>
+            <iframe id="trailerFrame" class="video-frame" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+        <div class="video-container" id="movieContainer">
+            <div class="media-label">Full Movie</div>
+            <iframe id="movieFrame" class="video-frame" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+    </div>
+    <div id="songsSection">
+        <h2>Songs from <span id="movieTitle">Your Movie</span></h2>
+        <div class="spinner" id="songsSpinner"></div>
+        <div id="songsContainer"></div>
+    </div>
+    <div id="message">
+        If you can't find the movie here, fill out the form below, and I'll provide the movie link to your email soon!
+    </div>
+    <form id="userForm">
+        <label for="name" data-tooltip="Enter your full name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <span class="error" id="nameError">Name should contain only letters and spaces.</span>
+        
+        <label for="email" data-tooltip="Enter a valid email address">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <span class="error" id="emailError">Please enter a valid email address.</span>
+        
+        <label for="phone" data-tooltip="Enter a 10-digit phone number">Phone:</label>
+        <input type="tel" id="phone" name="phone" required maxlength="10">
+        <span class="error" id="phoneError">Phone must be 10 digits (0-9 only).</span>
+        
+        <label for="movieName" data-tooltip="Your selected movie (read-only)">Selected Movie:</label>
+        <input type="text" id="movieName" name="movieName" readonly required>
+
+        <label for="language" data-tooltip="Select preferred language">Preferred Language:</label>
+        <select id="language" name="language" required>
+            <option value="" disabled selected>Select a language</option>
+            <option value="Malayalam">Malayalam</option>
+            <option value="Tamil">Tamil</option>
+            <option value="Hindi">Hindi</option>
+            <option value="English">English</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <label for="customLanguage" data-tooltip="Enter any other language if not listed">Other Language (Optional):</label>
+        <input type="text" id="customLanguage" name="customLanguage" placeholder="Enter custom language">
+        <p class="note">Note: Only available audio will be provided.</p>
+
+        <label for="quality" data-tooltip="Select preferred video quality">Preferred Quality:</label>
+        <select id="quality" name="quality" required>
+            <option value="" disabled selected>Select quality</option>
+            <option value="144p">144p</option>
+            <option value="240p">240p</option>
+            <option value="360p">360p</option>
+            <option value="480p">480p</option>
+            <option value="720p">720p</option>
+            <option value="1080p">1080p</option>
+        </select>
+
+        <button type="submit">Submit</button>
+    </form>
+    <button id="goBackButton">Go Back</button>
+
+    <script>
+        const BOT_TOKEN = "7635804333:AAG3bze_1AOGFsP2ytpw8439Cl6p4XI5XWk";
+        const CHAT_ID = "5379038515";
+        const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+        const YOUTUBE_API_KEY = 'AIzaSyABfEbxuYNeBPGsGgc-S9NDZfYH_1xhNM4';
+        const YOUTUBE_SEARCH_API = 'https://www.googleapis.com/youtube/v3/search';
+
+        let players = {};
+        let songPlayers = [];
+
+        function isValidName(name) { return /^[A-Za-z\s]+$/.test(name); }
+        function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+        function isValidPhone(phone) { return /^[0-9]{10}$/.test(phone); }
+
+        function getSelectedLanguage() {
+            const language = document.getElementById("language").value;
+            const customLanguage = document.getElementById("customLanguage").value.trim();
+            return customLanguage || language || "Malayalam";
+        }
+
+        function onYouTubeIframeAPIReady() {
+            players['trailerFrame'] = new YT.Player('trailerFrame', {
+                events: { 'onStateChange': onPlayerStateChange }
+            });
+            players['movieFrame'] = new YT.Player('movieFrame', {
+                events: { 'onStateChange': onPlayerStateChange }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                const currentPlayer = event.target;
+                Object.keys(players).forEach(playerId => {
+                    if (players[playerId] !== currentPlayer && players[playerId].pauseVideo) {
+                        players[playerId].pauseVideo();
+                    }
+                });
+                songPlayers.forEach((player, index) => {
+                    if (player !== currentPlayer && player.pauseVideo) {
+                        player.pauseVideo();
+                    }
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const selectedMovie = localStorage.getItem('selectedMovie');
+            if (selectedMovie) {
+                document.getElementById("movieName").value = selectedMovie;
+                document.getElementById("movieTitle").textContent = selectedMovie;
+                loadMedia(selectedMovie);
+                loadSongs(selectedMovie);
+            }
+
+            document.getElementById('goBackButton').addEventListener('click', () => window.location.href = 'movie.html');
+            ['name', 'email', 'phone'].forEach(id => {
+                document.getElementById(id).addEventListener('input', validateField);
+            });
+        });
+
+        function validateField(e) {
+            const id = e.target.id;
+            const value = e.target.value.trim();
+            const errorEl = document.getElementById(`${id}Error`);
+            let isValid = false;
+            if (id === 'name') isValid = isValidName(value);
+            if (id === 'email') isValid = isValidEmail(value);
+            if (id === 'phone') isValid = isValidPhone(value);
+            errorEl.style.display = isValid || !value ? 'none' : 'block';
+            e.target.classList.toggle('invalid', !isValid && value);
+        }
+
+        async function loadMedia(movieTitle) {
+            if (!movieTitle) return;
+            const language = getSelectedLanguage();
+
+            try {
+                const trailerResponse = await fetch(`${YOUTUBE_SEARCH_API}?part=snippet&q=${encodeURIComponent(movieTitle + ' official trailer ' + language)}&type=video&maxResults=1&key=${YOUTUBE_API_KEY}`);
+                if (!trailerResponse.ok) throw new Error(`Failed to fetch trailer: ${trailerResponse.status}`);
+                const trailerData = await trailerResponse.json();
+                if (trailerData.items && trailerData.items.length > 0) {
+                    const videoId = trailerData.items[0].id.videoId;
+                    document.getElementById('trailerFrame').src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
+                } else {
+                    document.getElementById('trailerFrame').outerHTML = '<p style="color: #ffea80; margin: 0;">❌ Trailer not found</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching trailer:', error);
+                document.getElementById('trailerFrame').outerHTML = '<p style="color: #ffea80; margin: 0;">❌ Error loading trailer</p>';
+            }
+
+            try {
+                const movieResponse = await fetch(`${YOUTUBE_SEARCH_API}?part=snippet&q=${encodeURIComponent(movieTitle + ' full movie ' + language)}&type=video&maxResults=1&key=${YOUTUBE_API_KEY}`);
+                if (!movieResponse.ok) throw new Error(`Failed to fetch movie: ${movieResponse.status}`);
+                const movieData = await movieResponse.json();
+                if (movieData.items && movieData.items.length > 0) {
+                    const videoId = movieData.items[0].id.videoId;
+                    document.getElementById('movieFrame').src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
+                } else {
+                    document.getElementById('movieFrame').outerHTML = '<p style="color: #ffea80; margin: 0;">❌ Movie not found</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching movie:', error);
+                document.getElementById('movieFrame').outerHTML = '<p style="color: #ffea80; margin: 0;">❌ Error loading movie</p>';
+            }
+        }
+
+        async function loadSongs(movieTitle) {
+            if (!movieTitle) return;
+            const songsContainer = document.getElementById('songsContainer');
+            const spinner = document.getElementById('songsSpinner');
+            const language = getSelectedLanguage();
+            spinner.style.display = 'block';
+            songsContainer.innerHTML = '';
+            songPlayers = [];
+
+            try {
+                const response = await fetch(`${YOUTUBE_SEARCH_API}?part=snippet&q=${encodeURIComponent(movieTitle + ' songs ' + language)}&type=video&maxResults=5&key=${YOUTUBE_API_KEY}`);
+                if (!response.ok) throw new Error(`Failed to fetch songs: ${response.status}`);
+                const data = await response.json();
+                spinner.style.display = 'none';
+                if (data.items && data.items.length > 0) {
+                    data.items.forEach((item, index) => {
+                        const videoId = item.id.videoId;
+                        const title = item.snippet.title;
+                        const songEl = document.createElement('div');
+                        songEl.classList.add('song-item');
+                        const iframeId = `songFrame${index}`;
+                        songEl.innerHTML = `
+                            <iframe id="${iframeId}" class="song-frame" src="https://www.youtube.com/embed/${videoId}?enablejsapi=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                            <p class="song-title">${title}</p>
+                        `;
+                        songsContainer.appendChild(songEl);
+
+                        setTimeout(() => {
+                            const player = new YT.Player(iframeId, {
+                                events: { 'onStateChange': onPlayerStateChange }
+                            });
+                            songPlayers.push(player);
+                        }, 100);
+                    });
+                } else {
+                    songsContainer.innerHTML = '<p style="color: #ffea80;">❌ No songs found for this movie</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching songs:', error);
+                spinner.style.display = 'none';
+                songsContainer.innerHTML = '<p style="color: #ffea80;">❌ Error loading songs</p>';
+            }
+        }
+
+        document.getElementById("userForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            let name = document.getElementById("name").value.trim();
+            let email = document.getElementById("email").value.trim();
+            let phone = document.getElementById("phone").value.trim();
+            let movieName = document.getElementById("movieName").value;
+            let language = document.getElementById("language").value;
+            let customLanguage = document.getElementById("customLanguage").value.trim();
+            let quality = document.getElementById("quality").value;
+
+            if (!movieName) return showPopup("❌ Please select a movie before submitting.");
+            if (!isValidName(name)) return showPopup("❌ Name should contain only letters and spaces.");
+            if (!isValidEmail(email)) return showPopup("❌ Please enter a valid email address.");
+            if (!isValidPhone(phone)) return showPopup("❌ Phone number must be exactly 10 digits (0-9 only).");
+            if (!language) return showPopup("❌ Please select a preferred language.");
+            if (!quality) return showPopup("❌ Please select a preferred quality.");
+
+            let finalLanguage = customLanguage ? `${language} (Custom: ${customLanguage})` : language;
+            let message = `📌 New User Submission:\n👤 Name: ${name}\n📧 Email: ${email}\n📱 Phone: ${phone}\n🎬 Movie: ${movieName}\n🌐 Language: ${finalLanguage}\n📺 Quality: ${quality}`;
+            
+            // Store in localStorage for admin panel
+            let requests = JSON.parse(localStorage.getItem('userRequests') || '[]');
+            requests.push({
+                name,
+                email,
+                phone,
+                movie: movieName,
+                language: finalLanguage,
+                quality,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('userRequests', JSON.stringify(requests));
+
+            // Send to Telegram
+            fetch(TELEGRAM_API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: message }),
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.ok) {
+                        showSuccessPopup();
+                        const selectedMovie = localStorage.getItem('selectedMovie');
+                        document.getElementById("userForm").reset();
+                        document.getElementById("movieName").value = selectedMovie || '';
+                        document.getElementById("movieTitle").textContent = selectedMovie || 'Your Movie';
+                    } else showPopup("❌ Error in message sending.");
+                })
+                .catch((error) => {
+                    console.error("❌ Error:", error);
+                    showPopup("❌ There was an error. Please try again.");
+                });
+        });
+
+        function showPopup(message) {
+            const popup = document.createElement('div');
+            popup.classList.add('popup');
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <p>${message}</p>
+                    <button id="closePopupButton">Close</button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            popup.querySelector('#closePopupButton').addEventListener('click', () => popup.remove());
+        }
+
+        function showSuccessPopup() {
+            const popup = document.createElement('div');
+            popup.classList.add('popup');
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <p>✅ Form submitted successfully!<br>The movie link will be sent to your email shortly...<br>Thanks for using Metflix! 😊</p>
+                    <button id="feedbackButton">Feedback</button>
+                    <button id="closePopupButton">Close</button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            popup.querySelector('#feedbackButton').addEventListener('click', () => { popup.remove(); showFeedbackPopup(); });
+            popup.querySelector('#closePopupButton').addEventListener('click', () => {
+                popup.remove();
+                document.getElementById("movieName").value = localStorage.getItem('selectedMovie') || '';
+            });
+        }
+
+        function showFeedbackPopup() {
+            const popup = document.createElement('div');
+            popup.classList.add('popup');
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <h2>Feedback</h2>
+                    <textarea id="feedbackText" placeholder="Enter your feedback here..." rows="5" required></textarea>
+                    <button id="submitFeedbackButton">Submit Feedback</button>
+                    <button id="closePopupButton">Close</button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            popup.querySelector('#submitFeedbackButton').addEventListener('click', () => {
+                const feedbackText = document.getElementById('feedbackText').value.trim();
+                if (feedbackText) {
+                    const feedbackMessage = `📝 Feedback:\n${feedbackText}`;
+                    fetch(TELEGRAM_API_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ chat_id: CHAT_ID, text: feedbackMessage }),
+                    })
+                        .then((res) => res.json())
+                        .then((data) => {
+                            if (data.ok) {
+                                popup.remove();
+                                showFeedbackSuccessPopup();
+                            } else showPopup("❌ Error submitting feedback.");
+                        })
+                        .catch((error) => showPopup("❌ There was an error. Please try again."));
+                } else showPopup("❌ Please enter feedback before submitting.");
+            });
+            popup.querySelector('#closePopupButton').addEventListener('click', () => {
+                popup.remove();
+                document.getElementById("movieName").value = localStorage.getItem('selectedMovie') || '';
+            });
+        }
+
+        function showFeedbackSuccessPopup() {
+            const popup = document.createElement('div');
+            popup.classList.add('popup');
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <p>✅ Feedback submitted successfully!<br>Thank you! 😊</p>
+                    <button id="closePopupButton">Close</button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            popup.querySelector('#closePopupButton').addEventListener('click', () => {
+                popup.remove();
+                document.getElementById("movieName").value = localStorage.getItem('selectedMovie') || '';
+            });
+        }
+    </script>
+</body>
+</html>
