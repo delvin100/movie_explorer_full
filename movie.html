@@ -4,7 +4,343 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/movie_styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <title>Metflix - Movie Explorer</title>
+    <style>
+        /* Review Modal Styles */
+        .review-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .review-modal-content {
+            background: #1e1e20;
+            margin: 5% auto;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
+        }
+
+        .review-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .rating-input {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            color: #ff0000;
+        }
+
+        .rating-input i {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .rating-input i:hover {
+            transform: scale(1.2);
+        }
+
+        .review-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            border: 1px solid #ff0000;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            resize: vertical;
+        }
+
+        .review-submit {
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .review-submit:hover {
+            background: #cc0000;
+        }
+
+        .reviews-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .review-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .review-author {
+            font-weight: bold;
+            color: #ff0000;
+        }
+
+        .review-rating {
+            color: #ffd700;
+        }
+
+        .review-content {
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .review-date {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 0.5rem;
+        }
+
+        .close-review-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-review-modal:hover {
+            color: #ff0000;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 1.5rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #ff0000;
+        }
+
+        .review-btn {
+            background: #ffd700;
+            color: #000;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+
+        .review-btn:hover {
+            background: #ffed4a;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .profile-dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-right: 2rem;
+        }
+        .profile-avatar-navbar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ff0000;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255,0,0,0.15);
+            transition: box-shadow 0.2s;
+        }
+        .profile-avatar-navbar:hover {
+            box-shadow: 0 4px 16px rgba(255,0,0,0.25);
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: #232325;
+            min-width: 270px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+            z-index: 2000;
+            padding: 1.2rem 1rem;
+            animation: fadeIn 0.2s;
+        }
+        .profile-dropdown.open .dropdown-content {
+            display: block;
+        }
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .dropdown-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ff0000;
+        }
+        .dropdown-username {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+        .dropdown-email {
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+        .dropdown-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            color: #ffd700;
+            font-size: 1rem;
+        }
+        .dropdown-links a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 0.5rem 0;
+            border-radius: 6px;
+            transition: color 0.2s;
+            font-size: 1rem;
+            background: none !important;
+        }
+        .dropdown-links a:hover, .dropdown-links a:focus {
+            color: #ff0000 !important;
+            background: none !important;
+        }
+        .dropdown-links a:active {
+            color: #ff0000 !important;
+            background: none !important;
+        }
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: auto;
+            background: rgba(0,0,0,0.7);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #232325;
+            margin: auto;
+            padding: 2rem 2.5rem;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+            color: #fff;
+            position: relative;
+            animation: fadeIn 0.2s;
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            color: #ffd700;
+            font-weight: 500;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.6rem;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background: #18181a;
+            color: #fff;
+            font-size: 1rem;
+            transition: border 0.2s;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border: 1.5px solid #ff0000;
+            outline: none;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        .save-btn {
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .save-btn:hover {
+            background: #cc0000;
+        }
+        .cancel-btn {
+            background: #444;
+            color: #fff;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .cancel-btn:hover {
+            background: #222;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
     <div class="navbar">
@@ -12,8 +348,79 @@
         <div class="nav-links">
             <span>WELCOME TO METFLIX</span>
         </div>
-        <div class="logo">
-            <img src="images/logo.png" alt="Metflix Logo" style="height:65px;">
+        <div class="profile-dropdown" id="profileDropdown">
+            <img src="images/default-avatar.png" alt="Profile" class="profile-avatar-navbar" id="navbarAvatar">
+            <div class="dropdown-content" id="dropdownContent">
+                <div class="dropdown-header">
+                    <img src="images/default-avatar.png" alt="Profile" class="dropdown-avatar" id="dropdownAvatar">
+                    <div>
+                        <div class="dropdown-username" id="dropdownUsername">Username</div>
+                        <div class="dropdown-email" id="dropdownEmail">user@email.com</div>
+                    </div>
+                </div>
+                <div class="dropdown-stats">
+                    <div><span id="dropdownWatchlist">0</span> Watchlist</div>
+                    <div><span id="dropdownReviews">0</span> Reviews</div>
+                </div>
+                <div class="dropdown-links">
+                    <a href="profile.html"><i class="fas fa-user"></i> My Profile</a>
+                    <a href="#" id="editProfileDropdown"><i class="fas fa-edit"></i> Edit Profile</a>
+                    <a href="#" id="logoutDropdown"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <h2>Edit Profile</h2>
+            <form id="editProfileForm">
+                <div class="form-group">
+                    <label>Avatar</label>
+                    <img id="avatarPreview" src="images/default-avatar.png" alt="Avatar Preview" style="display:block;margin:1rem auto 0 auto;width:100px;height:100px;border-radius:50%;object-fit:cover;border:2px solid #ff0000;">
+                    <button type="button" id="randomAvatarBtn" class="save-btn" style="margin-top:0.5rem;">Random Movie Avatar</button>
+                </div>
+                <div class="form-group">
+                    <label for="editUsername">Username</label>
+                    <input type="text" id="editUsername" required minlength="3" maxlength="32">
+                </div>
+                <div class="form-group">
+                    <label for="editBio">Bio</label>
+                    <textarea id="editBio" maxlength="150"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editGenres">Favorite Genres (comma separated)</label>
+                    <input type="text" id="editGenres">
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="save-btn">Save</button>
+                    <button type="button" class="cancel-btn" id="cancelEditProfile">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="review-modal">
+        <div class="review-modal-content">
+            <button class="close-review-modal" onclick="closeReviewModal()">&times;</button>
+            <h2>Write a Review</h2>
+            <form id="reviewForm" class="review-form">
+                <div class="rating-input">
+                    <i class="fas fa-star" data-rating="1"></i>
+                    <i class="fas fa-star" data-rating="2"></i>
+                    <i class="fas fa-star" data-rating="3"></i>
+                    <i class="fas fa-star" data-rating="4"></i>
+                    <i class="fas fa-star" data-rating="5"></i>
+                </div>
+                <textarea id="reviewText" class="review-textarea" placeholder="Write your review here..." required></textarea>
+                <button type="submit" class="review-submit">Submit Review</button>
+            </form>
+            <div class="reviews-section">
+                <h3>Reviews</h3>
+                <div id="reviewsList"></div>
+            </div>
         </div>
     </div>
 
@@ -83,6 +490,296 @@
                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
+
+        // Review Modal Functions
+        let currentMovieId = null;
+        let currentMovieTitle = null;
+        let selectedRating = 0;
+        let userReview = null;
+
+        async function openReviewModal(movieId, title) {
+            currentMovieId = movieId;
+            currentMovieTitle = title;
+            document.getElementById('reviewModal').style.display = 'block';
+            document.getElementById('reviewText').value = '';
+            selectedRating = 0;
+            userReview = null;
+            updateRatingStars();
+            await fetchAndPrefillUserReview(movieId);
+            fetchReviews(movieId);
+        }
+
+        async function fetchAndPrefillUserReview(movieId) {
+            const token = localStorage.getItem('metflix_jwt');
+            if (!token) return;
+            try {
+                const res = await fetch(`http://localhost:5000/api/reviews/${movieId}`);
+                const reviews = await res.json();
+                const username = localStorage.getItem('metflix_username');
+                // Find the user's review
+                userReview = reviews.find(r => r.username === username);
+                if (userReview) {
+                    document.getElementById('reviewText').value = userReview.review;
+                    selectedRating = userReview.rating;
+                    updateRatingStars();
+                    document.querySelector('.review-submit').textContent = 'Edit Review';
+                } else {
+                    document.querySelector('.review-submit').textContent = 'Submit Review';
+                }
+            } catch (e) { console.error('Error pre-filling user review', e); }
+        }
+
+        function closeReviewModal() {
+            document.getElementById('reviewModal').style.display = 'none';
+        }
+
+        function updateRatingStars() {
+            const stars = document.querySelectorAll('.rating-input i');
+            stars.forEach(star => {
+                const rating = parseInt(star.dataset.rating);
+                star.style.color = rating <= selectedRating ? '#ffd700' : '#ff0000';
+            });
+        }
+
+        // Add click event listeners to stars
+        document.querySelectorAll('.rating-input i').forEach(star => {
+            star.addEventListener('click', () => {
+                selectedRating = parseInt(star.dataset.rating);
+                updateRatingStars();
+            });
+        });
+
+        // Handle review submission (edit or new)
+        document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('metflix_jwt');
+            if (!token) {
+                alert('Please login to submit a review');
+                window.location.href = 'login.html';
+                return;
+            }
+            const review = document.getElementById('reviewText').value;
+            if (!selectedRating) {
+                alert('Please select a rating');
+                return;
+            }
+            try {
+                let response;
+                if (userReview) {
+                    // Edit existing review
+                    response = await fetch(`http://localhost:5000/api/reviews/${currentMovieId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ rating: selectedRating, review })
+                    });
+                } else {
+                    // New review
+                    response = await fetch('http://localhost:5000/api/reviews', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            movieId: currentMovieId,
+                            title: currentMovieTitle,
+                            rating: selectedRating,
+                            review: review
+                        })
+                    });
+                }
+                if (response.ok) {
+                    alert(userReview ? 'Review updated successfully!' : 'Review submitted successfully!');
+                    closeReviewModal();
+                    fetchReviews(currentMovieId);
+                } else {
+                    const data = await response.json();
+                    alert(data.message || 'Failed to submit review');
+                }
+            } catch (error) {
+                console.error('Error submitting review:', error);
+                alert('Failed to submit review');
+            }
+        });
+
+        // Fetch reviews for a movie
+        async function fetchReviews(movieId) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/reviews/${movieId}`);
+                const reviews = await response.json();
+                
+                const reviewsList = document.getElementById('reviewsList');
+                reviewsList.innerHTML = '';
+
+                if (reviews.length === 0) {
+                    reviewsList.innerHTML = '<p>No reviews yet. Be the first to review!</p>';
+                    return;
+                }
+
+                reviews.forEach(review => {
+                    const date = new Date(review.createdAt).toLocaleDateString();
+                    reviewsList.innerHTML += `
+                        <div class="review-item">
+                            <div class="review-header">
+                                <span class="review-author">${review.username}</span>
+                                <span class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</span>
+                            </div>
+                            <p class="review-content">${review.review}</p>
+                            <div class="review-date">Posted on ${date}</div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error fetching reviews:', error);
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('reviewModal');
+            if (event.target === modal) {
+                closeReviewModal();
+            }
+        }
+
+        // --- Profile Dropdown Logic ---
+        const token = localStorage.getItem('metflix_jwt');
+        const profileDropdown = document.getElementById('profileDropdown');
+        const dropdownContent = document.getElementById('dropdownContent');
+        const navbarAvatar = document.getElementById('navbarAvatar');
+        const dropdownAvatar = document.getElementById('dropdownAvatar');
+        const dropdownUsername = document.getElementById('dropdownUsername');
+        document.getElementById('dropdownEmail').textContent = '';
+        const dropdownWatchlist = document.getElementById('dropdownWatchlist');
+        const dropdownReviews = document.getElementById('dropdownReviews');
+
+        // Helper: Fetch profile data
+        async function fetchProfileDropdown() {
+            if (!token) return;
+            try {
+                const res = await fetch('http://localhost:5000/api/profile', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                dropdownUsername.textContent = data.username;
+                document.getElementById('dropdownEmail').textContent = data.email;
+                navbarAvatar.src = data.profile.avatar || randomAvatarUrl(data.username);
+                dropdownAvatar.src = data.profile.avatar || randomAvatarUrl(data.username);
+                // Prefill edit modal
+                document.getElementById('editUsername').value = data.username;
+                document.getElementById('editBio').value = data.profile.bio || '';
+                document.getElementById('editGenres').value = (data.profile.favoriteGenres || []).join(', ');
+            } catch (e) { console.error('Profile fetch error', e); }
+        }
+
+        // Helper: Fetch stats
+        async function fetchStatsDropdown() {
+            if (!token) return;
+            try {
+                const [wRes, rRes] = await Promise.all([
+                    fetch('http://localhost:5000/api/watchlist', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('http://localhost:5000/api/user/reviews', { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                const wData = await wRes.json();
+                const rData = await rRes.json();
+                dropdownWatchlist.textContent = wData.length;
+                dropdownReviews.textContent = rData.length;
+            } catch (e) { console.error('Stats fetch error', e); }
+        }
+
+        // Dropdown open/close
+        navbarAvatar.onclick = () => {
+            profileDropdown.classList.toggle('open');
+        };
+        document.addEventListener('click', (e) => {
+            if (!profileDropdown.contains(e.target)) profileDropdown.classList.remove('open');
+        });
+
+        // --- Edit Profile Modal Logic ---
+        const editProfileModal = document.getElementById('editProfileModal');
+        const editProfileDropdown = document.getElementById('editProfileDropdown');
+        const cancelEditProfile = document.getElementById('cancelEditProfile');
+        const editProfileForm = document.getElementById('editProfileForm');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const randomAvatarBtn = document.getElementById('randomAvatarBtn');
+
+        let currentAvatarUrl = 'images/default-avatar.png';
+
+        editProfileDropdown.onclick = async (e) => {
+            e.preventDefault();
+            await fetchProfileDropdown(); // Ensure latest data
+            avatarPreview.src = navbarAvatar.src || currentAvatarUrl;
+            editProfileModal.classList.add('active');
+            profileDropdown.classList.remove('open');
+        };
+        cancelEditProfile.onclick = () => editProfileModal.classList.remove('active');
+        window.onclick = function(event) {
+            if (event.target === editProfileModal) editProfileModal.classList.remove('active');
+        };
+
+        // Random avatar
+        function randomAvatarUrl(seed) {
+            return `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(seed || 'movie')}`;
+        }
+        randomAvatarBtn.onclick = () => {
+            const randomSeed = 'movie' + Math.floor(Math.random()*10000);
+            const url = randomAvatarUrl(randomSeed);
+            avatarPreview.src = url;
+        };
+
+        // Save profile changes
+        editProfileForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('editUsername').value.trim();
+            const bio = document.getElementById('editBio').value.trim();
+            const genres = document.getElementById('editGenres').value.split(',').map(g => g.trim()).filter(Boolean);
+            let avatarUrl = avatarPreview.src;
+            try {
+                const res = await fetch('http://localhost:5000/api/profile', {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        bio,
+                        avatar: avatarUrl,
+                        favoriteGenres: genres,
+                        username
+                    })
+                });
+                if (res.ok) {
+                    editProfileModal.classList.remove('active');
+                    await fetchProfileDropdown();
+                    navbarAvatar.src = avatarUrl;
+                    dropdownAvatar.src = avatarUrl;
+                } else {
+                    alert('Failed to update profile');
+                }
+            } catch (err) {
+                alert('Error updating profile');
+            }
+        };
+
+        // --- Logout ---
+        document.getElementById('logoutDropdown').onclick = (e) => {
+            e.preventDefault();
+            localStorage.removeItem('metflix_jwt');
+            window.location.href = 'login.html';
+        };
+
+        // --- On Load ---
+        fetchProfileDropdown();
+        fetchStatsDropdown();
+
+        // --- Increase Avatar Size ---
+        document.querySelectorAll('.profile-avatar-navbar, .dropdown-avatar').forEach(el => {
+            el.style.width = '72px';
+            el.style.height = '72px';
+        });
     </script>
 </body>
 </html>

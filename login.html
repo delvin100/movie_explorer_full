@@ -6,6 +6,70 @@
     <title>Metflix - Login/Register</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 24px #ff0000, 0 0 8px #fff; }
+            50% { transform: scale(1.05); box-shadow: 0 0 32px #ff0000, 0 0 16px #fff; }
+            100% { transform: scale(1); box-shadow: 0 0 24px #ff0000, 0 0 8px #fff; }
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37), 0 0 24px 4px #ff0000, 0 0 0 1.5px #fff2; }
+            50% { box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37), 0 0 32px 8px #ff0000, 0 0 0 1.5px #fff2; }
+            100% { box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37), 0 0 24px 4px #ff0000, 0 0 0 1.5px #fff2; }
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .logo-img {
+            animation: pulse 3s infinite ease-in-out;
+        }
+        #form-container {
+            animation: glow 3s infinite ease-in-out;
+        }
+        .form-title {
+            animation: float 4s infinite ease-in-out;
+        }
+        .switch-link {
+            color: #ff0000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            position: relative;
+            padding: 2px 4px;
+        }
+        .switch-link:hover {
+            color: #fff;
+            text-shadow: 0 0 8px #ff0000;
+        }
+        .switch-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #ff0000;
+            transition: width 0.3s ease;
+        }
+        .switch-link:hover::after {
+            width: 100%;
+        }
+        .input-field {
+            transition: all 0.3s ease;
+        }
+        .input-field:hover {
+            transform: translateY(-2px);
+        }
+        .submit-btn {
+            transition: all 0.3s ease;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 0 24px #ff0000;
+        }
+    </style>
 </head>
 <body style="margin:0; padding:0; min-height:100vh; background:linear-gradient(135deg, #18181a 0%, #232325 100%); overflow:hidden; font-family:'Segoe UI',Arial,sans-serif;">
     <!-- Animated Background -->
@@ -13,10 +77,10 @@
     <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;">
         <!-- Logo/Icon -->
         <div style="text-align:center;margin-bottom:18px;">
-            <img src="images/logo_circle.png" alt="Metflix Logo" style="height:60px;width:60px;border-radius:50%;box-shadow:0 0 24px #ff0000,0 0 8px #fff;object-fit:cover;">
+            <img src="images/logo_circle.png" alt="Metflix Logo" class="logo-img" style="height:60px;width:60px;border-radius:50%;box-shadow:0 0 24px #ff0000,0 0 8px #fff;object-fit:cover;">
         </div>
         <div style="text-align:center;margin-bottom:18px;">
-            <span style="font-size:2.5rem;font-weight:bold;color:#fff;text-shadow:0 0 20px #ff0000,0 0 40px #fff;letter-spacing:2px;">METFLIX</span>
+            <span class="form-title" style="font-size:2.5rem;font-weight:bold;color:#fff;text-shadow:0 0 20px #ff0000,0 0 40px #fff;letter-spacing:2px;">METFLIX</span>
             <div style="margin-top:8px;color:#ff0000;font-size:1.15rem;font-style:italic;letter-spacing:1px;">Your Perfect Movie Explorer</div>
         </div>
         <div id="form-container" style="background:rgba(30,30,32,0.92);backdrop-filter:blur(14px);border-radius:28px;box-shadow:0 8px 32px 0 rgba(31,38,135,0.37),0 0 24px 4px #ff0000,0 0 0 1.5px #fff2;max-width:390px;width:100%;padding:44px 36px 36px 36px;position:relative;transition:box-shadow 0.3s,transform 0.4s;overflow:hidden;">
@@ -30,39 +94,39 @@
             <form id="loginForm" autocomplete="off" style="display:block;animation:fadeInRight 0.6s;">
                 <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
                     <i class="fa fa-user" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
-                    <input type="text" placeholder=" " required style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <input type="text" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
                     <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Username</label>
                 </div>
                 <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
                     <i class="fa fa-lock" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
-                    <input type="password" placeholder=" " required style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <input type="password" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
                     <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Password</label>
                 </div>
-                <button type="submit" style="width:100%;padding:13px 0;background:linear-gradient(90deg,#ff0000 60%,#fff 100%);color:#18181a;font-weight:bold;font-size:1.13rem;border:none;border-radius:12px;box-shadow:0 0 16px #ff0000;cursor:pointer;transition:transform 0.2s,box-shadow 0.3s;letter-spacing:1px;">Login <i class="fa fa-arrow-right"></i></button>
+                <button type="submit" class="submit-btn" style="width:100%;padding:13px 0;background:linear-gradient(90deg,#ff0000 60%,#fff 100%);color:#18181a;font-weight:bold;font-size:1.13rem;border:none;border-radius:12px;box-shadow:0 0 16px #ff0000;cursor:pointer;transition:transform 0.2s,box-shadow 0.3s;letter-spacing:1px;">Login <i class="fa fa-arrow-right"></i></button>
                 <div style="margin-top:20px;text-align:center;color:#fff;font-size:1rem;">
-                    Don't have an account? <span id="switchToRegister" style="color:#ff0000;cursor:pointer;text-decoration:underline;">Register</span>
+                    Don't have an account? <span id="switchToRegister" class="switch-link">Register</span>
                 </div>
             </form>
             <!-- Register Form -->
             <form id="registerForm" autocomplete="off" style="display:none;animation:fadeInLeft 0.6s;">
                 <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
                     <i class="fa fa-user-plus" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
-                    <input type="text" placeholder=" " required style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <input type="text" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
                     <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Username</label>
                 </div>
                 <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
                     <i class="fa fa-envelope" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
-                    <input type="email" placeholder=" " required style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <input type="email" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
                     <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Email</label>
                 </div>
                 <div style="margin-bottom:20px;position:relative;height:52px;display:flex;align-items:center;justify-content:center;">
                     <i class="fa fa-lock" style="position:absolute;left:24px;top:16px;color:#ff0000;font-size:1.1rem;"></i>
-                    <input type="password" placeholder=" " required style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
+                    <input type="password" placeholder=" " required class="input-field" style="width:100%;max-width:340px;padding:0 16px 0 48px;height:54px;line-height:54px;background:rgba(255,255,255,0.08);border:1.5px solid #ff0000;border-radius:12px;color:#fff;font-size:0.98rem;outline:none;transition:border 0.3s,box-shadow 0.3s;box-shadow:0 0 0 0 #ff0000;display:block;margin:0 auto;"/>
                     <label class="floating-label" style="position:absolute;left:44px;top:16px;color:#aaa;pointer-events:none;transition:all 0.22s cubic-bezier(.77,0,.18,1);font-size:1rem;background:transparent;padding:0 4px;">Password</label>
                 </div>
-                <button type="submit" style="width:100%;padding:13px 0;background:linear-gradient(90deg,#ff0000 60%,#fff 100%);color:#18181a;font-weight:bold;font-size:1.13rem;border:none;border-radius:12px;box-shadow:0 0 16px #ff0000;cursor:pointer;transition:transform 0.2s,box-shadow 0.3s;letter-spacing:1px;">Register <i class="fa fa-user-plus"></i></button>
+                <button type="submit" class="submit-btn" style="width:100%;padding:13px 0;background:linear-gradient(90deg,#ff0000 60%,#fff 100%);color:#18181a;font-weight:bold;font-size:1.13rem;border:none;border-radius:12px;box-shadow:0 0 16px #ff0000;cursor:pointer;transition:transform 0.2s,box-shadow 0.3s;letter-spacing:1px;">Register <i class="fa fa-user-plus"></i></button>
                 <div style="margin-top:20px;text-align:center;color:#fff;font-size:1rem;">
-                    Already have an account? <span id="switchToLogin" style="color:#ff0000;cursor:pointer;text-decoration:underline;">Login</span>
+                    Already have an account? <span id="switchToLogin" class="switch-link">Login</span>
                 </div>
             </form>
             <!-- Add Back Button -->

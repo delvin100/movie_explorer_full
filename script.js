@@ -294,6 +294,7 @@ function createMovieElement(movie) {
                 <p>${overview || 'No overview available.'}</p>
                 <div class="buttons">
                     <button class="add-to-watchlist-btn add-watchlist" data-id="${id}" data-title="${title}" data-poster="${posterUrl}" data-overview="${overview}">Add to Watchlist</button>
+                    <button class="review-btn" data-id="${id}" data-title="${title}">Review</button>
                     <button class="more-btn more" data-title="${title}" data-overview="${overview}">More</button>
                 </div>
             </div>
@@ -309,6 +310,11 @@ function createMovieElement(movie) {
     movieEl.querySelector('.add-watchlist').addEventListener('click', (e) => {
         e.stopPropagation();
         addToWatchlist(e);
+    });
+    movieEl.querySelector('.review-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const { id, title } = e.target.dataset;
+        openReviewModal(id, title);
     });
     movieEl.querySelector('.more').addEventListener('click', (e) => {
         e.stopPropagation();
@@ -351,6 +357,7 @@ function showWatchlist() {
                     <p>${item.overview || 'No overview available.'}</p>
                     <div class="buttons">
                         <button class="add-to-watchlist-btn remove-watchlist" data-id="${item.id}">Remove from Watchlist</button>
+                        <button class="review-btn" data-id="${item.id}" data-title="${item.title}">Review</button>
                         <button class="more-btn more" data-title="${item.title}" data-overview="${item.overview}">More</button>
                     </div>
                 </div>
@@ -367,6 +374,11 @@ function showWatchlist() {
             e.stopPropagation();
             removeFromWatchlist(item.id);
             showWatchlist();
+        });
+        movieEl.querySelector('.review-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const { id, title } = e.target.dataset;
+            openReviewModal(id, title);
         });
         movieEl.querySelector('.more').addEventListener('click', (e) => {
             e.stopPropagation();
@@ -404,6 +416,7 @@ function displayWatchlist() {
                     <p>${item.overview || 'No overview available.'}</p>
                     <div class="buttons">
                         <button class="add-to-watchlist-btn remove-watchlist" data-id="${item.id}">Remove from Watchlist</button>
+                        <button class="review-btn" data-id="${item.id}" data-title="${item.title}">Review</button>
                         <button class="more-btn more" data-title="${item.title}" data-overview="${item.overview}">More</button>
                     </div>
                 </div>
@@ -419,6 +432,11 @@ function displayWatchlist() {
         movieEl.querySelector('.remove-watchlist').addEventListener('click', (e) => {
             e.stopPropagation();
             removeFromWatchlist(item.id);
+        });
+        movieEl.querySelector('.review-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const { id, title } = e.target.dataset;
+            openReviewModal(id, title);
         });
         movieEl.querySelector('.more').addEventListener('click', (e) => {
             e.stopPropagation();
