@@ -365,90 +365,103 @@ body {
 
 /* Popup Styles */
 .popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(28, 7, 7, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(12px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(28, 7, 7, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(12px);
+    animation: fadeIn 0.3s ease;
 }
 
 .popup-content {
-  background: linear-gradient(135deg, rgba(139, 46, 46, 0.9), rgba(255, 64, 64, 0.7));
-  padding: 1.875rem;
-  border-radius: 20px;
-  max-width: 34.375rem;
-  width: 90%;
-  text-align: center;
-  color: #fff3b0;
-  box-shadow: 0 8px 25px rgba(255, 64, 64, 0.5), 0 0 40px rgba(255, 128, 128, 0.3);
-  border: 2px solid #ff8080;
-  position: relative;
-  max-height: 80vh;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #ff4040 #333;
+    background: linear-gradient(135deg, rgba(139, 46, 46, 0.9), rgba(255, 64, 64, 0.7));
+    padding: 1.875rem;
+    border-radius: 20px;
+    max-width: 34.375rem;
+    width: 90%;
+    text-align: center;
+    color: #fff3b0;
+    box-shadow: 0 8px 25px rgba(255, 64, 64, 0.5), 0 0 40px rgba(255, 128, 128, 0.3);
+    border: 2px solid #ff8080;
+    position: relative;
+    max-height: 80vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #ff4040 #333;
+    animation: slideIn 0.3s ease;
 }
 
 .popup-content::-webkit-scrollbar {
-  width: 8px;
+    width: 8px;
 }
 
 .popup-content::-webkit-scrollbar-track {
-  background: #333;
-  border-radius: 10px;
+    background: #333;
+    border-radius: 10px;
 }
 
 .popup-content::-webkit-scrollbar-thumb {
-  background: #ff4040;
-  border-radius: 10px;
-  border: 2px solid #333;
+    background: #ff4040;
+    border-radius: 10px;
+    border: 2px solid #333;
 }
 
 .popup-content::-webkit-scrollbar-thumb:hover {
-  background: #ff8080;
-  box-shadow: 0 0 5px rgba(255, 64, 64, 0.5);
+    background: #ff8080;
+    box-shadow: 0 0 5px rgba(255, 64, 64, 0.5);
 }
 
 .popup h2 {
-  margin-bottom: 1.25rem;
-  font-size: 2rem;
-  color: #ffd700;
-  text-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
-  word-wrap: break-word;
-  max-height: 6rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    margin-bottom: 1.25rem;
+    font-size: 2rem;
+    color: #ffd700;
+    text-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
+    word-wrap: break-word;
+    max-height: 6rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .popup p {
-  font-size: 1.1rem;
-  margin-bottom: 1.5625rem;
-  color: #ffea80;
+    font-size: 1.1rem;
+    margin-bottom: 1.5625rem;
+    color: #ffea80;
+    line-height: 1.6;
 }
 
 .popup button {
-  padding: 0.75rem 1.875rem;
-  font-size: 1.1rem;
-  background: linear-gradient(45deg, #ff4040, #ff8080);
-  color: #ffe066;
-  font-weight: 600;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  margin: 0.5rem;
-  transition: all 0.4s ease;
+    padding: 0.75rem 1.875rem;
+    font-size: 1.1rem;
+    background: linear-gradient(45deg, #ff4040, #ff8080);
+    color: #ffe066;
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    margin: 0.5rem;
+    transition: all 0.4s ease;
 }
 
 .popup button:hover {
-  background: linear-gradient(45deg, #ff1a1a, #ff6666);
-  transform: scale(1.15);
-  box-shadow: 0 0 15px rgba(255, 64, 64, 0.8);
+    background: linear-gradient(45deg, #ff1a1a, #ff6666);
+    transform: scale(1.15);
+    box-shadow: 0 0 15px rgba(255, 64, 64, 0.8);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 #emailError {
@@ -538,19 +551,12 @@ body {
   font-size: 1rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, background-color 0.3s ease;
-  animation: pulse 1.5s infinite;
   z-index: 100;
 }
 
 .help-button:hover {
   background-color: #218838;
   transform: scale(1.1);
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
 }
 
 .help-icon {

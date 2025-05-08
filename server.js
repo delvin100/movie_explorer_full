@@ -33,9 +33,13 @@ const watchlistSchema = new mongoose.Schema({
     movieId: { type: String, required: true },
     title: { type: String, required: true },
     poster: { type: String },
+    overview: { type: String },
     addedDate: { type: Date, default: Date.now },
     status: { type: String, enum: ['plan_to_watch', 'watching', 'completed'], default: 'plan_to_watch' }
 });
+
+// Add compound index for faster queries
+watchlistSchema.index({ userId: 1, movieId: 1 }, { unique: true });
 
 // Review Schema
 const reviewSchema = new mongoose.Schema({
@@ -44,10 +48,18 @@ const reviewSchema = new mongoose.Schema({
     movieId: { type: String, required: true },
     title: { type: String, required: true },
     rating: { type: Number, required: true, min: 1, max: 5 },
-    review: { type: String, required: true },
+    review: { 
+        type: String, 
+        required: true,
+        minlength: [3, 'Review must be at least 3 characters long'],
+        maxlength: [1000, 'Review cannot exceed 1000 characters']
+    },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });
+
+// Add compound index for faster queries
+reviewSchema.index({ userId: 1, movieId: 1 }, { unique: true });
 
 const User = mongoose.model('User', userSchema);
 const Watchlist = mongoose.model('Watchlist', watchlistSchema);
@@ -95,7 +107,6 @@ app.post('/api/register', async (req, res) => {
             }
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        // Set a default avatar using DiceBear
         const defaultAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
         const user = new User({ username, email, password: hashedPassword, profile: { avatar: defaultAvatar } });
         await user.save();
@@ -144,12 +155,10 @@ app.get('/api/profile', auth, async (req, res) => {
 app.patch('/api/profile', auth, async (req, res) => {
     try {
         const { username, bio, avatar } = req.body;
-        // Only allow username, bio, and avatar to be updated
         if (username) {
             if (username.length < 3 || username.length > 32) {
                 return res.status(400).json({ message: 'Username must be 3-32 characters.' });
             }
-            // Check if username is taken by another user
             const existingUser = await User.findOne({ username });
             if (existingUser && existingUser._id.toString() !== req.user._id.toString()) {
                 return res.status(400).json({ message: 'Username already exists.' });
@@ -163,7 +172,7 @@ app.patch('/api/profile', auth, async (req, res) => {
             req.user.profile.avatar = avatar;
         }
         await req.user.save();
-        res.json({ username: req.user.username, bio: req.user.profile.bio, avatar: req.user.profile.avatar });
+        res.json({ message: 'Profile updated successfully.', username: req.user.username, bio: req.user.profile.bio, avatar: req.user.profile.avatar });
     } catch (err) {
         res.status(500).json({ message: 'Server error.' });
     }
@@ -172,7 +181,7 @@ app.patch('/api/profile', auth, async (req, res) => {
 // Add to watchlist
 app.post('/api/watchlist', auth, async (req, res) => {
     try {
-        const { movieId, title, poster } = req.body;
+        const { movieId, title, poster, overview } = req.body;
         const existingItem = await Watchlist.findOne({ userId: req.user._id, movieId });
         
         if (existingItem) {
@@ -183,12 +192,16 @@ app.post('/api/watchlist', auth, async (req, res) => {
             userId: req.user._id,
             movieId,
             title,
-            poster
+            poster,
+            overview
         });
 
         await watchlistItem.save();
-        res.status(201).json(watchlistItem);
+        res.status(201).json({ message: 'Added to watchlist.', watchlistItem });
     } catch (err) {
+        if (err.code === 11000) {
+            return res.status(400).json({ message: 'Movie already in watchlist.' });
+        }
         res.status(500).json({ message: 'Server error.' });
     }
 });
@@ -218,7 +231,7 @@ app.patch('/api/watchlist/:movieId', auth, async (req, res) => {
 
         watchlistItem.status = status;
         await watchlistItem.save();
-        res.json(watchlistItem);
+        res.json({ message: 'Watchlist item updated.', watchlistItem });
     } catch (err) {
         res.status(500).json({ message: 'Server error.' });
     }
@@ -247,7 +260,14 @@ app.post('/api/reviews', auth, async (req, res) => {
     try {
         const { movieId, title, rating, review } = req.body;
         
-        // Check if user already reviewed this movie
+        if (review.length < 3) {
+            return res.status(400).json({ message: 'Review must be at least 3 characters long.' });
+        }
+        
+        if (review.length > 1000) {
+            return res.status(400).json({ message: 'Review cannot exceed 1000 characters.' });
+        }
+
         const existingReview = await Review.findOne({ 
             userId: req.user._id, 
             movieId 
@@ -267,8 +287,14 @@ app.post('/api/reviews', auth, async (req, res) => {
         });
 
         await newReview.save();
-        res.status(201).json(newReview);
+        res.status(201).json({ message: 'Review submitted successfully.', review: newReview });
     } catch (err) {
+        if (err.code === 11000) {
+            return res.status(400).json({ message: 'You have already reviewed this movie.' });
+        }
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ message: err.message });
+        }
         res.status(500).json({ message: 'Server error.' });
     }
 });
@@ -313,7 +339,7 @@ app.patch('/api/reviews/:movieId', auth, async (req, res) => {
         existingReview.updatedAt = Date.now();
         await existingReview.save();
 
-        res.json(existingReview);
+        res.json({ message: 'Review updated successfully.', review: existingReview });
     } catch (err) {
         res.status(500).json({ message: 'Server error.' });
     }
@@ -338,4 +364,4 @@ app.delete('/api/reviews/:movieId', auth, async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); 
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

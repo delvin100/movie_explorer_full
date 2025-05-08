@@ -561,6 +561,21 @@
 
     <script src="script.js"></script>
     <script>
+        // Function to show popup messages with enhanced styles
+        function showPopup(message, type = 'info') {
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <p style="color: #ffea80; font-size: 1.1rem; margin-bottom: 1.5rem;">${message}</p>
+                    <button id="closePopupButton" style="background: linear-gradient(45deg, #ff4040, #ff8080); color: #ffe066; font-weight: 600; border: none; padding: 0.75rem 1.875rem; border-radius: 50px; cursor: pointer; transition: all 0.4s ease;">Close</button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            const closeButton = document.getElementById('closePopupButton');
+            closeButton.addEventListener('click', () => popup.remove());
+        }
+
         // Function to smoothly scroll to a section
         function scrollToSection(sectionId) {
             const section = document.getElementById(sectionId);
@@ -604,7 +619,10 @@
                 } else {
                     document.querySelector('.review-submit').textContent = 'Submit Review';
                 }
-            } catch (e) { console.error('Error pre-filling user review', e); }
+            } catch (e) { 
+                console.error('Error pre-filling user review', e);
+                showPopup('Error loading review. Please try again.', 'error');
+            }
         }
 
         function closeReviewModal() {
@@ -632,19 +650,23 @@
             e.preventDefault();
             const token = localStorage.getItem('metflix_jwt');
             if (!token) {
-                alert('Please login to submit a review');
+                showPopup('Please login to submit a review.', 'error');
                 window.location.href = 'login.html';
                 return;
             }
-            const review = document.getElementById('reviewText').value;
+            const review = document.getElementById('reviewText').value.trim();
             if (!selectedRating) {
-                alert('Please select a rating');
+                showPopup('Please select a rating.', 'error');
+                return;
+            }
+            if (review.length < 3) {
+                showPopup('Review must be at least 3 characters long.', 'error');
                 return;
             }
             try {
                 let response;
                 if (userReview) {
-                    // Edit existing review
+                    // Update existing review
                     response = await fetch(`http://localhost:5000/api/reviews/${currentMovieId}`, {
                         method: 'PATCH',
                         headers: {
@@ -654,7 +676,7 @@
                         body: JSON.stringify({ rating: selectedRating, review })
                     });
                 } else {
-                    // New review
+                    // Create new review
                     response = await fetch('http://localhost:5000/api/reviews', {
                         method: 'POST',
                         headers: {
@@ -665,21 +687,30 @@
                             movieId: currentMovieId,
                             title: currentMovieTitle,
                             rating: selectedRating,
-                            review: review
+                            review
                         })
                     });
                 }
-                if (response.ok) {
-                    alert(userReview ? 'Review updated successfully!' : 'Review submitted successfully!');
-                    closeReviewModal();
-                    fetchReviews(currentMovieId);
-                } else {
+                if (!response.ok) {
                     const data = await response.json();
-                    alert(data.message || 'Failed to submit review');
+                    let errorMsg = data.message || 'Failed to process review';
+                    if (errorMsg.includes(':')) {
+                        errorMsg = errorMsg.split(':').pop().trim();
+                    }
+                    showPopup(errorMsg, 'error');
+                    return;
                 }
+                showPopup(userReview ? '✅ Review updated successfully!' : '✅ Review submitted successfully!', 'success');
+                closeReviewModal();
+                await fetchReviews();
+                await fetchStatsDropdown();
             } catch (error) {
-                console.error('Error submitting review:', error);
-                alert('Failed to submit review');
+                console.error('Error processing review:', error);
+                let msg = error.message;
+                if (msg && msg.includes(':')) {
+                    msg = msg.split(':').pop().trim();
+                }
+                showPopup(msg || 'Error processing review. Please try again.', 'error');
             }
         });
 
@@ -687,16 +718,16 @@
         async function fetchReviews(movieId) {
             try {
                 const response = await fetch(`http://localhost:5000/api/reviews/${movieId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: Failed to fetch movie reviews`);
+                }
                 const reviews = await response.json();
-                
                 const reviewsList = document.getElementById('reviewsList');
                 reviewsList.innerHTML = '';
-
                 if (reviews.length === 0) {
-                    reviewsList.innerHTML = '<p>No reviews yet. Be the first to review!</p>';
+                    reviewsList.innerHTML = '<p style="text-align: center; color: #888; font-style: italic;">No reviews yet. Be the first to review!</p>';
                     return;
                 }
-
                 reviews.forEach(review => {
                     const date = new Date(review.createdAt).toLocaleDateString();
                     reviewsList.innerHTML += `
@@ -711,7 +742,10 @@
                     `;
                 });
             } catch (error) {
-                console.error('Error fetching reviews:', error);
+                console.error('Error fetching movie reviews:', error);
+                const reviewsList = document.getElementById('reviewsList');
+                reviewsList.innerHTML = '<p style="text-align: center; color: #ff0000;">Error loading reviews. Please try again.</p>';
+                showPopup(`Error loading movie reviews: ${error.message}. Please try again.`, 'error');
             }
         }
 
@@ -874,6 +908,39 @@
             el.style.width = '72px';
             el.style.height = '72px';
         });
+
+        // Help button functionality
+        const helpButton = document.getElementById('helpButton');
+        if (helpButton) {
+            helpButton.addEventListener('click', () => {
+                // Remove any existing help popup
+                document.querySelectorAll('.popup.help-popup').forEach(p => p.remove());
+                // Create help popup
+                const popup = document.createElement('div');
+                popup.className = 'popup help-popup';
+                popup.innerHTML = `
+                    <div class="popup-content">
+                        <h2>How to Use Metflix</h2>
+                        <ul style="text-align:left; color:#ffea80; font-size:1.1rem; margin:1.5rem 0; line-height:1.7;">
+                            <li><b>Browse Movies:</b> Scroll through trending and featured movies on the homepage.</li>
+                            <li><b>Search:</b> Use the search bar to find movies by title.</li>
+                            <li><b>Flip Cards:</b> Click on a movie card to flip and see more details and actions.</li>
+                            <li><b>Add to Watchlist:</b> Click the Add to Watchlist button on the card back to save a movie for later.</li>
+                            <li><b>Review:</b> Click the Review button to write or edit your review for a movie.</li>
+                            <li><b>More Info:</b> Click the More button for a detailed overview of the movie.</li>
+                            <li><b>Remove from Watchlist:</b> Click the Remove button to remove a movie from your watchlist.</li>
+                            <li><b>Profile:</b> Access your profile from the dashboard to view and edit your info, watchlist, and reviews.</li>
+                            <li><b>Edit Profile:</b> In your profile, click "Edit Profile" to change your username, bio, or avatar.</li>
+                            <li><b>Genre & Language Filters:</b> Use the language buttons and genre filters to quickly find movies in your preferred language or genre.</li>
+                            <li><b>Submit Feedback:</b> After watching a movie, you can submit feedback from the form page to help us improve Metflix.</li>
+                        </ul>
+                        <button id="closeHelpPopup" style="margin-top:1rem;">Close</button>
+                    </div>
+                `;
+                document.body.appendChild(popup);
+                document.getElementById('closeHelpPopup').onclick = () => popup.remove();
+            });
+        }
     </script>
 </body>
 </html>

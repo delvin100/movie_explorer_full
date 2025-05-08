@@ -6,6 +6,7 @@
     <title>Metflix - User Profile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="styles/movie_styles.css">
     <style>
         body {
             margin: 0;
@@ -32,15 +33,8 @@
             text-decoration: none;
         }
 
-        .nav-links a {
+        .nav-links {
             color: #fff;
-            text-decoration: none;
-            margin-left: 1.5rem;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: #ff0000;
         }
 
         .container {
@@ -58,6 +52,8 @@
             align-items: center;
             gap: 2rem;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
         }
 
         .profile-avatar {
@@ -67,6 +63,11 @@
             object-fit: cover;
             border: 3px solid #ff0000;
             box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
         }
 
         .profile-info {
@@ -87,16 +88,37 @@
         .profile-stats {
             display: flex;
             gap: 2rem;
+            background: rgba(255, 0, 0, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
         }
 
         .stat-item {
             text-align: center;
+            position: relative;
+        }
+
+        .stat-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: -1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 70%;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: bold;
-            color: #ff0000;
+            color: #fff;
+            background: linear-gradient(45deg, #ff0000, #ff4444);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(255, 0, 0, 0.2);
         }
 
         .stat-label {
@@ -121,84 +143,6 @@
             gap: 0.5rem;
         }
 
-        .watchlist-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .watchlist-item {
-            background: rgba(40, 40, 42, 0.95);
-            border-radius: 10px;
-            overflow: hidden;
-            transition: transform 0.3s;
-        }
-
-        .watchlist-item:hover {
-            transform: translateY(-5px);
-        }
-
-        .watchlist-poster {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-        }
-
-        .watchlist-info {
-            padding: 1rem;
-        }
-
-        .watchlist-title {
-            font-size: 1.1rem;
-            margin: 0 0 0.5rem 0;
-            color: #fff;
-        }
-
-        .watchlist-status {
-            font-size: 0.9rem;
-            color: #aaa;
-        }
-
-        .reviews-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .review-item {
-            background: rgba(40, 40, 42, 0.95);
-            border-radius: 10px;
-            padding: 1.5rem;
-        }
-
-        .review-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .review-movie {
-            font-size: 1.2rem;
-            color: #fff;
-        }
-
-        .review-rating {
-            color: #ff0000;
-            font-size: 1.1rem;
-        }
-
-        .review-content {
-            color: #aaa;
-            line-height: 1.6;
-        }
-
-        .review-date {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 1rem;
-        }
-
         .edit-profile-btn {
             background: #ff0000;
             color: #fff;
@@ -213,64 +157,105 @@
             background: #cc0000;
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 3px;
-            font-size: 0.8rem;
-            font-weight: bold;
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: auto;
+            background: rgba(0,0,0,0.7);
+            align-items: center;
+            justify-content: center;
         }
 
-        .status-plan {
-            background: #ffd700;
-            color: #000;
+        .modal.active {
+            display: flex;
         }
 
-        .status-watching {
-            background: #00ff00;
-            color: #000;
-        }
-
-        .status-completed {
-            background: #ff0000;
+        .modal-content {
+            background: #232325;
+            margin: auto;
+            padding: 2rem 2.5rem;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
             color: #fff;
+            position: relative;
+            animation: fadeIn 0.2s;
         }
 
-        /* Modal centering and styling */
-        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100vw; height: 100vh; overflow: auto; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: #232325; margin: auto; padding: 2rem 2.5rem; border-radius: 16px; max-width: 400px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.25); color: #fff; position: relative; animation: fadeIn 0.2s; }
-        .form-group { margin-bottom: 1.2rem; }
-        .form-group label { display: block; margin-bottom: 0.4rem; color: #ffd700; font-weight: 500; }
-        .form-group input, .form-group textarea { width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #444; background: #18181a; color: #fff; font-size: 1rem; transition: border 0.2s; }
-        .form-group input:focus, .form-group textarea:focus { border: 1.5px solid #ff0000; outline: none; }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 1rem; }
-        .save-btn { background: #ff0000; color: #fff; border: none; padding: 0.7rem 1.5rem; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-        .save-btn:hover { background: #cc0000; }
-        .cancel-btn { background: #444; color: #fff; border: none; padding: 0.7rem 1.5rem; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
-        .cancel-btn:hover { background: #222; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .profile-avatar { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #ff0000; box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); background: #18181a; }
-        .dropdown-links a { background: none !important; color: #fff; transition: color 0.2s; }
-        .dropdown-links a:hover, .dropdown-links a:focus { color: #ff0000 !important; background: none !important; }
-        .dropdown-links a:active { background: none !important; color: #ff0000 !important; }
-        .edit-review-btn { background: #232325; color: #ff0000; border: 1px solid #ff0000; border-radius: 5px; padding: 0.3rem 0.8rem; margin-left: 1rem; cursor: pointer; font-weight: bold; transition: background 0.2s, color 0.2s; }
-        .edit-review-btn:hover { background: #ff0000; color: #fff; }
-        .back-to-movies-btn {
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            color: #ffd700;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.6rem;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background: #18181a;
+            color: #fff;
+            font-size: 1rem;
+            transition: border 0.2s;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            border: 1.5px solid #ff0000;
+            outline: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .save-btn {
             background: #ff0000;
             color: #fff;
             border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            font-weight: bold;
             cursor: pointer;
-            transition: background 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            transition: background 0.2s;
         }
-        .back-to-movies-btn:hover {
+
+        .save-btn:hover {
             background: #cc0000;
         }
+
+        .cancel-btn {
+            background: #444;
+            color: #fff;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .cancel-btn:hover {
+            background: #222;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .avatar-container {
             display: flex;
             flex-direction: column;
@@ -278,6 +263,7 @@
             gap: 1rem;
             margin: 1rem 0;
         }
+        
         .avatar-container img {
             width: 100px;
             height: 100px;
@@ -285,6 +271,7 @@
             object-fit: cover;
             border: 2px solid #ff0000;
         }
+        
         .avatar-container button {
             width: fit-content;
             padding: 0.5rem 1rem;
@@ -295,28 +282,414 @@
             cursor: pointer;
             transition: background 0.3s;
         }
+        
         .avatar-container button:hover {
             background: #cc0000;
+        }
+
+        /* Reviews Section Styles */
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .review-item {
+            background: rgba(40, 40, 42, 0.95);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .review-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .review-poster {
+            width: 100px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .review-details {
+            flex: 1;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .review-movie {
+            font-size: 1.2rem;
+            color: #fff;
+            margin: 0;
+        }
+
+        .review-rating {
+            color: #ffd700;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        .review-content {
+            color: #ddd;
+            line-height: 1.6;
+            margin: 1rem 0;
+        }
+
+        .review-date {
+            color: #888;
+            font-size: 0.9rem;
+            text-align: right;
+        }
+
+        .no-reviews {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 2rem;
+        }
+
+        /* Popup Styles */
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(28, 7, 7, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(12px);
+        }
+
+        .popup-content {
+            background: linear-gradient(135deg, rgba(139, 46, 46, 0.9), rgba(255, 64, 64, 0.7));
+            padding: 1.875rem;
+            border-radius: 20px;
+            max-width: 34.375rem;
+            width: 90%;
+            text-align: center;
+            color: #fff3b0;
+            box-shadow: 0 8px 25px rgba(255, 64, 64, 0.5), 0 0 40px rgba(255, 128, 128, 0.3);
+            border: 2px solid #ff8080;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #ff4040 #333;
+        }
+
+        .popup-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .popup-content::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        .popup-content::-webkit-scrollbar-thumb {
+            background: #ff4040;
+            border-radius: 10px;
+            border: 2px solid #333;
+        }
+
+        .popup-content::-webkit-scrollbar-thumb:hover {
+            background: #ff8080;
+            box-shadow: 0 0 5px rgba(255, 64, 64, 0.5);
+        }
+
+        .popup h2 {
+            margin-bottom: 1.25rem;
+            font-size: 2rem;
+            color: #ffd700;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
+            word-wrap: break-word;
+            max-height: 6rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .popup p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5625rem;
+            color: #ffea80;
+        }
+
+        .popup button {
+            padding: 0.75rem 1.875rem;
+            font-size: 1.1rem;
+            background: linear-gradient(45deg, #ff4040, #ff8080);
+            color: #ffe066;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: all 0.4s ease;
+        }
+
+        .popup button:hover {
+            background: linear-gradient(45deg, #ff1a1a, #ff6666);
+            transform: scale(1.15);
+            box-shadow: 0 0 15px rgba(255, 64, 64, 0.8);
+        }
+
+        /* Individual Button Styles */
+        .nav-button, .back-button {
+            position: fixed;
+            background: linear-gradient(45deg, #ff4040, #ff8080);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(255, 64, 64, 0.3);
+            z-index: 100;
+        }
+
+        .nav-button:hover, .back-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255, 64, 64, 0.5);
+        }
+
+        #backToMoviesBtn {
+            bottom: 20px;
+            left: 20px;
+        }
+
+        #goToTopBtn {
+            bottom: 20px;
+            right: 20px;
+        }
+
+        /* Review Modal Styles */
+        .review-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .review-modal-content {
+            background: #1e1e20;
+            margin: 5% auto;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
+        }
+
+        .review-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .rating-input {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            color: #ff0000;
+        }
+
+        .rating-input i {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .rating-input i:hover {
+            transform: scale(1.2);
+        }
+
+        .review-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            border: 1px solid #ff0000;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            resize: vertical;
+        }
+
+        .review-submit {
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .review-submit:hover {
+            background: #cc0000;
+        }
+
+        .review-delete {
+            background: #444;
+            color: #fff;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .review-delete:hover {
+            background: #222;
+        }
+
+        .reviews-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .review-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .review-author {
+            font-weight: bold;
+            color: #ff0000;
+        }
+
+        .review-rating {
+            color: #ffd700;
+        }
+
+        .review-content {
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .review-date {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 0.5rem;
+        }
+
+        .close-review-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-review-modal:hover {
+            color: #ff0000;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #1a1a1a;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 1000;
+            border-radius: 8px;
+            padding: 8px 0;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+
+        .dropdown-item:hover {
+            background-color: #333;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .count {
+            margin-left: auto;
+            background-color: #e50914;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
         }
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <div class="logo">Metflix</div>
-        <div class="nav-links">
-            <span>MY PROFILE</span>
+    <div class="custom-header" style="display: flex; align-items: center; justify-content: space-between; background: #090909; border-bottom: 4px solid #ff0000; padding: 0.5rem 2rem 0.5rem 2rem; min-height: 70px; animation: fadeIn 0.5s ease-in-out;">
+        <div style="font-size: 2rem; font-weight: bold; color: #ff0000; letter-spacing: 2px; font-family: 'Poppins', Arial, sans-serif; animation: zoomIn 0.5s ease-out; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">METFLIX</div>
+        <div style="flex: 1; text-align: center;">
+            <span style="font-size: 2rem; font-weight: bold; color: #fff; font-family: 'Poppins', Arial, sans-serif; animation: fadeIn 0.8s ease-in-out; transition: color 0.3s ease;" onmouseover="this.style.color='#ff0000'" onmouseout="this.style.color='#fff'">MY PROFILE</span>
         </div>
-        <button class="back-to-movies-btn" onclick="window.location.href='movie.html'">
-            <i class="fas fa-arrow-left"></i> Back
-        </button>
+        <div style="display: flex; flex-direction: column; align-items: center; animation: slideInRight 0.5s ease-out;">
+            <img src="images/logo_circle.png" alt="Metflix Logo" style="width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 10px rgba(255,0,0,0.3); border: 2px solid #ff0000; background: #18181a; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+            <span style="color: #fff; font-weight: bold; font-size: 1rem; margin-top: 0.2rem; letter-spacing: 1px;">METFLIX</span>
+        </div>
     </div>
 
     <div class="container">
         <div class="profile-header">
-            <img src="images/default-avatar.png" alt="Profile Avatar" class="profile-avatar" id="profileAvatar">
+            <img src="https://via.placeholder.com/150" alt="Profile Avatar" class="profile-avatar" id="profileAvatar">
             <div class="profile-info">
                 <h1 class="profile-name" id="profileName">Loading...</h1>
-                <p class="profile-bio" id="profileBio">Loading bio...</p>
+                <p class="profile-bio" id="profileBio">Loading...</p>
                 <div class="profile-stats">
                     <div class="stat-item">
                         <div class="stat-value" id="watchlistCount">0</div>
@@ -328,7 +701,7 @@
                     </div>
                 </div>
             </div>
-            <button class="edit-profile-btn" id="editProfileBtn">
+            <button class="edit-profile-btn" onclick="openEditProfileModal()">
                 <i class="fas fa-edit"></i> Edit Profile
             </button>
         </div>
@@ -338,7 +711,7 @@
                 <i class="fas fa-list"></i> My Watchlist
             </h2>
             <div class="watchlist-grid" id="watchlistGrid">
-                <!-- Watchlist items will be added here dynamically -->
+                <!-- Watchlist items will be dynamically added here -->
             </div>
         </div>
 
@@ -347,7 +720,7 @@
                 <i class="fas fa-star"></i> My Reviews
             </h2>
             <div class="reviews-list" id="reviewsList">
-                <!-- Reviews will be added here dynamically -->
+                <!-- Reviews will be dynamically added here -->
             </div>
         </div>
     </div>
@@ -380,252 +753,619 @@
         </div>
     </div>
 
-    <!-- Edit Review Modal -->
-    <div class="modal" id="editReviewModal">
-        <div class="modal-content">
-            <h2>Edit Review</h2>
-            <form id="editReviewForm">
-                <div class="form-group">
-                    <label for="editReviewRating">Rating</label>
-                    <div id="editReviewStars" style="font-size:1.5rem;color:#ffd700;"></div>
+    <!-- Review Modal -->
+    <div id="reviewModal" class="review-modal">
+        <div class="review-modal-content">
+            <button class="close-review-modal" onclick="closeReviewModal()">×</button>
+            <h2>Write a Review</h2>
+            <form id="reviewForm" class="review-form">
+                <div class="rating-input">
+                    <i class="fas fa-star" data-rating="1"></i>
+                    <i class="fas fa-star" data-rating="2"></i>
+                    <i class="fas fa-star" data-rating="3"></i>
+                    <i class="fas fa-star" data-rating="4"></i>
+                    <i class="fas fa-star" data-rating="5"></i>
                 </div>
-                <div class="form-group">
-                    <label for="editReviewText">Review</label>
-                    <textarea id="editReviewText" maxlength="500" required></textarea>
-                </div>
-                <div class="modal-actions">
-                    <button type="submit" class="save-btn">Save</button>
-                    <button type="button" class="cancel-btn" id="cancelEditReview">Cancel</button>
+                <textarea id="reviewText" class="review-textarea" placeholder="Write your review here..." required></textarea>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" class="review-submit">Submit Review</button>
+                    <button type="button" class="review-delete" id="deleteReviewBtn" style="display: none;">Delete Review</button>
                 </div>
             </form>
+            <div class="reviews-section">
+                <h3>Reviews</h3>
+                <div id="movieReviewsList"></div>
+            </div>
         </div>
     </div>
 
+    <!-- Individual Fixed Buttons -->
+    <button id="backToMoviesBtn" class="back-button" title="Back to Movies" onclick="window.location.href='movie.html'">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+    <button id="goToTopBtn" class="nav-button" title="Go to Top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
     <script>
-        // Check if user is logged in
-        const token = localStorage.getItem('metflix_jwt');
-        if (!token) {
-            window.location.href = 'login.html';
-        }
+        let lastFlippedCard = null;
 
-        let currentAvatarUrl = 'images/default-avatar.png';
-        let editReviewMovieId = null;
-        let editReviewCurrentRating = 0;
-
-        // Fetch user profile
-        async function fetchProfile() {
+        // Function to fetch and display user profile
+        async function fetchUserProfile() {
             try {
+                const token = localStorage.getItem('metflix_jwt');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
                 const response = await fetch('http://localhost:5000/api/profile', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: Failed to fetch profile`);
+                }
+
                 const data = await response.json();
-                
-                document.getElementById('profileName').textContent = data.username;
-                document.getElementById('profileBio').textContent = data.profile.bio || 'No bio yet';
-                currentAvatarUrl = data.profile.avatar || 'images/default-avatar.png';
-                document.getElementById('profileAvatar').src = currentAvatarUrl;
-                document.getElementById('avatarPreview').src = currentAvatarUrl;
-                document.getElementById('editUsername').value = data.username;
-                document.getElementById('editBio').value = data.profile.bio || '';
+                document.getElementById('profileName').textContent = data.username || 'User';
+                document.getElementById('profileBio').textContent = data.profile?.bio || 'No bio yet';
+                document.getElementById('profileAvatar').src = data.profile?.avatar || 'https://api.dicebear.com/7.x/adventurer/svg?seed=default';
+                document.getElementById('avatarPreview').src = data.profile?.avatar || 'https://api.dicebear.com/7.x/adventurer/svg?seed=default';
+                document.getElementById('editUsername').value = data.username || '';
+                document.getElementById('editBio').value = data.profile?.bio || '';
+
+                // Fetch watchlist and reviews counts
+                await Promise.all([fetchWatchlist(), fetchReviews()]);
             } catch (error) {
                 console.error('Error fetching profile:', error);
+                showPopup(`Error loading profile: ${error.message}. Please try again.`, 'error');
             }
         }
 
-        // Fetch watchlist
+        // Function to fetch and display watchlist
         async function fetchWatchlist() {
             try {
+                const token = localStorage.getItem('metflix_jwt');
                 const response = await fetch('http://localhost:5000/api/watchlist', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                const data = await response.json();
-                
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: Failed to fetch watchlist`);
+                }
+
+                const watchlist = await response.json();
                 const watchlistGrid = document.getElementById('watchlistGrid');
                 watchlistGrid.innerHTML = '';
-                document.getElementById('watchlistCount').textContent = data.length;
+                document.getElementById('watchlistCount').textContent = watchlist.length;
 
-                data.forEach(item => {
-                    const statusClass = {
-                        'plan_to_watch': 'status-plan',
-                        'watching': 'status-watching',
-                        'completed': 'status-completed'
-                    }[item.status];
+                const grid = document.createElement('div');
+                grid.className = 'featured-grid';
 
-                    const statusText = {
-                        'plan_to_watch': 'Plan to Watch',
-                        'watching': 'Watching',
-                        'completed': 'Completed'
-                    }[item.status];
-
-                    watchlistGrid.innerHTML += `
-                        <div class="watchlist-item">
-                            <img src="${item.poster}" alt="${item.title}" class="watchlist-poster">
-                            <div class="watchlist-info">
-                                <h3 class="watchlist-title">${item.title}</h3>
-                                <span class="status-badge ${statusClass}">${statusText}</span>
+                for (const movie of watchlist) {
+                    let overview = movie.overview;
+                    if (!overview || overview.trim() === '') {
+                        try {
+                            const tmdbRes = await fetch(`https://api.themoviedb.org/3/movie/${movie.movieId}?api_key=3fd2be6f0c70a2a598f084ddfb75487c&language=en-US`);
+                            if (tmdbRes.ok) {
+                                const tmdbData = await tmdbRes.json();
+                                overview = tmdbData.overview || 'No overview available.';
+                            } else {
+                                overview = 'No overview available.';
+                            }
+                        } catch {
+                            overview = 'No overview available.';
+                        }
+                    }
+                    const movieEl = document.createElement('div');
+                    movieEl.className = 'movie';
+                    movieEl.innerHTML = `
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <img src="${movie.poster}" alt="${movie.title}">
+                                <div class="movie-info">
+                                    <h3>${movie.title}</h3>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <h3>${movie.title}</h3>
+                                <p>${overview}</p>
+                                <div class="buttons">
+                                    <button class="review-btn" data-id="${movie.movieId}" data-title="${movie.title}">Review</button>
+                                    <button class="more-btn more" data-title="${movie.title}" data-overview="${overview}">More</button>
+                                    <button class="add-to-watchlist-btn remove-watchlist" data-id="${movie.movieId}">Remove</button>
+                                </div>
                             </div>
                         </div>
                     `;
-                });
+                    movieEl.addEventListener('click', function(e) {
+                        if (!e.target.closest('button')) {
+                            if (lastFlippedCard && lastFlippedCard !== this) {
+                                lastFlippedCard.classList.remove('flipped');
+                            }
+                            this.classList.toggle('flipped');
+                            lastFlippedCard = this.classList.contains('flipped') ? this : null;
+                        }
+                    });
+                    movieEl.querySelector('.review-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const { id, title } = e.target.dataset;
+                        openReviewModal(id, title);
+                    });
+                    movieEl.querySelector('.more-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const { title, overview } = e.target.dataset;
+                        openMorePopup(title, overview);
+                    });
+                    movieEl.querySelector('.remove-watchlist').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const movieId = e.target.dataset.id;
+                        removeFromWatchlist(movieId);
+                    });
+                    grid.appendChild(movieEl);
+                }
+                watchlistGrid.appendChild(grid);
             } catch (error) {
                 console.error('Error fetching watchlist:', error);
+                showPopup(`Error loading watchlist: ${error.message}. Please try again.`, 'error');
             }
         }
 
-        // Fetch reviews
+        // Function to remove movie from watchlist
+        async function removeFromWatchlist(movieId) {
+            try {
+                const token = localStorage.getItem('metflix_jwt');
+                const response = await fetch(`http://localhost:5000/api/watchlist/${movieId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(`HTTP ${response.status}: ${data.message || 'Failed to remove movie'}`);
+                }
+
+                showPopup('✅ Removed from watchlist!', 'success');
+                await Promise.all([fetchWatchlist(), fetchReviews()]);
+            } catch (error) {
+                console.error('Error removing movie:', error);
+                showPopup(`Error removing movie: ${error.message}. Please try again.`, 'error');
+            }
+        }
+
+        // Function to fetch and display reviews
         async function fetchReviews() {
             try {
+                const token = localStorage.getItem('metflix_jwt');
                 const response = await fetch('http://localhost:5000/api/user/reviews', {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
-                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: Failed to fetch reviews`);
+                }
+
+                const reviews = await response.json();
                 const reviewsList = document.getElementById('reviewsList');
                 reviewsList.innerHTML = '';
-                document.getElementById('reviewsCount').textContent = data.length;
-                data.forEach(review => {
-                    const date = new Date(review.createdAt).toLocaleDateString();
-                    const reviewItem = document.createElement('div');
-                    reviewItem.className = 'review-item';
-                    reviewItem.innerHTML = `
-                        <div class="review-header">
-                            <h3 class="review-movie">${review.title}</h3>
-                            <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</div>
-                            <button class="edit-review-btn" data-movieid="${review.movieId}" data-title="${review.title}" data-rating="${review.rating}" data-review="${encodeURIComponent(review.review)}">Edit</button>
-                        </div>
-                        <p class="review-content">${review.review}</p>
-                        <div class="review-date">Posted on ${date}</div>
-                    `;
-                    reviewsList.appendChild(reviewItem);
-                });
-                // Add event listeners for edit buttons
-                document.querySelectorAll('.edit-review-btn').forEach(btn => {
-                    btn.onclick = function() {
-                        editReviewMovieId = btn.dataset.movieid;
-                        editReviewCurrentRating = parseInt(btn.dataset.rating);
-                        document.getElementById('editReviewText').value = decodeURIComponent(btn.dataset.review);
-                        renderEditStars(editReviewCurrentRating);
-                        document.getElementById('editReviewModal').classList.add('active');
-                    };
-                });
-            } catch (error) { console.error('Error fetching reviews:', error); }
-        }
+                document.getElementById('reviewsCount').textContent = reviews.length;
 
-        function renderEditStars(selected) {
-            const starsDiv = document.getElementById('editReviewStars');
-            starsDiv.innerHTML = '';
-            for (let i = 1; i <= 5; i++) {
-                const star = document.createElement('span');
-                star.innerHTML = '★';
-                star.style.cursor = 'pointer';
-                star.style.color = i <= selected ? '#ffd700' : '#aaa';
-                star.onclick = () => {
-                    editReviewCurrentRating = i;
-                    renderEditStars(i);
-                };
-                starsDiv.appendChild(star);
+                if (reviews.length === 0) {
+                    reviewsList.innerHTML = '<p class="no-reviews">No reviews yet. Start reviewing movies!</p>';
+                    return;
+                }
+
+                for (const review of reviews) {
+                    let poster = 'https://via.placeholder.com/100x150';
+                    let overview = 'No overview available.';
+                    try {
+                        const tmdbRes = await fetch(`https://api.themoviedb.org/3/movie/${review.movieId}?api_key=3fd2be6f0c70a2a598f084ddfb75487c&language=en-US`);
+                        if (tmdbRes.ok) {
+                            const tmdbData = await tmdbRes.json();
+                            poster = tmdbData.poster_path ? `https://image.tmdb.org/t/p/w1280${tmdbData.poster_path}` : poster;
+                            overview = tmdbData.overview || 'No overview available.';
+                        }
+                    } catch {
+                        console.error('Error fetching movie details for review:', review.movieId);
+                    }
+
+                    const reviewElement = document.createElement('div');
+                    reviewElement.className = 'review-item';
+                    reviewElement.innerHTML = `
+                        <img src="${poster}" alt="${review.title}" class="review-poster" data-title="${review.title}" data-overview="${overview}">
+                        <div class="review-details">
+                            <div class="review-header">
+                                <h3 class="review-movie">${review.title}</h3>
+                                <div class="review-rating">
+                                    ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
+                                </div>
+                            </div>
+                            <p class="review-content">${review.review}</p>
+                            <div class="review-date">
+                                ${new Date(review.createdAt).toLocaleDateString()}
+                                <button class="edit-review-btn" data-id="${review.movieId}" data-title="${review.title}" style="margin-left: 1rem; background: #ff0000; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Edit</button>
+                                <button class="delete-review-btn" data-id="${review.movieId}" style="margin-left: 0.5rem; background: #444; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                    reviewElement.querySelector('.review-poster').addEventListener('click', (e) => {
+                        const { title, overview } = e.target.dataset;
+                        openMorePopup(title, overview);
+                    });
+                    reviewElement.querySelector('.edit-review-btn').addEventListener('click', (e) => {
+                        const { id, title } = e.target.dataset;
+                        openReviewModal(id, title);
+                    });
+                    reviewElement.querySelector('.delete-review-btn').addEventListener('click', (e) => {
+                        const movieId = e.target.dataset.id;
+                        deleteReview(movieId);
+                    });
+                    reviewsList.appendChild(reviewElement);
+                }
+            } catch (error) {
+                console.error('Error fetching reviews:', error);
+                showPopup(`Error loading reviews: ${error.message}. Please try again.`, 'error');
             }
         }
 
-        // Edit profile button click handler
-        document.getElementById('editProfileBtn').addEventListener('click', () => {
+        // Function to delete a review
+        async function deleteReview(movieId) {
+            try {
+                const token = localStorage.getItem('metflix_jwt');
+                const response = await fetch(`http://localhost:5000/api/reviews/${movieId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(`HTTP ${response.status}: ${data.message || 'Failed to delete review'}`);
+                }
+
+                showPopup('✅ Review deleted successfully!', 'success');
+                await Promise.all([fetchReviews(), fetchWatchlist()]);
+            } catch (error) {
+                console.error('Error deleting review:', error);
+                showPopup(`Error deleting review: ${error.message}. Please try again.`, 'error');
+            }
+        }
+
+        // Function to show popup message
+        function showPopup(message, type = 'info') {
+            const existingPopup = document.querySelector('.popup');
+            if (existingPopup) existingPopup.remove();
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <p>${message}</p>
+                    <button id="closePopupButton">Close</button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            const closeButton = popup.querySelector('#closePopupButton');
+            closeButton.addEventListener('click', () => {
+                popup.remove();
+            });
+        }
+
+        // Function to open edit profile modal
+        function openEditProfileModal() {
             document.getElementById('editProfileModal').classList.add('active');
-            document.getElementById('avatarPreview').src = currentAvatarUrl;
-        });
+        }
+
+        // Function to close edit profile modal
+        function closeEditProfileModal() {
+            document.getElementById('editProfileModal').classList.remove('active');
+        }
 
         // Edit Profile Modal Logic
         const editProfileModal = document.getElementById('editProfileModal');
-        const cancelEditProfile = document.getElementById('cancelEditProfile');
         const editProfileForm = document.getElementById('editProfileForm');
+        const cancelEditProfile = document.getElementById('cancelEditProfile');
         const avatarPreview = document.getElementById('avatarPreview');
         const randomAvatarBtn = document.getElementById('randomAvatarBtn');
+
+        let currentAvatarUrl = 'images/default-avatar.png';
 
         cancelEditProfile.onclick = () => editProfileModal.classList.remove('active');
         window.onclick = function(event) {
             if (event.target === editProfileModal) editProfileModal.classList.remove('active');
-            if (event.target === document.getElementById('editReviewModal')) document.getElementById('editReviewModal').classList.remove('active');
+            const modal = document.getElementById('reviewModal');
+            if (event.target === modal) closeReviewModal();
         };
 
-        // Random avatar
         function randomAvatarUrl(seed) {
             return `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(seed || 'movie')}`;
         }
         randomAvatarBtn.onclick = () => {
-            const randomSeed = 'movie' + Math.floor(Math.random()*10000);
+            const randomSeed = 'movie' + Math.floor(Math.random() * 10000);
             const url = randomAvatarUrl(randomSeed);
             avatarPreview.src = url;
+            currentAvatarUrl = url;
         };
 
-        // Save profile changes
         editProfileForm.onsubmit = async (e) => {
             e.preventDefault();
             const username = document.getElementById('editUsername').value.trim();
             const bio = document.getElementById('editBio').value.trim();
-            let avatar = avatarPreview.src;
+            let avatarUrl = avatarPreview.src;
             try {
+                const token = localStorage.getItem('metflix_jwt');
                 const res = await fetch('http://localhost:5000/api/profile', {
                     method: 'PATCH',
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ username, bio, avatar })
+                    body: JSON.stringify({
+                        bio,
+                        avatar: avatarUrl,
+                        username
+                    })
                 });
-                if (res.ok) {
-                    editProfileModal.classList.remove('active');
-                    await fetchProfile();
-                } else {
+                if (!res.ok) {
                     const data = await res.json();
-                    alert(data.message || 'Failed to update profile');
+                    throw new Error(`HTTP ${res.status}: ${data.message || 'Failed to update profile'}`);
                 }
+                showPopup('✅ Profile updated successfully!', 'success');
+                editProfileModal.classList.remove('active');
+                await fetchUserProfile();
             } catch (err) {
-                alert('Error updating profile');
+                console.error('Error updating profile:', err);
+                showPopup(`Error updating profile: ${err.message}. Please try again.`, 'error');
             }
         };
 
-        // Edit Review Modal Logic
-        const editReviewForm = document.getElementById('editReviewForm');
-        const cancelEditReview = document.getElementById('cancelEditReview');
+        function openMorePopup(title, overview) {
+            const existingPopup = document.querySelector('.popup');
+            if (existingPopup) existingPopup.remove();
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <h2>${title}</h2>
+                    <p>${overview || 'No overview available.'}</p>
+                    <button id="messageButton">Watch</button>
+                    <button id="closePopUpButton">Close</button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            const closeButton = document.getElementById('closePopUpButton');
+            const messageButton = document.getElementById('messageButton');
+            closeButton.addEventListener('click', () => popup.remove());
+            messageButton.addEventListener('click', () => {
+                localStorage.setItem('selectedMovie', title);
+                window.location.href = 'form.html';
+            });
+        }
 
-        cancelEditReview.onclick = () => {
-            document.getElementById('editReviewModal').classList.remove('active');
-        };
+        // Review Modal Functions
+        let currentMovieId = null;
+        let currentMovieTitle = null;
+        let selectedRating = 0;
+        let userReview = null;
 
-        document.getElementById('editReviewForm').onsubmit = async (e) => {
+        async function openReviewModal(movieId, title) {
+            currentMovieId = movieId;
+            currentMovieTitle = title;
+            document.getElementById('reviewModal').style.display = 'block';
+            document.getElementById('reviewText').value = '';
+            selectedRating = 0;
+            userReview = null;
+            updateRatingStars();
+            await fetchAndPrefillUserReview(movieId);
+            await fetchMovieReviews(movieId);
+        }
+
+        async function fetchAndPrefillUserReview(movieId) {
+            const token = localStorage.getItem('metflix_jwt');
+            if (!token) return;
+            try {
+                const res = await fetch(`http://localhost:5000/api/user/reviews`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: Failed to fetch user reviews`);
+                }
+                const reviews = await res.json();
+                userReview = reviews.find(r => r.movieId === movieId);
+                if (userReview) {
+                    document.getElementById('reviewText').value = userReview.review;
+                    selectedRating = userReview.rating;
+                    updateRatingStars();
+                    document.querySelector('.review-submit').textContent = 'Update Review';
+                    document.getElementById('deleteReviewBtn').style.display = 'block';
+                } else {
+                    document.getElementById('reviewText').value = '';
+                    selectedRating = 0;
+                    updateRatingStars();
+                    document.querySelector('.review-submit').textContent = 'Submit Review';
+                    document.getElementById('deleteReviewBtn').style.display = 'none';
+                }
+            } catch (e) {
+                console.error('Error pre-filling user review:', e);
+                showPopup(`Error loading review: ${e.message}. Please try again.`, 'error');
+            }
+        }
+
+        function closeReviewModal() {
+            document.getElementById('reviewModal').style.display = 'none';
+            currentMovieId = null;
+            currentMovieTitle = null;
+            selectedRating = 0;
+            userReview = null;
+        }
+
+        function updateRatingStars() {
+            const stars = document.querySelectorAll('.rating-input i');
+            stars.forEach(star => {
+                const rating = parseInt(star.dataset.rating);
+                star.style.color = rating <= selectedRating ? '#ffd700' : '#ff0000';
+            });
+        }
+
+        document.querySelectorAll('.rating-input i').forEach(star => {
+            star.addEventListener('click', () => {
+                selectedRating = parseInt(star.dataset.rating);
+                updateRatingStars();
+            });
+        });
+
+        document.getElementById('reviewForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const reviewText = document.getElementById('editReviewText').value.trim();
-            if (!editReviewCurrentRating) {
-                alert('Please select a rating');
+            const token = localStorage.getItem('metflix_jwt');
+            if (!token) {
+                showPopup('Please login to submit a review.', 'error');
+                window.location.href = 'login.html';
+                return;
+            }
+            const review = document.getElementById('reviewText').value.trim();
+            if (!selectedRating) {
+                showPopup('Please select a rating.', 'error');
+                return;
+            }
+            if (review.length < 3) {
+                showPopup('Review must be at least 3 characters long.', 'error');
                 return;
             }
             try {
-                const res = await fetch(`http://localhost:5000/api/reviews/${editReviewMovieId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ rating: editReviewCurrentRating, review: reviewText })
-                });
-                if (res.ok) {
-                    document.getElementById('editReviewModal').classList.remove('active');
-                    await fetchReviews();
+                let response;
+                if (userReview) {
+                    // Update existing review
+                    response = await fetch(`http://localhost:5000/api/reviews/${currentMovieId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ rating: selectedRating, review })
+                    });
                 } else {
-                    const data = await res.json();
-                    alert(data.message || 'Failed to update review');
+                    // Create new review
+                    response = await fetch('http://localhost:5000/api/reviews', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            movieId: currentMovieId,
+                            title: currentMovieTitle,
+                            rating: selectedRating,
+                            review
+                        })
+                    });
                 }
-            } catch (err) {
-                alert('Error updating review');
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(`HTTP ${response.status}: ${data.message || 'Failed to process review'}`);
+                }
+                showPopup(userReview ? '✅ Review updated successfully!' : '✅ Review submitted successfully!', 'success');
+                closeReviewModal();
+                await Promise.all([fetchReviews(), fetchWatchlist()]);
+            } catch (error) {
+                console.error('Error processing review:', error);
+                showPopup(`Error processing review: ${error.message}. Please try again.`, 'error');
             }
-        };
+        });
 
-        // Initial data fetch
-        fetchProfile();
-        fetchWatchlist();
-        fetchReviews();
+        document.getElementById('deleteReviewBtn').addEventListener('click', async () => {
+            try {
+                const token = localStorage.getItem('metflix_jwt');
+                const response = await fetch(`http://localhost:5000/api/reviews/${currentMovieId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(`HTTP ${response.status}: ${data.message || 'Failed to delete review'}`);
+                }
+
+                showPopup('✅ Review deleted successfully!', 'success');
+                closeReviewModal();
+                await Promise.all([fetchReviews(), fetchWatchlist()]);
+            } catch (error) {
+                console.error('Error deleting review:', error);
+                showPopup(`Error deleting review: ${error.message}. Please try again.`, 'error');
+            }
+        });
+
+        async function fetchMovieReviews(movieId) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/reviews/${movieId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: Failed to fetch movie reviews`);
+                }
+                const reviews = await response.json();
+                const reviewsList = document.getElementById('movieReviewsList');
+                reviewsList.innerHTML = '';
+                if (reviews.length === 0) {
+                    reviewsList.innerHTML = '<p style="text-align: center; color: #888; font-style: italic;">No reviews yet. Be the first to review!</p>';
+                    return;
+                }
+                reviews.forEach(review => {
+                    const date = new Date(review.createdAt).toLocaleDateString();
+                    reviewsList.innerHTML += `
+                        <div class="review-item">
+                            <div class="review-header">
+                                <span class="review-author">${review.username}</span>
+                                <span class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</span>
+                            </div>
+                            <p class="review-content">${review.review}</p>
+                            <div class="review-date">Posted on ${date}</div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error fetching movie reviews:', error);
+                const reviewsList = document.getElementById('movieReviewsList');
+                reviewsList.innerHTML = '<p style="text-align: center; color: #ff0000;">Error loading reviews. Please try again.</p>';
+                showPopup(`Error loading movie reviews: ${error.message}. Please try again.`, 'error');
+            }
+        }
+
+        // Go to top button functionality
+        document.getElementById('goToTopBtn').addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Show/hide go to top button based on scroll position
+        window.addEventListener('scroll', () => {
+            const goToTopBtn = document.getElementById('goToTopBtn');
+            if (window.scrollY > 300) {
+                goToTopBtn.style.display = 'flex';
+            } else {
+                goToTopBtn.style.display = 'none';
+            }
+        });
+
+        // Initialize go to top button visibility
+        document.getElementById('goToTopBtn').style.display = 'none';
+
+        // Initialize profile page
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchUserProfile();
+        });
     </script>
 </body>
 </html>

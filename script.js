@@ -326,15 +326,39 @@ function createMovieElement(movie) {
 
 function addToWatchlist(event) {
     const { id, title, poster, overview } = event.target.dataset;
-    let watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
-    if (!watchlist.some(item => item.id === id)) {
-        watchlist.push({ id, title, poster, overview });
-        localStorage.setItem('watchlist', JSON.stringify(watchlist));
-        showPopup('✅ Added to watchlist!');
-        displayWatchlist();
-    } else {
-        showPopup('⚠️ Already in watchlist!');
+    const token = localStorage.getItem('metflix_jwt');
+    
+    if (!token) {
+        showPopup('⚠️ Please login to add movies to your watchlist!');
+        return;
     }
+
+    fetch('http://localhost:5000/api/watchlist', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            movieId: id,
+            title: title,
+            poster: poster,
+            overview: overview,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message && data.message.includes('already')) {
+            showPopup('⚠️ ' + data.message);
+        } else if (data.message) {
+            showPopup('✅ Added to watchlist!');
+        }
+        if (typeof fetchStatsDropdown === 'function') fetchStatsDropdown();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showPopup('❌ Error adding to watchlist');
+    });
 }
 
 function showWatchlist() {
@@ -454,6 +478,7 @@ function removeFromWatchlist(id) {
     localStorage.setItem('watchlist', JSON.stringify(watchlist));
     displayWatchlist();
     showPopup('✅ Removed from watchlist!');
+    if (typeof fetchStatsDropdown === 'function') fetchStatsDropdown();
 }
 
 function showAutocompleteSuggestions(query) {
@@ -546,18 +571,58 @@ function openMorePopup(movieTitle, overviewText) {
 function showPopup(message) {
     const popup = document.createElement('div');
     popup.classList.add('popup');
-    popup.innerHTML = `
-        <div class="popup-content">
-            <p>${message}</p>
-            <button id="closePopupButton">Close</button>
-        </div>
+    popup.style.position = 'fixed';
+    popup.style.top = '0';
+    popup.style.left = '0';
+    popup.style.width = '100%';
+    popup.style.height = '100%';
+    popup.style.background = 'rgba(0, 0, 0, 0.7)';
+    popup.style.display = 'flex';
+    popup.style.alignItems = 'center';
+    popup.style.justifyContent = 'center';
+    popup.style.zIndex = '3000';
+
+    const popupContent = document.createElement('div');
+    popupContent.classList.add('popup-content');
+    popupContent.style.background = '#232325';
+    popupContent.style.padding = '2rem 2.5rem';
+    popupContent.style.borderRadius = '16px';
+    popupContent.style.maxWidth = '400px';
+    popupContent.style.width = '100%';
+    popupContent.style.boxShadow = '0 8px 32px rgba(0,0,0,0.25)';
+    popupContent.style.color = '#fff';
+    popupContent.style.position = 'relative';
+    popupContent.style.animation = 'fadeIn 0.2s';
+
+    popupContent.innerHTML = `
+        <p style="font-size: 1.1rem; margin-bottom: 1.5625rem; color: #fff; text-align: center;">${message}</p>
+        <button id="closePopupButton" style="background: #ff0000; color: #fff; border: none; padding: 0.7rem 1.5rem; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; display: block; margin: 0 auto;">Close</button>
     `;
+    popup.appendChild(popupContent);
     document.body.appendChild(popup);
 
     const closeButton = popup.querySelector('#closePopupButton');
     closeButton.addEventListener('click', () => {
         popup.remove();
     });
+
+    window.addEventListener('click', (event) => {
+        if (event.target === popup) {
+            popup.remove();
+        }
+    });
+
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #closePopupButton:hover {
+            background: #cc0000;
+        }
+    `;
+    document.head.appendChild(styleSheet);
 }
 
 async function sendToTelegram(message) {
@@ -586,47 +651,26 @@ function showHelpPopup() {
     popupContent.classList.add('popup');
     popupContent.innerHTML = `
         <div class="popup-content">
-            <h2>Need Help?</h2>
-            <p>Submit your question and email below:</p>
-            <textarea id="helpQuestion" placeholder="Type your question here..." rows="4" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none;"></textarea>
-            <input type="email" id="helpEmail" placeholder="Your email address" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none;">
-            <p id="emailError" style="color: #ff4040; display: none;">Please enter a valid email address.</p>
-            <button id="submitHelpButton">Submit</button>
-            <button id="closePopupButton">Close</button>
+            <h2>How to Use Metflix</h2>
+            <ul style="text-align:left; color:#ffea80; font-size:1.1rem; margin:1.5rem 0; line-height:1.7; padding-left: 1.2em;">
+                <li><b>Browse Movies:</b> Explore trending, featured, and language-specific movies on the homepage.</li>
+                <li><b>Search:</b> Use the search bar at the top to find movies by title. Suggestions will appear as you type.</li>
+                <li><b>Flip Movie Cards:</b> Click on any movie card to flip it and reveal more details and available actions.</li>
+                <li><b>Add to Watchlist:</b> On the back of a movie card, click <b>Add to Watchlist</b> to save a movie for later viewing. Your watchlist is always accessible from your profile or dashboard.</li>
+                <li><b>Remove from Watchlist:</b> In your watchlist or on the card back, click <b>Remove</b> to delete a movie from your watchlist.</li>
+                <li><b>Write & Edit Reviews:</b> Click <b>Review</b> on a movie card or in your watchlist to write or update your review and rating for that movie.</li>
+                <li><b>View Reviews:</b> See what others think by checking the <b>Reviews</b> section for each movie.</li>
+                <li><b>Profile & Dashboard:</b> Access your profile from the dashboard to view and edit your info, watchlist, and reviews. Your stats are always up-to-date.</li>
+                <li><b>Edit Profile:</b> In your profile, click <b>Edit Profile</b> to change your username, bio, or avatar. You can even generate a random movie-themed avatar!</li>
+                <li><b>Genre & Language Filters:</b> Use the language buttons and genre filters to quickly find movies in your preferred language or genre.</li>
+                <li><b>Submit Feedback:</b> After watching a movie, you can submit feedback from the form page to help us improve Metflix.</li>
+            </ul>
+            <div style="color:#ffd700; font-size:1rem; margin-bottom:1rem;">Enjoy exploring, watching, and reviewing movies with Metflix!</div>
+            <button id="closePopupButton" style="margin-top:1rem;">Close</button>
         </div>
     `;
     document.body.appendChild(popupContent);
 
-    const submitButton = document.getElementById('submitHelpButton');
     const closeButton = document.getElementById('closePopupButton');
-    const emailInput = document.getElementById('helpEmail');
-    const questionInput = document.getElementById('helpQuestion');
-    const emailError = document.getElementById('emailError');
-
     closeButton.addEventListener('click', () => popupContent.remove());
-
-    submitButton.addEventListener('click', async () => {
-        const email = emailInput.value.trim();
-        const question = questionInput.value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!emailRegex.test(email)) {
-            emailError.style.display = 'block';
-            return;
-        }
-        if (!question) {
-            showPopup('❌ Please enter a question.');
-            return;
-        }
-
-        const message = `New Help Request:\nEmail: ${email}\nQuestion: ${question}`;
-        const sent = await sendToTelegram(message);
-
-        if (sent) {
-            showPopup('✅ Your question has been submitted!');
-            popupContent.remove();
-        } else {
-            showPopup('❌ Failed to submit your question. Please try again.');
-        }
-    });
 }
