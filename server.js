@@ -8,6 +8,7 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(express.static('.')); // Serve static files from the current directory
 
 // MongoDB connection
 mongoose.connect('mongodb+srv://delvinvarghese2028:Delvin2806@cluster0.isgjvem.mongodb.net/metflix?retryWrites=true&w=majority&appName=Cluster0')
@@ -98,18 +99,29 @@ const updateUserActivity = async (userId) => {
 app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
+        // Check for empty fields
         if (!username || !email || !password) {
             return res.status(400).json({ message: 'All fields are required.' });
         }
+        // Validate username
         if (username.length < 3 || username.length > 32) {
             return res.status(400).json({ message: 'Username must be 3-32 characters.' });
         }
+        if (username.includes(' ') || username.trim() !== username) {
+            return res.status(400).json({ message: 'Username cannot contain spaces.' });
+        }
+        // Validate password
         if (password.length < 6) {
             return res.status(400).json({ message: 'Password must be at least 6 characters.' });
         }
-        if (!/.+@.+\..+/.test(email)) {
-            return res.status(400).json({ message: 'Invalid email address.' });
+        if (password.includes(' ') || password.trim() !== password) {
+            return res.status(400).json({ message: 'Password cannot contain spaces.' });
         }
+        // Validate email
+        if (!/.+@.+\..+/.test(email)) {
+            return res.status(400).json({ message: 'Please enter a valid email address.' });
+        }
+        // Check for existing user
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
             if (existingUser.username === username) {
@@ -118,6 +130,7 @@ app.post('/api/register', async (req, res) => {
                 return res.status(400).json({ message: 'Email already exists.' });
             }
         }
+        // Create user
         const hashedPassword = await bcrypt.hash(password, 10);
         const defaultAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
         const user = new User({ username, email, password: hashedPassword, profile: { avatar: defaultAvatar } });
@@ -135,17 +148,32 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
+        // Check for empty fields
         if (!username || !password) {
             return res.status(400).json({ message: 'All fields are required.' });
         }
+        // Validate username
+        if (username.includes(' ') || username.trim() !== username) {
+            return res.status(400).json({ message: 'Username cannot contain spaces.' });
+        }
+        // Validate password
+        if (password.length < 6) {
+            return res.status(400).json({ message: 'Password must be at least 6 characters.' });
+        }
+        if (password.includes(' ') || password.trim() !== password) {
+            return res.status(400).json({ message: 'Password cannot contain spaces.' });
+        }
+        // Find user
         const user = await User.findOne({ username });
         if (!user || user.isDeleted) {
             return res.status(400).json({ message: 'Invalid username or password.' });
         }
+        // Verify password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid username or password.' });
         }
+        // Update activity and generate token
         await updateUserActivity(user._id);
         const token = jwt.sign({ id: user._id, username: user.username }, 'metflix_secret', { expiresIn: '2h' });
         res.json({ message: 'Login successful.', token, username: user.username });

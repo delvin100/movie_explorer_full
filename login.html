@@ -285,15 +285,55 @@
         }
         msgBox.text(text).css('color', color);
     }
+    // Validation functions
+    const isValidUsername = username => !username.includes(' ') && username.trim() === username;
+    const isValidPassword = password => password.length >= 6 && !password.includes(' ') && password.trim() === password;
+    const isValidEmail = email => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
+        return emailRegex.test(email);
+    };
     // Backend integration for Register
     $('#registerForm').submit(async function(e) {
         e.preventDefault();
-        const username = $(this).find('input[type=text]').val().trim();
-        const email = $(this).find('input[type=email]').val().trim();
-        const password = $(this).find('input[type=password]').val().trim();
+        // Get raw input values (without trimming for validation)
+        const usernameRaw = $(this).find('input[type=text]').val();
+        const emailRaw = $(this).find('input[type=email]').val();
+        const passwordRaw = $(this).find('input[type=password]').val();
         const btn = $(this).find('button[type=submit]');
         btn.prop('disabled', true).html("<i class='fa fa-spinner fa-spin'></i> Registering...");
         showMsg($(this), 'registerMsg', 'Please wait...', '#ff0000');
+
+        // Check for empty fields
+        if (!usernameRaw || !emailRaw || !passwordRaw) {
+            showMsg($(this), 'registerMsg', 'Please fill in all fields.', '#ff0000');
+            btn.prop('disabled', false).html("Register <i class='fa fa-user-plus'></i>");
+            return;
+        }
+
+        // Validate raw inputs
+        if (!isValidUsername(usernameRaw)) {
+            showMsg($(this), 'registerMsg', 'Username cannot contain spaces.', '#ff0000');
+            btn.prop('disabled', false).html("Register <i class='fa fa-user-plus'></i>");
+            return;
+        }
+
+        if (!isValidPassword(passwordRaw)) {
+            showMsg($(this), 'registerMsg', 'Password must be at least 6 characters long and cannot contain spaces.', '#ff0000');
+            btn.prop('disabled', false).html("Register <i class='fa fa-user-plus'></i>");
+            return;
+        }
+
+        if (!isValidEmail(emailRaw)) {
+            showMsg($(this), 'registerMsg', 'Please enter a valid email address.', '#ff0000');
+            btn.prop('disabled', false).html("Register <i class='fa fa-user-plus'></i>");
+            return;
+        }
+
+        // Trim inputs for backend request
+        const username = usernameRaw.trim();
+        const email = emailRaw.trim();
+        const password = passwordRaw.trim();
+
         try {
             const res = await fetch('http://localhost:5000/api/register', {
                 method: 'POST',
@@ -303,23 +343,49 @@
             const data = await res.json();
             if (res.ok) {
                 showMsg($(this), 'registerMsg', data.message, '#0f0');
-                setTimeout(()=>{ $('#loginTab').click(); }, 1200);
+                setTimeout(() => { $('#loginTab').click(); }, 1200);
             } else {
                 showMsg($(this), 'registerMsg', data.message || 'Registration failed.', '#ff0000');
             }
-        } catch {
-            showMsg($(this), 'registerMsg', 'Server error.', '#ff0000');
+        } catch (error) {
+            showMsg($(this), 'registerMsg', 'Server error: ' + error.message, '#ff0000');
         }
         btn.prop('disabled', false).html("Register <i class='fa fa-user-plus'></i>");
     });
     // Backend integration for Login
     $('#loginForm').submit(async function(e) {
         e.preventDefault();
-        const username = $(this).find('input[type=text]').val().trim();
-        const password = $(this).find('input[type=password]').val().trim();
+        // Get raw input values
+        const usernameRaw = $(this).find('input[type=text]').val();
+        const passwordRaw = $(this).find('input[type=password]').val();
         const btn = $(this).find('button[type=submit]');
         btn.prop('disabled', true).html("<i class='fa fa-spinner fa-spin'></i> Logging in...");
         showMsg($(this), 'loginMsg', 'Please wait...', '#ff0000');
+
+        // Check for empty fields
+        if (!usernameRaw || !passwordRaw) {
+            showMsg($(this), 'loginMsg', 'Please fill in all fields.', '#ff0000');
+            btn.prop('disabled', false).html("Login <i class='fa fa-arrow-right'></i>");
+            return;
+        }
+
+        // Validate raw inputs
+        if (!isValidUsername(usernameRaw)) {
+            showMsg($(this), 'loginMsg', 'Username cannot contain spaces.', '#ff0000');
+            btn.prop('disabled', false).html("Login <i class='fa fa-arrow-right'></i>");
+            return;
+        }
+
+        if (!isValidPassword(passwordRaw)) {
+            showMsg($(this), 'loginMsg', 'Password must be at least 6 characters long and cannot contain spaces.', '#ff0000');
+            btn.prop('disabled', false).html("Login <i class='fa fa-arrow-right'></i>");
+            return;
+        }
+
+        // Trim inputs for backend request
+        const username = usernameRaw.trim();
+        const password = passwordRaw.trim();
+
         try {
             const res = await fetch('http://localhost:5000/api/login', {
                 method: 'POST',
@@ -330,15 +396,16 @@
             if (res.ok) {
                 showMsg($(this), 'loginMsg', data.message, '#0f0');
                 localStorage.setItem('metflix_jwt', data.token);
-                setTimeout(()=>{ window.location.href = 'movie.html'; }, 1200);
+                setTimeout(() => { window.location.href = 'movie.html'; }, 1200);
             } else {
                 showMsg($(this), 'loginMsg', data.message || 'Login failed.', '#ff0000');
             }
-        } catch {
-            showMsg($(this), 'loginMsg', 'Server error.', '#ff0000');
+        } catch (error) {
+            showMsg($(this), 'loginMsg', 'Server error: ' + error.message, '#ff0000');
         }
         btn.prop('disabled', false).html("Login <i class='fa fa-arrow-right'></i>");
     });
     </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93d279f9e852b076',t:'MTc0NjgwNzEyNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>

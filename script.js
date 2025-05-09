@@ -577,7 +577,7 @@ function openMorePopup(movieTitle, overviewText) {
     closeButton.addEventListener('click', () => moviePopUp.remove());
     messageButton.addEventListener('click', () => {
         localStorage.setItem('selectedMovie', movieTitle);
-        window.location.href = 'form.html';
+        window.location.href = 'more.html';
     });
 }
 
