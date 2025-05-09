@@ -7,6 +7,113 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Metflix - Movie Explorer</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1c1c1c;
+            padding: 2.5rem;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(255, 0, 0, 0.4);
+            position: relative;
+            border: 2px solid #ff0000;
+        }
+
+        .modal-content h2 {
+            color: #ff0000;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .admin-login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .admin-login-form input {
+            padding: 1rem;
+            border: 2px solid rgba(255, 0, 0, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .admin-login-form input:focus {
+            outline: none;
+            border-color: #ff0000;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 12px rgba(255, 0, 0, 0.4);
+        }
+
+        .admin-login-form input::placeholder {
+            color: #aaa;
+        }
+
+        .admin-login-form button {
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            background: #ff0000;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .admin-login-form button:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+        }
+
+        .close-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: #ff0000;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0.5rem;
+        }
+
+        .close-icon:hover {
+            color: #cc0000;
+            transform: scale(1.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
 </head>
 <body>
     <div class="navbar">
@@ -64,20 +171,15 @@
         </div>
     </div>
 
-    <!-- Admin Modal -->
-    <div class="modal" id="adminModal">
+    <!-- Admin Login Modal -->
+    <div class="modal" id="adminLoginModal">
         <div class="modal-content">
-            <h2>Admin Panel</h2>
-            <i class="fas fa-times admin-close-icon" id="adminCloseIcon"></i>
-            <div id="adminLogin" class="admin-login">
+            <h2>Admin Login</h2>
+            <div class="admin-login-form">
                 <input type="password" id="adminPassword" placeholder="Enter Admin Password">
-                <button id="submitAdminPassword">Login</button>
+                <button id="adminLoginBtn">Login</button>
             </div>
-            <div id="adminContent" class="admin-content" style="display: none;">
-                <h3>User Requests</h3>
-                <div id="requestList"></div>
-                <button class="close-btn" id="closeAdminBtn">Close</button>
-            </div>
+            <i class="fas fa-times close-icon" id="closeAdminLoginBtn"></i>
         </div>
     </div>
 
@@ -106,6 +208,11 @@
                         $(this).removeClass('active');
                     });
                 }
+                if (event.target === $('#adminLoginModal')[0]) {
+                    $('#adminLoginModal').fadeOut(300, function() {
+                        $(this).removeClass('active');
+                    });
+                }
             });
 
             // Image Hover
@@ -120,6 +227,48 @@
 
             $.get(defaultImage).fail(() => console.error('Default image not found:', defaultImage));
             $.get(hoverImage).fail(() => console.error('Hover image not found:', hoverImage));
+
+            // Admin Login Modal
+            $('#adminLogo').dblclick(function() {
+                $('#adminLoginModal').addClass('active').fadeIn(300);
+                $('#adminPassword').focus();
+            });
+
+            $('#closeAdminLoginBtn').click(function() {
+                $('#adminLoginModal').fadeOut(300, function() {
+                    $(this).removeClass('active');
+                });
+            });
+
+            $('#adminLoginBtn').click(function() {
+                const password = $('#adminPassword').val();
+                fetch('http://localhost:5000/api/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ password })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.token) {
+                        localStorage.setItem('admin_token', data.token);
+                        window.location.href = 'admin.html';
+                    } else {
+                        alert('Invalid admin password!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Login error:', error);
+                    alert('Login failed. Please try again.');
+                });
+            });
+
+            $('#adminPassword').keypress(function(e) {
+                if (e.which === 13) {
+                    $('#adminLoginBtn').click();
+                }
+            });
 
             // Admin Panel Logic
             const $adminModal = $('#adminModal');
@@ -264,6 +413,20 @@
 
             // Uncomment to add a sample request for testing
             // addSampleRequest();
+
+            // Only allow closing modal by clicking overlay or close button
+            $('#reviewsModal').off('click').on('click', function(event) {
+                if (event.target === this) {
+                    $(this).fadeOut(300);
+                }
+            });
+
+            // When opening the modal, stop event propagation
+            $('.view-btn').off('click').on('click', function(event) {
+                event.stopPropagation();
+                const userId = $(this).closest('.user-card').attr('id').replace('user-card-', '');
+                viewUserReviews(userId);
+            });
         });
     </script>
 </body>

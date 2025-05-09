@@ -538,7 +538,7 @@ body {
 /* Help Button */
 .help-button {
   position: fixed;
-  bottom: 105px;
+  bottom: 90px;
   right: 8px;
   background-color: #28a745;
   color: white;

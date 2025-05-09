@@ -36,6 +36,19 @@ document.addEventListener("DOMContentLoaded", () => {
     setupGenreButtons();
     displayWatchlist();
 
+    // Add scroll event listener for go to top button
+    const goToTopBtn = document.getElementById('goToTopBtn');
+    // Hide the button by default
+    goToTopBtn.style.display = 'none';
+    
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            goToTopBtn.style.display = 'block';
+        } else {
+            goToTopBtn.style.display = 'none';
+        }
+    });
+
     document.getElementById('goToTopBtn').addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });

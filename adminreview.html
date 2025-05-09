@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metflix - Admin User Reviews</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background: #141414;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .review-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: #1c1c1c;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(255, 0, 0, 0.4);
+            padding: 2rem;
+            border: 2px solid #ff0000;
+        }
+        .review-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .review-header-bar h2 {
+            color: #ff0000;
+            font-size: 1.8rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .back-btn {
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .back-btn:hover {
+            background: #cc0000;
+        }
+        .user-info {
+            margin-bottom: 2rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+        .user-info h3 {
+            color: #ff0000;
+            margin: 0 0 1rem 0;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+        .user-info .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.6rem;
+            color: #ddd;
+            font-size: 0.95rem;
+        }
+        .user-info .info-item i {
+            color: #ff0000;
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+        .review-items {
+            display: grid;
+            gap: 1.5rem;
+        }
+        .review-item {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid #ff0000;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 6px 20px rgba(255,0,0,0.1);
+        }
+        .review-item:hover {
+            background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255,0,0,0.15);
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255,0,0,0.2);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .review-header h5 {
+            color: #ff0000;
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .review-header h5 i {
+            color: #ff0000;
+            font-size: 1.2rem;
+        }
+        .review-rating {
+            background: linear-gradient(145deg, #ff0000, #cc0000);
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 3px 10px rgba(255,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .review-rating i {
+            color: #ffd700;
+            font-size: 1.1rem;
+        }
+        .review-text {
+            margin: 1.2rem 0;
+            line-height: 1.8;
+            color: #eee;
+            font-size: 1.1rem;
+            padding: 1rem 1rem 1rem 2.2rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            border-left: 3px solid rgba(255,0,0,0.3);
+            position: relative;
+        }
+        .review-text i {
+            color: rgba(255,0,0,0.3);
+            position: absolute;
+            top: 0.4rem;
+            left: 0.4rem;
+            font-size: 1rem;
+        }
+        .review-date {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .review-date i {
+            color: #aaa;
+            font-size: 1rem;
+        }
+        .review-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .review-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+        .review-action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .review-action-btn.delete {
+            background: #ff0000;
+            color: white;
+        }
+        .review-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+        .no-reviews, .error-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            color: #ddd;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        .no-reviews i, .error-message i {
+            font-size: 1.8rem;
+            color: #ff0000;
+            margin-bottom: 0.8rem;
+        }
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #ff0000;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #232325;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 8px 30px rgba(255,0,0,0.4);
+            border: 2px solid #ff0000;
+            text-align: center;
+            color: #fff;
+        }
+        .modal-content h4 {
+            color: #ff0000;
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .modal-btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .modal-btn.confirm {
+            background: #ff0000;
+            color: #fff;
+        }
+        .modal-btn.confirm:hover {
+            background: #cc0000;
+        }
+        .modal-btn.cancel {
+            background: #444;
+            color: #fff;
+        }
+        .modal-btn.cancel:hover {
+            background: #222;
+        }
+        .back-btn i {
+            font-size: 1.1rem;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @media (max-width: 768px) {
+            .review-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            .review-header-bar h2 {
+                font-size: 1.5rem;
+            }
+            .back-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            .review-item {
+                padding: 1.2rem;
+            }
+            .review-header h5 {
+                font-size: 1.1rem;
+            }
+            .review-rating {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            .modal-content {
+                padding: 1.5rem;
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="review-container">
+        <div class="review-header-bar">
+            <h2><i class="fas fa-user"></i> User Reviews</h2>
+            <button class="back-btn" onclick="window.location.href='admin.html'">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+        <div id="userInfo"></div>
+        <div id="reviewsContent">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Loading reviews...</p>
+            </div>
+        </div>
+    </div>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <h4>Confirm Delete</h4>
+            <p>Are you sure you want to delete this review? This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn confirm" id="confirmDeleteBtn">Yes, Delete</button>
+                <button class="modal-btn cancel" id="cancelDeleteBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <script>
+    function getQueryParam(name) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name);
+    }
+    async function fetchUserAndReviews(userId) {
+        const token = localStorage.getItem('admin_token');
+        if (!token) {
+            window.location.href = 'index.html';
+            return;
+        }
+        try {
+            const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch user details');
+            }
+            const user = await response.json();
+            renderUserInfo(user);
+            renderReviews(user.reviews);
+        } catch (error) {
+            document.getElementById('reviewsContent').innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>Error loading reviews. Please try again.<br><small>${error.message}</small></p>
+                </div>`;
+        }
+    }
+    function renderUserInfo(user) {
+        const joinDate = user.profile && user.profile.joinDate ? new Date(user.profile.joinDate).toLocaleDateString() : 'N/A';
+        // Calculate review count from user.reviews if not present
+        const reviewCount = (typeof user.reviewCount === 'number') ? user.reviewCount : (Array.isArray(user.reviews) ? user.reviews.length : 0);
+        // Calculate status based on lastActiveAt
+        let statusText = 'Inactive';
+        if (user.lastActiveAt) {
+            const lastActive = new Date(user.lastActiveAt);
+            const now = new Date();
+            const diffDays = (now - lastActive) / (1000 * 60 * 60 * 24);
+            statusText = diffDays <= 15 ? 'Active' : 'Inactive';
+        }
+        document.getElementById('userInfo').innerHTML = `
+            <div class="user-info">
+                <h3><i class="fas fa-user"></i> ${user.username || 'N/A'}</h3>
+                <div class="info-item"><i class="fas fa-envelope"></i> ${user.email || 'N/A'}</div>
+                <div class="info-item"><i class="fas fa-calendar-alt"></i> Joined: ${joinDate}</div>
+                <div class="info-item"><i class="fas fa-comments"></i> Reviews: ${reviewCount}</div>
+                <div class="info-item"><i class="fas fa-user-check"></i> Status: ${statusText}</div>
+            </div>
+        `;
+    }
+    function renderReviews(reviews) {
+        if (Array.isArray(reviews) && reviews.length > 0) {
+            document.getElementById('reviewsContent').innerHTML = `
+                <div class="review-items">
+                    ${reviews.map(review => `
+                        <div class="review-item" data-review-id="${review._id}">
+                            <div class="review-header">
+                                <h5><i class="fas fa-film"></i> ${review.title || 'N/A'}</h5>
+                                <span class="review-rating"><i class="fas fa-star"></i> ${review.rating || 'N/A'}/5</span>
+                            </div>
+                            <p class="review-text"><i class="fas fa-quote-left"></i> ${review.review || 'N/A'}</p>
+                            <div class="review-meta">
+                                <p class="review-date"><i class="fas fa-clock"></i> Posted: ${review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'N/A'}</p>
+                                <div class="review-actions">
+                                    <button class="review-action-btn delete" data-review-id="${review._id}">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            document.querySelectorAll('.review-action-btn.delete').forEach(btn => {
+                btn.onclick = function() {
+                    const reviewId = this.getAttribute('data-review-id');
+                    showDeleteModal(reviewId);
+                };
+            });
+        } else {
+            document.getElementById('reviewsContent').innerHTML = `
+                <div class="no-reviews">
+                    <i class="fas fa-comment-slash"></i>
+                    <p>No reviews found for this user.</p>
+                </div>
+            `;
+        }
+    }
+    let reviewIdToDelete = null;
+    function showDeleteModal(reviewId) {
+        reviewIdToDelete = reviewId;
+        document.getElementById('deleteModal').classList.add('active');
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('cancelDeleteBtn').onclick = function() {
+            reviewIdToDelete = null;
+            document.getElementById('deleteModal').classList.remove('active');
+        };
+        document.getElementById('confirmDeleteBtn').onclick = async function() {
+            if (!reviewIdToDelete) return;
+            await deleteReview(reviewIdToDelete);
+            document.getElementById('deleteModal').classList.remove('active');
+            reviewIdToDelete = null;
+        };
+    });
+    async function deleteReview(reviewId) {
+        const token = localStorage.getItem('admin_token');
+        if (!token) return;
+        try {
+            const response = await fetch(`http://localhost:5000/api/admin/reviews/${reviewId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.message || 'Failed to delete review');
+            }
+            const reviewElem = document.querySelector(`.review-item[data-review-id='${reviewId}']`);
+            if (reviewElem) reviewElem.remove();
+            // Update review count in user info
+            const reviewCount = document.querySelectorAll('.review-item').length;
+            const reviewCountElem = document.querySelector('.user-info .fa-comments').parentElement;
+            if (reviewCountElem) {
+                reviewCountElem.innerHTML = `<i class="fas fa-comments"></i> Reviews: ${reviewCount}`;
+            }
+            const reviews = document.querySelectorAll('.review-item');
+            if (reviews.length === 0) {
+                document.getElementById('reviewsContent').innerHTML = `
+                    <div class="no-reviews">
+                        <i class="fas fa-comment-slash"></i>
+                        <p>No reviews found for this user.</p>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            alert('Failed to delete review: ' + error.message);
+        }
+    }
+    const userId = getQueryParam('userId');
+    if (userId) {
+        fetchUserAndReviews(userId);
+    } else {
+        document.getElementById('reviewsContent').innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>No user selected.</p>
+            </div>`;
+    }
+    </script>
+</body>
+</html>
