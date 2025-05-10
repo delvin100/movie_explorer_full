@@ -66,9 +66,26 @@ const reviewSchema = new mongoose.Schema({
 
 reviewSchema.index({ userId: 1, movieId: 1 }, { unique: true });
 
+// Movie Request Schema
+const movieRequestSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    movie: { type: String, required: true },
+    language: { type: String, required: true },
+    quality: { type: String, required: true },
+    status: { 
+        type: String, 
+        enum: ['pending', 'processing', 'completed', 'rejected'],
+        default: 'pending'
+    },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
+    response: { type: String, default: '' }
+});
+
 const User = mongoose.model('User', userSchema);
 const Watchlist = mongoose.model('Watchlist', watchlistSchema);
 const Review = mongoose.model('Review', reviewSchema);
+const MovieRequest = mongoose.model('MovieRequest', movieRequestSchema);
 
 // Middleware to verify JWT token
 const auth = async (req, res, next) => {
@@ -537,6 +554,113 @@ app.delete('/api/admin/reviews/:reviewId', authenticateAdmin, async (req, res) =
         res.json({ message: 'Review deleted permanently.' });
     } catch (err) {
         res.status(500).json({ message: 'Server error.' });
+    }
+});
+
+// Submit movie request
+app.post('/api/movie-request', auth, async (req, res) => {
+    try {
+        const { movie, language, quality } = req.body;
+
+        // Validate required fields
+        if (!movie || !language || !quality) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'All fields are required.' 
+            });
+        }
+
+        // Create new movie request
+        const movieRequest = new MovieRequest({
+            userId: req.user._id,
+            movie,
+            language,
+            quality,
+            status: 'pending'
+        });
+
+        const savedRequest = await movieRequest.save();
+
+        // Send response
+        return res.status(201).json({
+            success: true,
+            message: 'Movie request submitted successfully',
+            requestId: savedRequest._id
+        });
+
+    } catch (err) {
+        console.error('Error submitting movie request:', err);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Error submitting movie request' 
+        });
+    }
+});
+
+// Get all movie requests (admin only)
+app.get('/api/movie-requests', auth, async (req, res) => {
+    try {
+        // Check if user is admin (you can add admin check logic here)
+        const requests = await MovieRequest.find()
+            .sort({ createdAt: -1 })
+            .limit(100);
+        
+        res.json({
+            success: true,
+            requests
+        });
+    } catch (err) {
+        console.error('Error fetching movie requests:', err);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error fetching movie requests' 
+        });
+    }
+});
+
+// Update movie request status (admin only)
+app.patch('/api/movie-request/:id', auth, async (req, res) => {
+    try {
+        const { status, response } = req.body;
+        const requestId = req.params.id;
+
+        // Validate status
+        if (!['pending', 'processing', 'completed', 'rejected'].includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid status'
+            });
+        }
+
+        const updatedRequest = await MovieRequest.findByIdAndUpdate(
+            requestId,
+            {
+                status,
+                response: response || '',
+                updatedAt: new Date()
+            },
+            { new: true }
+        );
+
+        if (!updatedRequest) {
+            return res.status(404).json({
+                success: false,
+                message: 'Movie request not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Request status updated successfully',
+            request: updatedRequest
+        });
+
+    } catch (err) {
+        console.error('Error updating movie request:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating movie request'
+        });
     }
 });
 

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/form_styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Metflix - Movie Request Form</title>
+    <style>
+        .popup-btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1><i class="fas fa-film"></i> Metflix - Movie Request Form</h1>
+    <div id="message">
+        <i class="fas fa-info-circle"></i> Fill out the form below, and I'll provide the movie link to your email!
+    </div>
+    <form id="userForm">
+        <label for="movieName" data-tooltip="Your selected movie"><i class="fas fa-film"></i> Selected Movie:</label>
+        <input type="text" id="movieName" name="movieName" readonly required>
+
+        <label for="language" data-tooltip="Select preferred language"><i class="fas fa-globe"></i> Preferred Language:</label>
+        <select id="language" name="language" required>
+            <option value="" disabled selected>Select a language</option>
+            <option value="Malayalam">Malayalam</option>
+            <option value="Tamil">Tamil</option>
+            <option value="Hindi">Hindi</option>
+            <option value="English">English</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <label for="customLanguage" data-tooltip="Enter any other language if not listed"><i class="fas fa-language"></i> Other Language (Optional):</label>
+        <input type="text" id="customLanguage" name="customLanguage" placeholder="Enter custom language">
+        <p class="note">Note: Only available audio will be provided.</p>
+
+        <label for="quality" data-tooltip="Select preferred video quality"><i class="fas fa-star"></i> Preferred Quality:</label>
+        <select id="quality" name="quality" required>
+            <option value="" disabled selected>Select quality</option>
+            <option value="144p">144p</option>
+            <option value="240p">240p</option>
+            <option value="360p">360p</option>
+            <option value="480p">480p</option>
+            <option value="720p">720p</option>
+            <option value="1080p">1080p</option>
+        </select>
+
+        <button type="submit"><i class="fas fa-paper-plane"></i> Submit</button>
+    </form>
+    <div class="spinner" id="formSpinner"></div>
+    <button id="goBackButton"><i class="fas fa-arrow-left"></i> Go Back</button>
+
+    <script>
+        const BOT_TOKEN = "7635804333:AAG3bze_1AOGFsP2ytpw8439Cl6p4XI5XWk";
+        const CHAT_ID = "5379038515";
+        const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+        const ADMIN_DASHBOARD_URL = 'admin.html'; // URL for the admin dashboard
+
+        function getSelectedLanguage() {
+            const language = document.getElementById("language").value;
+            const customLanguage = document.getElementById("customLanguage").value.trim();
+            return customLanguage || language || "Malayalam";
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const selectedMovie = localStorage.getItem('selectedMovie');
+            if (selectedMovie) {
+                document.getElementById("movieName").value = selectedMovie;
+            }
+
+            document.getElementById('goBackButton').addEventListener('click', () => window.location.href = 'more.html');
+        });
+
+        // Function to save request to admin dashboard
+        function saveToAdminDashboard(requestData) {
+            // Get existing requests from localStorage
+            let requests = JSON.parse(localStorage.getItem('userRequests') || '[]');
+            
+            // Add new request with timestamp and status
+            const newRequest = {
+                ...requestData,
+                timestamp: Date.now(),
+                status: 'pending', // Initial status
+                id: Date.now().toString(), // Unique ID for the request
+                date: new Date().toLocaleString() // Human-readable date
+            };
+            
+            // Add to requests array
+            requests.push(newRequest);
+            
+            // Save back to localStorage
+            localStorage.setItem('userRequests', JSON.stringify(requests));
+            
+            // Dispatch event to notify admin dashboard if it's open
+            window.dispatchEvent(new CustomEvent('newRequest', { detail: newRequest }));
+            
+            return newRequest;
+        }
+
+        document.getElementById("userForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const spinner = document.getElementById("formSpinner");
+            spinner.style.display = "block";
+
+            let movieName = document.getElementById("movieName").value;
+            let language = document.getElementById("language").value;
+            let customLanguage = document.getElementById("customLanguage").value.trim();
+            let quality = document.getElementById("quality").value;
+
+            if (!movieName) {
+                spinner.style.display = "none";
+                return showPopup("❌ Please select a movie before submitting.");
+            }
+            if (!language) {
+                spinner.style.display = "none";
+                return showPopup("❌ Please select a preferred language.");
+            }
+            if (!quality) {
+                spinner.style.display = "none";
+                return showPopup("❌ Please select a preferred quality.");
+            }
+
+            let finalLanguage = customLanguage ? `${language} (Custom: ${customLanguage})` : language;
+            
+            // Prepare request data
+            const requestData = {
+                movie: movieName,
+                language: finalLanguage,
+                quality: quality
+            };
+
+            try {
+                // Get the authentication token
+                const token = localStorage.getItem('metflix_jwt');
+                if (!token) {
+                    throw new Error('Please login to submit a movie request');
+                }
+
+                // Send to server
+                const serverResponse = await fetch('http://localhost:5000/api/movie-request', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                let serverData;
+                const contentType = serverResponse.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    serverData = await serverResponse.json();
+                } else {
+                    throw new Error('Server returned non-JSON response');
+                }
+
+                if (!serverResponse.ok) {
+                    throw new Error(serverData.message || 'Server error');
+                }
+
+                if (!serverData.success) {
+                    throw new Error(serverData.message || 'Request failed');
+                }
+
+                // Send to Telegram
+                const telegramMessage = `📌 New Movie Request:\n🎬 Movie: ${movieName}\n🌐 Language: ${finalLanguage}\n📺 Quality: ${quality}\n🆔 Request ID: ${serverData.requestId}`;
+                
+                const telegramResponse = await fetch(TELEGRAM_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: telegramMessage,
+                        parse_mode: 'HTML'
+                    })
+                });
+
+                if (!telegramResponse.ok) {
+                    console.warn('Failed to send Telegram notification, but request was saved');
+                }
+
+                // Save to admin dashboard
+                saveToAdminDashboard({
+                    ...requestData,
+                    requestId: serverData.requestId
+                });
+
+                spinner.style.display = "none";
+                showPopup("✅ Your request has been submitted successfully!");
+                this.reset();
+
+            } catch (error) {
+                spinner.style.display = "none";
+                console.error('Error:', error);
+                if (error.message === 'Please login to submit a movie request') {
+                    showPopup("❌ Please login to submit a movie request");
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    showPopup(`❌ ${error.message || 'There was an error submitting your request. Please try again.'}`);
+                }
+            }
+        });
+
+        function showPopup(message) {
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <p>${message}</p>
+                    <div class="popup-btn-container">
+                        <button id="popupOkBtn">OK</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            document.getElementById('popupOkBtn').onclick = function() {
+                popup.remove();
+                window.location.href = 'more.html';
+            };
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93d88a1feedaafc2',t:'MTc0Njg3MDcwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>
