@@ -571,6 +571,133 @@
             color: #ff0000;
             margin-bottom: 1rem;
         }
+        /* Movie Requests Section Styles */
+        .movie-requests-section {
+            margin-top: 2rem;
+        }
+        .movie-request-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            border-left: 5px solid #ff0000;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(255, 0, 0, 0.1);
+        }
+        .movie-request-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(255, 0, 0, 0.2);
+        }
+        .movie-request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .movie-request-title {
+            color: #ff0000;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        .movie-request-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .movie-request-status.pending {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+        }
+        .movie-request-status.completed {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+        }
+        .movie-request-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .movie-request-info {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .movie-request-info i {
+            color: #ff0000;
+            font-size: 1.2rem;
+        }
+        .movie-request-info span {
+            color: #ddd;
+            font-size: 1.1rem;
+        }
+        .movie-request-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .movie-request-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .movie-request-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        .movie-request-btn.approve {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+        }
+        .movie-request-btn.reject {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ddd;
+            font-size: 1.1rem;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #ff0000;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .form-control::placeholder {
+            color: #aaa;
+        }
     </style>
 </head>
 <body>
@@ -591,29 +718,40 @@
                 <div class="stat-label">Total Users</div>
             </div>
             <div class="stat-card">
+                <div class="stat-number" id="totalRequests">0</div>
+                <div class="stat-label">Total Requests</div>
+            </div>
+            <div class="stat-card">
                 <div class="stat-number" id="totalReviews">0</div>
                 <div class="stat-label">Total Reviews</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="activeUsers">0</div>
-                <div class="stat-label">Active Users</div>
+        </div>
+
+        <!-- Movie Requests Section -->
+        <div class="admin-section movie-requests-section">
+            <h2>Movie Requests</h2>
+            <div class="search-bar" id="movieRequestSearch" placeholder="Search movie requests..."></div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="pending">Pending</button>
+                <button class="filter-btn" data-filter="completed">Completed</button>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="inactiveUsers">0</div>
-                <div class="stat-label">Inactive Users</div>
+            <div id="movieRequestsList" class="user-list">
+                <!-- Movie requests will be loaded here -->
             </div>
         </div>
 
+        <!-- Existing User Management Section -->
         <div class="admin-section">
             <h2>User Management</h2>
-            <input type="text" class="search-bar" id="userSearch" placeholder="Search users...">
+            <div class="search-bar" id="userSearch" placeholder="Search users..."></div>
             <div class="filter-buttons">
                 <button class="filter-btn active" data-filter="all">All</button>
                 <button class="filter-btn" data-filter="active">Active</button>
                 <button class="filter-btn" data-filter="inactive">Inactive</button>
             </div>
-            <div class="user-list" id="userList">
-                <!-- User cards will be dynamically added here -->
+            <div id="userList" class="user-list">
+                <!-- Users will be loaded here -->
             </div>
         </div>
     </div>
@@ -827,15 +965,13 @@
                 const stats = await response.json();
                 console.log('Stats fetched:', stats);
                 $('#totalUsers').text(stats.totalUsers || 0);
+                $('#totalRequests').text(stats.totalRequests || 0);
                 $('#totalReviews').text(stats.totalReviews || 0);
-                $('#activeUsers').text(stats.activeUsers || 0);
-                $('#inactiveUsers').text(stats.inactiveUsers || 0);
             } catch (error) {
                 console.error('Error updating stats:', error);
                 $('#totalUsers').text('0');
+                $('#totalRequests').text('0');
                 $('#totalReviews').text('0');
-                $('#activeUsers').text('0');
-                $('#inactiveUsers').text('0');
             }
         }
 
@@ -1134,6 +1270,187 @@
                 alert('Failed to delete review. Please try again.');
             }
         }
+
+        // Function to load movie requests
+        async function loadMovieRequests() {
+            try {
+                const token = localStorage.getItem('admin_token');
+                if (!token) {
+                    throw new Error('Admin authentication required');
+                }
+
+                const response = await fetch('http://localhost:5000/api/movie-requests', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to fetch movie requests');
+                }
+
+                const requests = await response.json();
+                const requestsList = document.getElementById('movieRequestsList');
+                requestsList.innerHTML = '';
+
+                if (!Array.isArray(requests) || requests.length === 0) {
+                    requestsList.innerHTML = `
+                        <div class="no-users">
+                            <i class="fas fa-film fa-3x"></i>
+                            <p>No movie requests found</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                requests.forEach(request => {
+                    const requestCard = document.createElement('div');
+                    requestCard.className = 'movie-request-card';
+                    requestCard.innerHTML = `
+                        <div class="movie-request-header">
+                            <h3 class="movie-request-title">${request.movie}</h3>
+                            <span class="movie-request-status ${request.status.toLowerCase()}">${request.status}</span>
+                        </div>
+                        <div class="movie-request-details">
+                            <div class="movie-request-info">
+                                <i class="fas fa-language"></i>
+                                <span>${request.language}</span>
+                            </div>
+                            <div class="movie-request-info">
+                                <i class="fas fa-video"></i>
+                                <span>${request.quality}</span>
+                            </div>
+                            <div class="movie-request-info">
+                                <i class="fas fa-user"></i>
+                                <span>User: ${request.userId?.username || 'Unknown'}</span>
+                            </div>
+                            <div class="movie-request-info">
+                                <i class="fas fa-clock"></i>
+                                <span>Date: ${new Date(request.createdAt).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                        <div class="movie-request-actions">
+                            <button class="movie-request-btn approve" onclick="updateRequestStatus('${request._id}', 'completed')">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button class="movie-request-btn reject" onclick="updateRequestStatus('${request._id}', 'rejected')">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        </div>
+                    `;
+                    requestsList.appendChild(requestCard);
+                });
+
+                // Update total requests count
+                document.getElementById('totalRequests').textContent = requests.length;
+
+            } catch (error) {
+                console.error('Error loading movie requests:', error);
+                const requestsList = document.getElementById('movieRequestsList');
+                requestsList.innerHTML = `
+                    <div class="no-users">
+                        <i class="fas fa-exclamation-circle fa-3x"></i>
+                        <p>${error.message || 'Failed to load movie requests'}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Function to update request status
+        async function updateRequestStatus(requestId, newStatus) {
+            try {
+                const token = localStorage.getItem('admin_token');
+                if (!token) {
+                    throw new Error('Admin authentication required');
+                }
+
+                if (newStatus === 'completed') {
+                    window.location.href = `adminapprove.html?requestId=${requestId}`;
+                    return;
+                }
+
+                // For other statuses, proceed as normal
+                const response = await fetch(`http://localhost:5000/api/movie-request/${requestId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to update request status');
+                }
+
+                // Reload requests after update
+                await loadMovieRequests();
+                showSuccess('Request status updated successfully');
+
+            } catch (error) {
+                console.error('Error updating request status:', error);
+                showError(error.message || 'Failed to update request status');
+            }
+        }
+
+        // Function to show success message
+        function showSuccess(message) {
+            // Implement your success notification here
+            alert(message);
+        }
+
+        // Function to show error message
+        function showError(message) {
+            // Implement your error notification here
+            alert(message);
+        }
+
+        // Load movie requests when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMovieRequests();
+        });
+
+        // Add search functionality
+        document.getElementById('movieRequestSearch').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const requestCards = document.querySelectorAll('.movie-request-card');
+            
+            requestCards.forEach(card => {
+                const title = card.querySelector('.movie-request-title').textContent.toLowerCase();
+                const language = card.querySelector('.movie-request-info:nth-child(1) span').textContent.toLowerCase();
+                const quality = card.querySelector('.movie-request-info:nth-child(2) span').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || language.includes(searchTerm) || quality.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Add filter functionality
+        document.querySelectorAll('.movie-requests-section .filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.movie-requests-section .filter-btn').forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                
+                const filter = btn.dataset.filter;
+                const requestCards = document.querySelectorAll('.movie-request-card');
+                
+                requestCards.forEach(card => {
+                    const status = card.querySelector('.movie-request-status').textContent.toLowerCase();
+                    if (filter === 'all' || status === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>

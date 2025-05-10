@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 require('dotenv').config();
+const { sendMovieRequestApprovalEmail } = require('./emailHelper');
 
 const app = express();
 app.use(express.json());
@@ -11,7 +12,7 @@ app.use(cors());
 app.use(express.static('.')); // Serve static files from the current directory
 
 // MongoDB connection
-mongoose.connect('mongodb+srv://delvinvarghese2028:Delvin2806@cluster0.isgjvem.mongodb.net/metflix?retryWrites=true&w=majority&appName=Cluster0')
+mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('MongoDB connected successfully.'))
     .catch(err => console.error('MongoDB connection error:', err));
 
@@ -79,7 +80,8 @@ const movieRequestSchema = new mongoose.Schema({
     },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
-    response: { type: String, default: '' }
+    response: { type: String, default: '' },
+    downloadLink: { type: String }
 });
 
 const User = mongoose.model('User', userSchema);
@@ -528,14 +530,12 @@ app.get('/api/admin/users/:id', authenticateAdmin, async (req, res) => {
 app.get('/api/admin/stats', authenticateAdmin, async (req, res) => {
     try {
         const totalUsers = await User.countDocuments();
-        const activeUsers = await User.countDocuments({ isActive: true });
-        const inactiveUsers = await User.countDocuments({ isActive: false });
+        const totalRequests = await MovieRequest.countDocuments();
         const totalReviews = await Review.countDocuments();
 
         res.json({
             totalUsers,
-            activeUsers,
-            inactiveUsers,
+            totalRequests,
             totalReviews
         });
     } catch (error) {
@@ -597,18 +597,30 @@ app.post('/api/movie-request', auth, async (req, res) => {
     }
 });
 
-// Get all movie requests (admin only)
-app.get('/api/movie-requests', auth, async (req, res) => {
+// Get user's own movie requests
+app.get('/api/movie-requests/user', auth, async (req, res) => {
     try {
-        // Check if user is admin (you can add admin check logic here)
+        const requests = await MovieRequest.find({ userId: req.user._id })
+            .sort({ createdAt: -1 });
+        
+        res.json(requests);
+    } catch (err) {
+        console.error('Error fetching user movie requests:', err);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error fetching your movie requests' 
+        });
+    }
+});
+
+// Get all movie requests (admin only)
+app.get('/api/movie-requests', authenticateAdmin, async (req, res) => {
+    try {
         const requests = await MovieRequest.find()
             .sort({ createdAt: -1 })
-            .limit(100);
+            .populate('userId', 'username email');
         
-        res.json({
-            success: true,
-            requests
-        });
+        res.json(requests);
     } catch (err) {
         console.error('Error fetching movie requests:', err);
         res.status(500).json({ 
@@ -618,36 +630,50 @@ app.get('/api/movie-requests', auth, async (req, res) => {
     }
 });
 
-// Update movie request status (admin only)
-app.patch('/api/movie-request/:id', auth, async (req, res) => {
+// Update movie request status
+app.patch('/api/movie-request/:id', authenticateAdmin, async (req, res) => {
     try {
-        const { status, response } = req.body;
+        const { status, downloadLink } = req.body;
         const requestId = req.params.id;
 
-        // Validate status
-        if (!['pending', 'processing', 'completed', 'rejected'].includes(status)) {
+        if (!['pending', 'completed', 'rejected'].includes(status)) {
             return res.status(400).json({
                 success: false,
                 message: 'Invalid status'
             });
         }
 
-        const updatedRequest = await MovieRequest.findByIdAndUpdate(
-            requestId,
-            {
-                status,
-                response: response || '',
-                updatedAt: new Date()
-            },
-            { new: true }
-        );
-
-        if (!updatedRequest) {
+        const request = await MovieRequest.findById(requestId).populate('userId', 'email');
+        
+        if (!request) {
             return res.status(404).json({
                 success: false,
                 message: 'Movie request not found'
             });
         }
+
+        // If status is completed and downloadLink is provided, send email
+        if (status === 'completed' && downloadLink) {
+            try {
+                await sendMovieRequestApprovalEmail(
+                    request.userId.email,
+                    request.movie,
+                    downloadLink
+                );
+            } catch (emailError) {
+                console.error('Error sending approval email:', emailError);
+                // Continue with the status update even if email fails
+            }
+        }
+
+        const updatedRequest = await MovieRequest.findByIdAndUpdate(
+            requestId,
+            { 
+                status,
+                downloadLink: status === 'completed' ? downloadLink : undefined
+            },
+            { new: true }
+        );
 
         res.json({
             success: true,
@@ -657,10 +683,58 @@ app.patch('/api/movie-request/:id', auth, async (req, res) => {
 
     } catch (err) {
         console.error('Error updating movie request:', err);
-        res.status(500).json({
-            success: false,
-            message: 'Error updating movie request'
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error updating movie request' 
         });
+    }
+});
+
+// Get a single movie request by ID (admin)
+app.get('/api/movie-request/:id', authenticateAdmin, async (req, res) => {
+    try {
+        const request = await MovieRequest.findById(req.params.id)
+            .populate('userId', 'username email');
+        if (!request) {
+            return res.status(404).json({ message: 'Request not found' });
+        }
+        res.json(request);
+    } catch (err) {
+        res.status(500).json({ message: 'Server error.' });
+    }
+});
+
+// Delete a movie request (user or admin)
+app.delete('/api/movie-requests/:id', auth, async (req, res) => {
+    try {
+        const request = await MovieRequest.findById(req.params.id);
+        if (!request) return res.status(404).json({ message: 'Request not found' });
+        // Only allow the user who made the request or an admin to delete
+        if (request.userId.toString() !== req.user._id.toString() && !req.user.isAdmin) {
+            return res.status(403).json({ message: 'Not authorized' });
+        }
+        await request.deleteOne();
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Permanently delete user and all related data
+app.delete('/api/profile', auth, async (req, res) => {
+    try {
+        const userId = req.user._id;
+        // Delete all watchlist items
+        await Watchlist.deleteMany({ userId });
+        // Delete all reviews
+        await Review.deleteMany({ userId });
+        // Delete all movie requests
+        await MovieRequest.deleteMany({ userId });
+        // Delete the user
+        await User.findByIdAndDelete(userId);
+        res.json({ message: 'Account and all related data deleted permanently.' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error.' });
     }
 });
 

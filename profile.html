@@ -141,6 +141,9 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            justify-content: flex-start;
+            font-weight: bold;
+            letter-spacing: 1px;
         }
 
         .edit-profile-btn {
@@ -352,102 +355,56 @@
             text-align: right;
         }
 
-        .no-reviews {
+        .no-requests {
             text-align: center;
-            color: #888;
-            font-style: italic;
-            padding: 2rem;
-        }
-
-        /* Popup Styles */
-        .popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(28, 7, 7, 0.85);
+            padding: 3rem;
+            color: #aaa;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin: 2rem auto 0 auto;
+            max-width: 400px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(12px);
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(255,0,0,0.08);
         }
 
-        .popup-content {
-            background: linear-gradient(135deg, rgba(139, 46, 46, 0.9), rgba(255, 64, 64, 0.7));
-            padding: 1.875rem;
-            border-radius: 20px;
-            max-width: 34.375rem;
-            width: 90%;
-            text-align: center;
-            color: #fff3b0;
-            box-shadow: 0 8px 25px rgba(255, 64, 64, 0.5), 0 0 40px rgba(255, 128, 128, 0.3);
-            border: 2px solid #ff8080;
-            position: relative;
-            max-height: 80vh;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #ff4040 #333;
+        .no-requests i {
+            font-size: 3rem;
+            color: #ff0000;
+            margin-bottom: 1rem;
         }
 
-        .popup-content::-webkit-scrollbar {
-            width: 8px;
+        .download-link {
+            color: #00ff00;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s;
         }
 
-        .popup-content::-webkit-scrollbar-track {
-            background: #333;
-            border-radius: 10px;
+        .download-link:hover {
+            color: #00cc00;
         }
 
-        .popup-content::-webkit-scrollbar-thumb {
-            background: #ff4040;
-            border-radius: 10px;
-            border: 2px solid #333;
-        }
-
-        .popup-content::-webkit-scrollbar-thumb:hover {
-            background: #ff8080;
-            box-shadow: 0 0 5px rgba(255, 64, 64, 0.5);
-        }
-
-        .popup h2 {
-            margin-bottom: 1.25rem;
-            font-size: 2rem;
-            color: #ffd700;
-            text-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
-            word-wrap: break-word;
-            max-height: 6rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .popup p {
-            font-size: 1.1rem;
-            margin-bottom: 1.5625rem;
-            color: #ffea80;
-        }
-
-        .popup button {
-            padding: 0.75rem 1.875rem;
-            font-size: 1.1rem;
-            background: linear-gradient(45deg, #ff4040, #ff8080);
-            color: #ffe066;
-            font-weight: 600;
+        .delete-request-btn {
+            background: none;
             border: none;
-            border-radius: 50px;
+            color: #ff3333;
             cursor: pointer;
-            margin: 0.5rem;
-            transition: all 0.4s ease;
+            font-size: 1.2rem;
+            margin-left: 10px;
+            transition: color 0.2s;
         }
 
-        .popup button:hover {
-            background: linear-gradient(45deg, #ff1a1a, #ff6666);
-            transform: scale(1.15);
-            box-shadow: 0 0 15px rgba(255, 64, 64, 0.8);
+        .delete-request-btn:hover {
+            color: #fff;
+            background: #ff3333;
+            border-radius: 50%;
         }
 
-        /* Individual Button Styles */
         .nav-button, .back-button {
             position: fixed;
             background: linear-gradient(45deg, #ff4040, #ff8080);
@@ -464,211 +421,135 @@
             box-shadow: 0 2px 10px rgba(255, 64, 64, 0.3);
             z-index: 100;
         }
-
         .nav-button:hover, .back-button:hover {
             transform: scale(1.1);
             box-shadow: 0 4px 15px rgba(255, 64, 64, 0.5);
         }
-
         #backToMoviesBtn {
             bottom: 20px;
             left: 20px;
         }
-
         #goToTopBtn {
             bottom: 20px;
             right: 20px;
         }
 
-        /* Review Modal Styles */
-        .review-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* My Requests Section Styles */
+        .requests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .request-card {
+            background: #232325;
+            border-radius: 18px;
+            padding: 2rem 2.5rem;
+            border-left: 4px solid #ff0000;
+            box-shadow: 0 4px 24px rgba(255, 0, 0, 0.08);
+            margin-bottom: 1rem;
+            min-width: 340px;
+            max-width: 420px;
             width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .review-modal-content {
-            background: #1e1e20;
-            margin: 5% auto;
-            padding: 2rem;
-            width: 90%;
-            max-width: 600px;
-            border-radius: 15px;
-            position: relative;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
-        }
-
-        .review-form {
+            transition: transform 0.3s, box-shadow 0.3s;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            align-items: flex-start;
         }
-
-        .rating-input {
-            display: flex;
-            gap: 0.5rem;
-            font-size: 1.5rem;
-            color: #ff0000;
+        .request-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 32px rgba(255, 0, 0, 0.18);
         }
-
-        .rating-input i {
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .rating-input i:hover {
-            transform: scale(1.2);
-        }
-
-        .review-textarea {
-            width: 100%;
-            min-height: 150px;
-            padding: 1rem;
-            border: 1px solid #ff0000;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            resize: vertical;
-        }
-
-        .review-submit {
-            background: #ff0000;
-            color: #fff;
-            border: none;
-            padding: 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-
-        .review-submit:hover {
-            background: #cc0000;
-        }
-
-        .review-delete {
-            background: #444;
-            color: #fff;
-            border: none;
-            padding: 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-
-        .review-delete:hover {
-            background: #222;
-        }
-
-        .reviews-section {
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .review-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .review-header {
+        .request-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.5rem;
+            width: 100%;
+            margin-bottom: 1rem;
         }
-
-        .review-author {
+        .request-title {
+            color: #ff0000;
+            font-size: 1.3rem;
             font-weight: bold;
-            color: #ff0000;
+            margin: 0;
+            word-break: break-word;
         }
-
-        .review-rating {
-            color: #ffd700;
-        }
-
-        .review-content {
+        .request-status {
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: lowercase;
+            background: #18181a;
             color: #fff;
-            line-height: 1.6;
+            margin-left: 1rem;
         }
-
-        .review-date {
-            font-size: 0.8rem;
-            color: #aaa;
+        .request-status.completed {
+            background: #0f0;
+            color: #fff;
+        }
+        .request-status.pending {
+            background: #ffa500;
+            color: #fff;
+        }
+        .request-status.rejected {
+            background: #ff0000;
+            color: #fff;
+        }
+        .request-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
             margin-top: 0.5rem;
+            width: 100%;
         }
-
-        .close-review-modal {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .close-review-modal:hover {
-            color: #ff0000;
-        }
-
-        .dropdown {
-            position: relative;
-            display: inline-block;
-            cursor: pointer;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #1a1a1a;
-            min-width: 200px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            z-index: 1000;
-            border-radius: 8px;
-            padding: 8px 0;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        .dropdown-item {
-            padding: 12px 16px;
+        .request-info {
             display: flex;
             align-items: center;
-            gap: 12px;
-            color: #fff;
-            transition: background-color 0.3s;
+            gap: 0.5rem;
+            color: #ddd;
+            font-size: 1.05rem;
         }
-
-        .dropdown-item:hover {
-            background-color: #333;
+        .request-info i {
+            color: #ff0000;
         }
-
-        .dropdown-item i {
-            width: 20px;
+        .download-link {
+            color: #00ff00;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+        .download-link:hover {
+            color: #00cc00;
+            text-decoration: underline;
+        }
+        .request-date {
+            color: #aaa;
+            font-size: 0.95rem;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .no-requests {
             text-align: center;
-        }
-
-        .count {
-            margin-left: auto;
-            background-color: #e50914;
-            color: white;
-            padding: 2px 8px;
+            padding: 3rem;
+            color: #aaa;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
-            font-size: 0.8em;
+            margin: 2rem auto 0 auto;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(255,0,0,0.08);
+        }
+        .no-requests i {
+            font-size: 3rem;
+            color: #ff0000;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
@@ -699,6 +580,10 @@
                         <div class="stat-value" id="reviewsCount">0</div>
                         <div class="stat-label">Reviews</div>
                     </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="requestsCount">0</div>
+                        <div class="stat-label">Requested Movies</div>
+                    </div>
                 </div>
             </div>
             <button class="edit-profile-btn" onclick="openEditProfileModal()">
@@ -712,6 +597,16 @@
             </h2>
             <div class="watchlist-grid" id="watchlistGrid">
                 <!-- Watchlist items will be dynamically added here -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-film"></i>
+                My Movie Requests
+            </h2>
+            <div id="requestsList" class="requests-grid">
+                <!-- Requests will be loaded here -->
             </div>
         </div>
 
@@ -754,7 +649,7 @@
     </div>
 
     <!-- Review Modal -->
-    <div id="reviewModal" class="review-modal">
+    <div id="reviewModal" class="review-modal" style="display: none;">
         <div class="review-modal-content">
             <button class="close-review-modal" onclick="closeReviewModal()">×</button>
             <h2>Write a Review</h2>
@@ -843,6 +738,16 @@
                 const watchlistGrid = document.getElementById('watchlistGrid');
                 watchlistGrid.innerHTML = '';
                 document.getElementById('watchlistCount').textContent = watchlist.length;
+
+                if (watchlist.length === 0) {
+                    watchlistGrid.innerHTML = `
+                        <div class="no-requests">
+                            <i class="fas fa-film"></i>
+                            <p>You haven't added any movies to your watchlist yet.</p>
+                        </div>
+                    `;
+                    return;
+                }
 
                 const grid = document.createElement('div');
                 grid.className = 'featured-grid';
@@ -960,7 +865,12 @@
                 document.getElementById('reviewsCount').textContent = reviews.length;
 
                 if (reviews.length === 0) {
-                    reviewsList.innerHTML = '<p class="no-reviews">No reviews yet. Start reviewing movies!</p>';
+                    reviewsList.innerHTML = `
+                        <div class="no-requests">
+                            <i class="fas fa-star"></i>
+                            <p>No reviews yet. Start reviewing movies!</p>
+                        </div>
+                    `;
                     return;
                 }
 
@@ -1362,9 +1272,137 @@
         // Initialize go to top button visibility
         document.getElementById('goToTopBtn').style.display = 'none';
 
-        // Initialize profile page
-        document.addEventListener('DOMContentLoaded', () => {
+        // Function to load user's movie requests
+        async function loadMyRequests() {
+            try {
+                const token = localStorage.getItem('metflix_jwt');
+                if (!token) {
+                    throw new Error('Please login to view your requests');
+                }
+
+                const response = await fetch('http://localhost:5000/api/movie-requests/user', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    console.error('Error parsing response:', e);
+                    throw new Error('Invalid server response');
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to fetch requests');
+                }
+
+                const requests = Array.isArray(data) ? data : [];
+                const requestsList = document.getElementById('requestsList');
+
+                if (requests.length === 0) {
+                    requestsList.innerHTML = `
+                        <div class="no-requests">
+                            <i class="fas fa-film"></i>
+                            <p>You haven't made any movie requests yet.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                requestsList.innerHTML = requests.map(request => `
+                    <div class="request-card" data-request-id="${request._id}">
+                        <div class="request-header">
+                            <h3 class="request-title">${request.movie || 'Unknown Movie'}</h3>
+                            <span class="request-status ${(request.status || 'pending').toLowerCase()}">${request.status || 'Pending'}</span>
+                            <button class="delete-request-btn" title="Delete Request">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        <div class="request-details">
+                            <div class="request-info">
+                                <i class="fas fa-language"></i>
+                                <span>${request.language || 'Not specified'}</span>
+                            </div>
+                            <div class="request-info">
+                                <i class="fas fa-video"></i>
+                                <span>${request.quality || 'Not specified'}</span>
+                            </div>
+                            ${request.downloadLink ? `
+                                <div class="request-info">
+                                    <i class="fas fa-download"></i>
+                                    <a href="${request.downloadLink}" target="_blank" class="download-link">Download Link</a>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="request-date">
+                            <i class="fas fa-clock"></i>
+                            Requested on: ${new Date(request.createdAt || Date.now()).toLocaleDateString()}
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add delete button event listeners
+                document.querySelectorAll('.delete-request-btn').forEach(btn => {
+                    btn.addEventListener('click', async function(e) {
+                        e.stopPropagation();
+                        const card = this.closest('.request-card');
+                        const requestId = card.getAttribute('data-request-id');
+                        if (confirm('Are you sure you want to delete this request?')) {
+                            await deleteRequest(requestId);
+                        }
+                    });
+                });
+
+                document.getElementById('requestsCount').textContent = requests.length;
+
+            } catch (error) {
+                console.error('Error loading requests:', error);
+                const requestsList = document.getElementById('requestsList');
+                requestsList.innerHTML = `
+                    <div class="no-requests">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>${error.message || 'Error loading requests. Please try again.'}</p>
+                    </div>
+                `;
+                
+                // If authentication error, redirect to login
+                if (error.message.includes('login')) {
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                }
+            }
+        }
+
+        // Add this function after loadMyRequests
+        async function deleteRequest(requestId) {
+            try {
+                const token = localStorage.getItem('metflix_jwt');
+                const response = await fetch(`http://localhost:5000/api/movie-requests/${requestId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to delete request');
+                }
+                // Refresh the list
+                loadMyRequests();
+            } catch (error) {
+                alert('Error deleting request: ' + error.message);
+            }
+        }
+
+        // Call loadMyRequests when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
             fetchUserProfile();
+            loadMyRequests();
+            document.getElementById('reviewModal').style.display = 'none';
         });
     </script>
 </body>
