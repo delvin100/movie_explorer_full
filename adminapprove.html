@@ -29,52 +29,41 @@
             border: 2px solid #ff0000;
         }
 
-        .approval-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .approval-header h1 {
+        #actionTitle {
             color: #ff0000;
             font-size: 2.5rem;
-            margin: 0;
+            margin: 0 0 2rem 0;
             text-transform: uppercase;
             letter-spacing: 2px;
+            text-align: center;
+            border-bottom: 3px solid #ff0000;
+            padding-bottom: 1rem;
         }
 
-        .movie-info {
+        .request-details {
             background: rgba(255, 255, 255, 0.05);
             padding: 1.5rem;
             border-radius: 10px;
             margin-bottom: 2rem;
+            border-left: 4px solid #ff0000;
         }
 
-        .movie-info h2 {
-            color: #ff0000;
-            margin-top: 0;
-            font-size: 1.8rem;
-        }
-
-        .info-item {
+        .request-details p {
+            margin: 1rem 0;
             display: flex;
             align-items: center;
             gap: 1rem;
-            margin: 1rem 0;
-            padding: 0.8rem;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-        }
-
-        .info-item i {
-            color: #ff0000;
-            font-size: 1.2rem;
-            width: 24px;
-            text-align: center;
-        }
-
-        .info-item span {
-            color: #ddd;
             font-size: 1.1rem;
+        }
+
+        .request-details strong {
+            color: #ff0000;
+            min-width: 120px;
+            display: inline-block;
+        }
+
+        .request-details span {
+            color: #ddd;
         }
 
         .form-group {
@@ -83,14 +72,21 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
             color: #ddd;
             font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .form-control {
+        .form-group label i {
+            color: #ff0000;
+        }
+
+        input[type="url"], select, textarea {
             width: 100%;
-            padding: 0.8rem;
+            padding: 1rem;
             border: 2px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.05);
@@ -99,220 +95,515 @@
             transition: all 0.3s ease;
         }
 
-        .form-control:focus {
+        input[type="url"]:focus, select:focus, textarea:focus {
             outline: none;
             border-color: #ff0000;
             background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
         }
 
-        .form-control::placeholder {
+        input[type="url"]::placeholder {
             color: #aaa;
         }
 
-        .button-group {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-            margin-top: 2rem;
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+            color: white;
         }
 
-        .btn {
-            padding: 0.8rem 1.5rem;
+        select option {
+            background-color: #1c1c1c;
+            color: white;
+            padding: 1rem;
+        }
+
+        select:focus option:checked {
+            background-color: #ff0000;
+            color: white;
+        }
+
+        select option:hover {
+            background-color: #333;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .approve-btn, .reject-btn, .back-btn {
+            width: 100%;
+            padding: 1rem;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 1.1rem;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 0.5rem;
+            margin-top: 1rem;
         }
 
-        .btn-primary {
-            background: #ff0000;
+        .approve-btn {
+            background: #138a13;
             color: white;
         }
 
-        .btn-primary:hover {
-            background: #cc0000;
-            transform: scale(1.05);
+        .approve-btn:hover:not(:disabled) {
+            background: #0e6b0e;
         }
 
-        .btn-secondary {
-            background: #555;
+        .approve-btn:disabled {
+            background: #138a13;
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .reject-btn {
+            background: #a11212;
             color: white;
         }
 
-        .btn-secondary:hover {
-            background: #333;
-            transform: scale(1.05);
+        .reject-btn:hover:not(:disabled) {
+            background: #7a0d0d;
         }
 
-        .error-message {
-            color: #ff0000;
+        .reject-btn:disabled {
+            background: #a11212;
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .back-btn {
+            background: transparent;
+            color: #ddd;
+            border: 1px solid #555;
+            margin-top: 1.5rem;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #ff0000;
+            color: #fff;
+        }
+
+        #otherReasonDiv {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border-left: 3px solid #ff0000;
+            display: none;
+        }
+
+        #otherReason {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        #otherReason:focus {
+            outline: none;
+            border-color: #ff0000;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+        }
+
+        #otherReason::placeholder {
+            color: #aaa;
+        }
+
+        .alert {
+            padding: 1.2rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.1rem;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .alert-error {
             background: rgba(255, 0, 0, 0.1);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            display: none;
+            color: #ff4444;
+            border-left: 4px solid #ff0000;
         }
 
-        .success-message {
-            color: #00ff00;
+        .alert-success {
             background: rgba(0, 255, 0, 0.1);
-            padding: 1rem;
-            border-radius: 8px;
+            color: #00ff00;
+            border-left: 4px solid #00ff00;
+        }
+
+        .alert i {
+            font-size: 1.5rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-close {
+            margin-left: auto;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .alert-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .approve-btn:disabled, .reject-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        .approve-btn:disabled:hover, .reject-btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: bold;
             margin-bottom: 1rem;
-            display: none;
+        }
+
+        .status-approved {
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+
+        .status-rejected {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
+            border: 1px solid #ff0000;
         }
     </style>
 </head>
 <body>
     <div class="approval-container">
-        <div class="approval-header">
-            <h1>Approve Movie Request</h1>
+        <h2 id="actionTitle">
+            <i class="fas fa-film"></i>
+            <span>Movie Request Action</span>
+        </h2>
+        <div class="request-details">
+            <p>
+                <strong><i class="fas fa-film"></i> Movie:</strong>
+                <span id="movieTitle"></span>
+            </p>
+            <p>
+                <strong><i class="fas fa-user"></i> Requested by:</strong>
+                <span id="userEmail"></span>
+            </p>
+            <p>
+                <strong><i class="fas fa-calendar"></i> Requested on:</strong>
+                <span id="requestDate"></span>
+            </p>
+            <div id="statusBadge" class="status-badge" style="display: none;"></div>
         </div>
 
-        <div class="movie-info">
-            <h2 id="movieTitle">Loading...</h2>
-            <div class="info-item">
-                <i class="fas fa-language"></i>
-                <span id="movieLanguage">Loading...</span>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-video"></i>
-                <span id="movieQuality">Loading...</span>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-user"></i>
-                <span id="userInfo">Loading...</span>
-            </div>
-        </div>
+        <div id="alertContainer"></div>
 
-        <div class="error-message" id="errorMessage"></div>
-        <div class="success-message" id="successMessage"></div>
-
-        <div class="form-group">
-            <label for="downloadLink">Download Link:</label>
-            <input type="url" id="downloadLink" class="form-control" placeholder="Enter the download link" required>
-        </div>
-
-        <div class="button-group">
-            <button class="btn btn-secondary" onclick="window.location.href='admin.html'">
-                <i class="fas fa-times"></i> Cancel
+        <div id="approvalSection" style="display: none;">
+            <div class="form-group">
+                <label for="downloadLink">
+                    <i class="fas fa-link"></i>
+                    Download Link:
+                </label>
+                <input type="url" id="downloadLink" required placeholder="Enter download link">
+            </div>
+            <button onclick="approveRequest()" class="approve-btn">
+                <i class="fas fa-check"></i>
+                Approve Request
             </button>
-            <button class="btn btn-primary" onclick="approveRequest()">
-                <i class="fas fa-check"></i> Approve & Send
+        </div>
+
+        <div id="rejectionSection" style="display: none;">
+            <div class="form-group">
+                <label for="rejectionReason">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Reason for Rejection:
+                </label>
+                <select id="rejectionReason" required>
+                    <option value="">Select a reason</option>
+                    <option value="Content Unavailable">Content Unavailable</option>
+                    <option value="Copyright Restrictions">Copyright Restrictions</option>
+                    <option value="Quality Requirements Not Met">Quality Requirements Not Met</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div id="otherReasonDiv">
+                <div class="form-group">
+                    <label for="otherReason">
+                        <i class="fas fa-comment-alt"></i>
+                        Please specify:
+                    </label>
+                    <textarea id="otherReason" rows="3" placeholder="Enter your reason for rejection..."></textarea>
+                </div>
+            </div>
+            <button onclick="rejectRequest()" class="reject-btn">
+                <i class="fas fa-times"></i>
+                Confirm Rejection
             </button>
         </div>
+
+        <button onclick="window.location.href='admin.html'" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Admin Panel
+        </button>
     </div>
 
     <script>
-        let requestId = null;
-        let userEmail = null;
+        let currentRequest = null;
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestId = urlParams.get('requestId');
+        const action = urlParams.get('action');
 
-        // Get request details from URL parameters
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            requestId = urlParams.get('requestId');
+        // Show appropriate section based on action
+        if (action === 'completed') {
+            document.getElementById('actionTitle').textContent = 'Approve Movie Request';
+            document.getElementById('approvalSection').style.display = 'block';
+        } else if (action === 'rejected') {
+            document.getElementById('actionTitle').textContent = 'Reject Movie Request';
+            document.getElementById('rejectionSection').style.display = 'block';
+        }
+
+        // Add this at the start of your script section
+        document.addEventListener('DOMContentLoaded', function() {
+            const rejectionReason = document.getElementById('rejectionReason');
+            const otherReasonDiv = document.getElementById('otherReasonDiv');
+            const otherReason = document.getElementById('otherReason');
+
+            rejectionReason.addEventListener('change', function() {
+                if (this.value === 'Other') {
+                    otherReasonDiv.style.display = 'block';
+                    otherReason.setAttribute('required', 'required');
+                } else {
+                    otherReasonDiv.style.display = 'none';
+                    otherReason.removeAttribute('required');
+                    otherReason.value = ''; // Clear the textarea when hidden
+                }
+            });
+        });
+
+        function showAlert(message, type = 'error') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
             
-            if (!requestId) {
-                showError('No request ID provided');
-                return;
-            }
-
-            loadRequestDetails();
-        };
+            const icon = type === 'error' ? 'exclamation-circle' : 'check-circle';
+            alert.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                <span>${message}</span>
+                <i class="fas fa-times alert-close" onclick="this.parentElement.remove()"></i>
+            `;
+            
+            alertContainer.appendChild(alert);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
 
         async function loadRequestDetails() {
             try {
                 const token = localStorage.getItem('admin_token');
                 if (!token) {
-                    showError('Admin authentication required');
+                    window.location.href = 'index.html';
                     return;
                 }
+
                 const response = await fetch(`http://localhost:5000/api/movie-request/${requestId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+
                 if (!response.ok) {
                     throw new Error('Failed to fetch request details');
                 }
-                const request = await response.json();
 
-                // Update UI with request details
-                document.getElementById('movieTitle').textContent = request.movie;
-                document.getElementById('movieLanguage').textContent = request.language;
-                document.getElementById('movieQuality').textContent = request.quality;
-                // Show both username and email
-                document.getElementById('userInfo').textContent = `Requested by: ${request.userId?.username || 'Unknown'} (${request.userId?.email || 'No email'})`;
-                userEmail = request.userId?.email;
+                currentRequest = await response.json();
+                
+                document.getElementById('movieTitle').textContent = currentRequest.movie;
+                document.getElementById('userEmail').textContent = `${currentRequest.userId.username} (${currentRequest.userId.email})`;
+                document.getElementById('requestDate').textContent = new Date(currentRequest.createdAt).toLocaleString();
+
+                // Handle request status
+                const statusBadge = document.getElementById('statusBadge');
+                const approveBtn = document.querySelector('.approve-btn');
+                const rejectBtn = document.querySelector('.reject-btn');
+
+                if (currentRequest.status === 'completed' || currentRequest.status === 'rejected') {
+                    if (currentRequest.status === 'completed') {
+                        statusBadge.textContent = 'Request Approved';
+                        statusBadge.className = 'status-badge status-approved';
+                    } else {
+                        statusBadge.textContent = 'Request Rejected';
+                        statusBadge.className = 'status-badge status-rejected';
+                    }
+                    statusBadge.style.display = 'block';
+                    if (approveBtn) approveBtn.disabled = true;
+                    if (rejectBtn) rejectBtn.disabled = true;
+                } else {
+                    if (approveBtn) approveBtn.disabled = false;
+                    if (rejectBtn) rejectBtn.disabled = false;
+                }
 
             } catch (error) {
                 console.error('Error loading request details:', error);
-                showError('Failed to load request details');
+                showAlert('Error loading request details. Please try again.');
             }
         }
 
         async function approveRequest() {
             try {
-                const downloadLink = document.getElementById('downloadLink').value.trim();
+                const downloadLink = document.getElementById('downloadLink').value;
                 if (!downloadLink) {
-                    showError('Please enter a download link');
+                    showAlert('Please enter a download link');
                     return;
                 }
 
                 const token = localStorage.getItem('admin_token');
-                if (!token) {
-                    showError('Admin authentication required');
-                    return;
-                }
-
                 const response = await fetch(`http://localhost:5000/api/movie-request/${requestId}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         status: 'completed',
-                        downloadLink 
+                        downloadLink
                     })
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to update request status');
+                    throw new Error('Failed to approve request');
                 }
 
-                showSuccess('Request approved and email sent successfully');
+                // Disable buttons and show status
+                const approveBtn = document.querySelector('.approve-btn');
+                const rejectBtn = document.querySelector('.reject-btn');
+                const statusBadge = document.getElementById('statusBadge');
                 
-                // Close window after 2 seconds
+                if (approveBtn) approveBtn.disabled = true;
+                if (rejectBtn) rejectBtn.disabled = true;
+                
+                statusBadge.textContent = 'Request Approved';
+                statusBadge.className = 'status-badge status-approved';
+                statusBadge.style.display = 'block';
+
+                showAlert('Request approved successfully!', 'success');
                 setTimeout(() => {
-                    window.close();
-                }, 2000);
+                    window.location.href = 'admin.html';
+                }, 1500);
 
             } catch (error) {
                 console.error('Error approving request:', error);
-                showError('Failed to approve request');
+                showAlert('Error approving request. Please try again.');
             }
         }
 
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
+        async function rejectRequest() {
+            try {
+                const reason = document.getElementById('rejectionReason').value;
+                if (!reason) {
+                    showAlert('Please select a reason for rejection');
+                    return;
+                }
+
+                let rejectionReason = reason;
+                if (reason === 'Other') {
+                    const otherReason = document.getElementById('otherReason').value.trim();
+                    if (!otherReason) {
+                        showAlert('Please specify the reason for rejection');
+                        return;
+                    }
+                    rejectionReason = otherReason;
+                }
+
+                const token = localStorage.getItem('admin_token');
+                const response = await fetch(`http://localhost:5000/api/movie-request/${requestId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        status: 'rejected',
+                        rejectionReason: rejectionReason
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to reject request');
+                }
+
+                if (data.success) {
+                    // Disable buttons and show status
+                    const approveBtn = document.querySelector('.approve-btn');
+                    const rejectBtn = document.querySelector('.reject-btn');
+                    const statusBadge = document.getElementById('statusBadge');
+                    
+                    if (approveBtn) approveBtn.disabled = true;
+                    if (rejectBtn) rejectBtn.disabled = true;
+                    
+                    statusBadge.textContent = 'Request Rejected';
+                    statusBadge.className = 'status-badge status-rejected';
+                    statusBadge.style.display = 'block';
+
+                    showAlert(data.message || 'Request rejected successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 1500);
+                } else {
+                    throw new Error(data.message || 'Failed to reject request');
+                }
+
+            } catch (error) {
+                console.error('Error rejecting request:', error);
+                showAlert(error.message || 'Error rejecting request. Please try again.');
+            }
         }
 
-        function showSuccess(message) {
-            const successDiv = document.getElementById('successMessage');
-            successDiv.textContent = message;
-            successDiv.style.display = 'block';
-        }
+        // Load request details when page loads
+        loadRequestDetails();
     </script>
 </body>
 </html> 

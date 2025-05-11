@@ -698,6 +698,208 @@
         .form-control::placeholder {
             color: #aaa;
         }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            padding: 10px 15px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 14px;
+            width: 300px;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #e50914;
+        }
+        .search-button {
+            background: #e50914;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .search-button:hover {
+            background: #f40612;
+        }
+        /* New Feedback Section Styles */
+        .feedback-section {
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin-top: 2.5rem;
+            box-shadow: 0 10px 40px rgba(255, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        .feedback-section:hover {
+            transform: translateY(-8px);
+        }
+        .feedback-section h2 {
+            color: #ff0000;
+            margin-bottom: 2rem;
+            border-bottom: 3px solid #ff0000;
+            padding-bottom: 0.8rem;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .feedback-search-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+        .feedback-search.search-input {
+            flex: 1;
+            padding: 14px 18px;
+            border: none;
+            border-radius: 8px 0 0 8px;
+            background: #232323;
+            color: #fff;
+            font-size: 1.1rem;
+            outline: none;
+            transition: background 0.2s;
+        }
+        .feedback-search.search-input::placeholder {
+            color: #aaa;
+        }
+        .feedback-search-btn {
+            background: #e50914;
+            color: #fff;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-left: 0;
+        }
+        .feedback-search-btn:hover {
+            background: #ff0000;
+        }
+        .feedback-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 1.5rem;
+        }
+        .feedback-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            border-left: 5px solid #ff0000;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(255, 0, 0, 0.1);
+        }
+        .feedback-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(255, 0, 0, 0.2);
+        }
+        .feedback-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .feedback-info h3 {
+            color: #ff0000;
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(255, 0, 0, 0.2);
+            padding-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .feedback-info h3 i {
+            color: #ff0000;
+            font-size: 1.4rem;
+        }
+        .feedback-text {
+            position: relative;
+            color: #ddd;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin: 1rem 0;
+            padding: 1.5rem 1rem 1rem 2.5rem; /* extra left padding for icon */
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border-left: 3px solid rgba(255, 0, 0, 0.3);
+            min-height: 48px;
+        }
+        .feedback-text::before {
+            content: '\f10d';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 0.2rem;
+            left: 0.7rem;
+            font-size: 1.7rem;
+            color: #ff0000;
+            opacity: 0.25;
+            pointer-events: none;
+        }
+        .feedback-meta {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 0, 0, 0.2);
+        }
+        .feedback-date {
+            color: #aaa;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .feedback-date i {
+            color: #ff0000;
+        }
+        #goTopBtn {
+            display: none;
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            z-index: 9999;
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            outline: none;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            font-size: 2rem;
+            box-shadow: 0 4px 16px rgba(255,0,0,0.25);
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s, opacity 0.2s;
+            opacity: 0.85;
+        }
+        #goTopBtn:hover {
+            background: #cc0000;
+            transform: translateY(-4px) scale(1.08);
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -712,6 +914,9 @@
     </div>
 
     <div class="admin-container">
+        <div class="admin-header">
+            <h1>Admin Dashboard</h1>
+        </div>
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number" id="totalUsers">0</div>
@@ -729,8 +934,13 @@
 
         <!-- Movie Requests Section -->
         <div class="admin-section movie-requests-section">
-            <h2>Movie Requests</h2>
-            <div class="search-bar" id="movieRequestSearch" placeholder="Search movie requests..."></div>
+            <h2><i class="fas fa-film"></i> Movie Requests</h2>
+            <div class="search-container feedback-search-container">
+                <input type="text" id="movieRequestSearch" placeholder="Search by username..." class="feedback-search search-input">
+                <button id="movieRequestSearchBtn" class="search-button feedback-search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
             <div class="filter-buttons">
                 <button class="filter-btn active" data-filter="all">All</button>
                 <button class="filter-btn" data-filter="pending">Pending</button>
@@ -741,10 +951,15 @@
             </div>
         </div>
 
-        <!-- Existing User Management Section -->
+        <!-- User Management Section -->
         <div class="admin-section">
-            <h2>User Management</h2>
-            <div class="search-bar" id="userSearch" placeholder="Search users..."></div>
+            <h2><i class="fas fa-users"></i> User Management</h2>
+            <div class="search-container feedback-search-container">
+                <input type="text" id="userManagementSearch" placeholder="Search by username..." class="feedback-search search-input">
+                <button id="userManagementSearchBtn" class="search-button feedback-search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
             <div class="filter-buttons">
                 <button class="filter-btn active" data-filter="all">All</button>
                 <button class="filter-btn" data-filter="active">Active</button>
@@ -752,6 +967,20 @@
             </div>
             <div id="userList" class="user-list">
                 <!-- Users will be loaded here -->
+            </div>
+        </div>
+
+        <!-- New Feedback Section -->
+        <div class="feedback-section">
+            <h2><i class="fas fa-comment-dots"></i> User Feedbacks</h2>
+            <div class="search-container feedback-search-container">
+                <input type="text" class="feedback-search search-input" id="feedbackSearch" placeholder="Search by username...">
+                <button id="feedbackSearchBtn" class="search-button feedback-search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div class="feedback-list" id="feedbackList">
+                <!-- Feedback cards will be dynamically inserted here -->
             </div>
         </div>
     </div>
@@ -781,6 +1010,10 @@
         </div>
     </div>
 
+    <button id="goTopBtn" title="Go to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
     <script>
         // Ensure jQuery is loaded
         if (typeof $ !== 'function') {
@@ -809,13 +1042,28 @@
             loadUsers();
             updateStats();
 
-            $('#userSearch').on('input', function() {
-                filterUsers($(this).val());
+            $('#userManagementSearch').on('input', () => {
+                if (!userManagementSearch.value.trim()) {
+                    loadUsers();
+                } else {
+                    searchUserManagement();
+                }
+            });
+            userManagementSearchBtn.addEventListener('click', () => {
+                searchUserManagement();
+            });
+            userManagementSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    searchUserManagement();
+                }
             });
 
             $('.filter-btn').click(function() {
-                $(this).siblings().removeClass('active');
+                // Remove active class from all buttons in the same section
+                $(this).closest('.admin-section').find('.filter-btn').removeClass('active');
+                // Add active class to clicked button
                 $(this).addClass('active');
+                
                 const filter = $(this).data('filter');
                 filterUsersByStatus(filter);
             });
@@ -883,6 +1131,13 @@
                 users.forEach(user => {
                     userList.append(createUserCard(user));
                 });
+
+                // After loading users, apply the current filter
+                const activeFilter = $('.admin-section:has(#userList) .filter-btn.active').data('filter');
+                if (activeFilter) {
+                    filterUsersByStatus(activeFilter);
+                }
+
                 await updateStats();
             } catch (error) {
                 console.error('Error loading users:', error);
@@ -894,19 +1149,20 @@
             const card = document.createElement('div');
             card.className = 'user-card';
             card.id = `user-card-${user._id}`;
+            
+            // Set lastActiveAt data attribute
             if (user.lastActiveAt) {
                 card.setAttribute('data-last-active-at', user.lastActiveAt);
             }
             
             const joinDate = user.profile?.joinDate ? new Date(user.profile.joinDate).toLocaleDateString() : 'N/A';
+            
             // Calculate active status based on lastActiveAt
             const lastActiveAt = user.lastActiveAt ? new Date(user.lastActiveAt) : null;
             const now = new Date();
-            let isActive = false;
-            if (lastActiveAt) {
-                const diffDays = (now - lastActiveAt) / (1000 * 60 * 60 * 24);
-                isActive = diffDays <= 15;
-            }
+            const fifteenDaysAgo = new Date(now.getTime() - (15 * 24 * 60 * 60 * 1000));
+            const isActive = lastActiveAt && lastActiveAt >= fifteenDaysAgo;
+            
             const statusClass = isActive ? 'active' : 'inactive';
             const statusText = isActive ? 'Active' : 'Inactive';
             
@@ -983,23 +1239,60 @@
         }
 
         function filterUsersByStatus(status) {
+            let visibleCount = 0;
+            const now = new Date();
+            const fifteenDaysAgo = new Date(now.getTime() - (15 * 24 * 60 * 60 * 1000));
+            const userList = $('#userList');
+
+            // First, make sure we have the original user list
+            if (userList.find('.user-card').length === 0) {
+                loadUsers();
+                return;
+            }
+
             $('.user-card').each(function() {
                 const lastActiveAt = $(this).data('last-active-at');
                 let isActive = false;
+                
                 if (lastActiveAt) {
-                    const now = new Date();
                     const lastActive = new Date(lastActiveAt);
-                    const diffDays = (now - lastActive) / (1000 * 60 * 60 * 24);
-                    isActive = diffDays <= 15;
+                    isActive = lastActive >= fifteenDaysAgo;
                 }
+
                 if (status === 'all') {
                     $(this).show();
+                    visibleCount++;
                 } else if (status === 'active') {
-                    $(this).toggle(isActive);
+                    if (isActive) {
+                        $(this).show();
+                        visibleCount++;
+                    } else {
+                        $(this).hide();
+                    }
                 } else if (status === 'inactive') {
-                    $(this).toggle(!isActive);
+                    if (!isActive) {
+                        $(this).show();
+                        visibleCount++;
+                    } else {
+                        $(this).hide();
+                    }
                 }
             });
+
+            // Show/hide the no users message without replacing the user list
+            if (visibleCount === 0) {
+                if ($('#noUsersMessage').length === 0) {
+                    const message = `
+                        <div id="noUsersMessage" class="no-users">
+                            <i class="fas fa-user-slash" style="font-size:2.5rem;color:#ff0000;margin-bottom:1rem;"></i>
+                            <p>No ${status} users found</p>
+                        </div>
+                    `;
+                    userList.prepend(message);
+                }
+            } else {
+                $('#noUsersMessage').remove();
+            }
         }
 
         async function viewUserDetails(userId) {
@@ -1271,90 +1564,175 @@
             }
         }
 
-        // Function to load movie requests
-        async function loadMovieRequests() {
+        // Movie Requests Search
+        const movieRequestSearch = document.getElementById('movieRequestSearch');
+        const movieRequestSearchBtn = document.getElementById('movieRequestSearchBtn');
+
+        movieRequestSearch.addEventListener('input', () => {
+            const activeFilter = document.querySelector('.movie-requests-section .filter-btn.active').dataset.filter;
+            loadMovieRequests(activeFilter);
+        });
+        movieRequestSearchBtn.addEventListener('click', () => {
+            const activeFilter = document.querySelector('.movie-requests-section .filter-btn.active').dataset.filter;
+            loadMovieRequests(activeFilter);
+        });
+
+        // Update search function to maintain current filter
+        async function searchMovieRequests() {
+            const username = movieRequestSearch.value.trim();
+            const activeFilter = document.querySelector('.movie-requests-section .filter-btn.active').dataset.filter;
+            await loadMovieRequests(activeFilter);
+        }
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMovieRequests('all');
+        });
+
+        // Function to load movie requests with filters
+        async function loadMovieRequests(status = 'all') {
             try {
                 const token = localStorage.getItem('admin_token');
                 if (!token) {
                     throw new Error('Admin authentication required');
                 }
 
-                const response = await fetch('http://localhost:5000/api/movie-requests', {
+                const username = movieRequestSearch.value.trim();
+                let url = `http://localhost:5000/api/movie-requests?status=${status}`;
+                if (username) {
+                    url += `&username=${encodeURIComponent(username)}`;
+                }
+
+                const response = await fetch(url, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
                 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Failed to fetch movie requests');
+                    throw new Error('Failed to fetch movie requests');
                 }
 
                 const requests = await response.json();
-                const requestsList = document.getElementById('movieRequestsList');
-                requestsList.innerHTML = '';
-
-                if (!Array.isArray(requests) || requests.length === 0) {
-                    requestsList.innerHTML = `
-                        <div class="no-users">
-                            <i class="fas fa-film fa-3x"></i>
-                            <p>No movie requests found</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                requests.forEach(request => {
-                    const requestCard = document.createElement('div');
-                    requestCard.className = 'movie-request-card';
-                    requestCard.innerHTML = `
-                        <div class="movie-request-header">
-                            <h3 class="movie-request-title">${request.movie}</h3>
-                            <span class="movie-request-status ${request.status.toLowerCase()}">${request.status}</span>
-                        </div>
-                        <div class="movie-request-details">
-                            <div class="movie-request-info">
-                                <i class="fas fa-language"></i>
-                                <span>${request.language}</span>
-                            </div>
-                            <div class="movie-request-info">
-                                <i class="fas fa-video"></i>
-                                <span>${request.quality}</span>
-                            </div>
-                            <div class="movie-request-info">
-                                <i class="fas fa-user"></i>
-                                <span>User: ${request.userId?.username || 'Unknown'}</span>
-                            </div>
-                            <div class="movie-request-info">
-                                <i class="fas fa-clock"></i>
-                                <span>Date: ${new Date(request.createdAt).toLocaleDateString()}</span>
-                            </div>
-                        </div>
-                        <div class="movie-request-actions">
-                            <button class="movie-request-btn approve" onclick="updateRequestStatus('${request._id}', 'completed')">
-                                <i class="fas fa-check"></i> Approve
-                            </button>
-                            <button class="movie-request-btn reject" onclick="updateRequestStatus('${request._id}', 'rejected')">
-                                <i class="fas fa-times"></i> Reject
-                            </button>
-                        </div>
-                    `;
-                    requestsList.appendChild(requestCard);
-                });
-
-                // Update total requests count
-                document.getElementById('totalRequests').textContent = requests.length;
-
+                displayMovieRequests(requests);
             } catch (error) {
                 console.error('Error loading movie requests:', error);
-                const requestsList = document.getElementById('movieRequestsList');
+                showError(error.message);
+            }
+        }
+
+        // Function to display movie requests
+        function displayMovieRequests(requests) {
+            const requestsList = document.getElementById('movieRequestsList');
+            requestsList.innerHTML = '';
+
+            // Sort by createdAt descending (newest first)
+            requests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            if (!Array.isArray(requests) || requests.length === 0) {
                 requestsList.innerHTML = `
                     <div class="no-users">
-                        <i class="fas fa-exclamation-circle fa-3x"></i>
-                        <p>${error.message || 'Failed to load movie requests'}</p>
+                        <i class="fas fa-film fa-3x"></i>
+                        <p>No movie requests found</p>
                     </div>
                 `;
+                return;
             }
+
+            requests.forEach(request => {
+                const requestCard = document.createElement('div');
+                requestCard.className = 'movie-request-card';
+                requestCard.innerHTML = `
+                    <div class="movie-request-header">
+                        <h3 class="movie-request-title">${request.movie}</h3>
+                        <span class="movie-request-status ${request.status.toLowerCase()}">${request.status}</span>
+                    </div>
+                    <div class="movie-request-details">
+                        <div class="movie-request-info">
+                            <i class="fas fa-language"></i>
+                            <span>${request.language}</span>
+                        </div>
+                        <div class="movie-request-info">
+                            <i class="fas fa-video"></i>
+                            <span>${request.quality}</span>
+                        </div>
+                        <div class="movie-request-info">
+                            <i class="fas fa-user"></i>
+                            <span>User: ${request.userId?.username || 'Unknown'}</span>
+                        </div>
+                        <div class="movie-request-info">
+                            <i class="fas fa-clock"></i>
+                            <span>Date: ${new Date(request.createdAt).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                    <div class="movie-request-actions">
+                        <button class="movie-request-btn approve" onclick="updateRequestStatus('${request._id}', 'completed')">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="movie-request-btn reject" onclick="updateRequestStatus('${request._id}', 'rejected')">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    </div>
+                `;
+                requestsList.appendChild(requestCard);
+            });
+        }
+
+        // User Management Search
+        const userManagementSearch = document.getElementById('userManagementSearch');
+        const userManagementSearchBtn = document.getElementById('userManagementSearchBtn');
+
+        async function searchUserManagement() {
+            const username = userManagementSearch.value.trim();
+            try {
+                const token = localStorage.getItem('admin_token');
+                if (!token) {
+                    throw new Error('Admin authentication required');
+                }
+
+                let url = 'http://localhost:5000/api/admin/users';
+                if (username) {
+                    url += `/search?username=${encodeURIComponent(username)}`;
+                }
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch users');
+                }
+
+                const users = await response.json();
+                displayUsers(users);
+            } catch (error) {
+                console.error('Error searching users:', error);
+                showError(error.message);
+            }
+        }
+
+        // Function to display users
+        function displayUsers(users) {
+            const userList = $('#userList');
+            userList.empty();
+
+            // Sort by join date descending (newest first)
+            users.sort((a, b) => {
+                const dateA = a.profile?.joinDate ? new Date(a.profile.joinDate) : new Date(0);
+                const dateB = b.profile?.joinDate ? new Date(b.profile.joinDate) : new Date(0);
+                return dateB - dateA;
+            });
+
+            if (users.length === 0) {
+                userList.html('<div class="no-users"><i class="fas fa-user-slash" style="font-size:2.5rem;color:#ff0000;margin-bottom:1rem;"></i>No users found</div>');
+                return;
+            }
+
+            users.forEach(user => {
+                userList.append(createUserCard(user));
+            });
         }
 
         // Function to update request status
@@ -1365,91 +1743,182 @@
                     throw new Error('Admin authentication required');
                 }
 
-                if (newStatus === 'completed') {
-                    window.location.href = `adminapprove.html?requestId=${requestId}`;
-                    return;
-                }
-
-                // For other statuses, proceed as normal
-                const response = await fetch(`http://localhost:5000/api/movie-request/${requestId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ status: newStatus })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Failed to update request status');
-                }
-
-                // Reload requests after update
-                await loadMovieRequests();
-                showSuccess('Request status updated successfully');
+                // For both completed and rejected, redirect to adminapprove.html
+                window.location.href = `adminapprove.html?requestId=${requestId}&action=${newStatus}`;
+                return;
 
             } catch (error) {
                 console.error('Error updating request status:', error);
-                showError(error.message || 'Failed to update request status');
+                alert(error.message || 'Failed to update request status');
             }
         }
 
         // Function to show success message
         function showSuccess(message) {
-            // Implement your success notification here
-            alert(message);
+            const popup = document.createElement('div');
+            popup.className = 'popup success-popup';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <i class="fas fa-check-circle"></i>
+                    <p>${message}</p>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 3000);
         }
 
         // Function to show error message
         function showError(message) {
-            // Implement your error notification here
-            alert(message);
+            const popup = document.createElement('div');
+            popup.className = 'popup error-popup';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>${message}</p>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 3000);
         }
 
-        // Load movie requests when page loads
+        // New feedback management script
+        async function loadFeedbacks() {
+            try {
+                const token = localStorage.getItem('admin_token');
+                if (!token) {
+                    throw new Error('Admin authentication required');
+                }
+
+                const response = await fetch('http://localhost:5000/api/feedbacks', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to load feedbacks');
+                }
+
+                let data = await response.json();
+                const feedbackList = document.getElementById('feedbackList');
+                feedbackList.innerHTML = '';
+
+                // Sort by createdAt descending (newest first)
+                data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                if (!data || data.length === 0) {
+                    feedbackList.innerHTML = `
+                        <div class="no-users">
+                            <i class="fas fa-comment-slash" style="font-size:2.5rem;color:#ff0000;margin-bottom:1rem;"></i>
+                            <p>No feedbacks found</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                data.forEach(feedback => {
+                    const feedbackCard = document.createElement('div');
+                    feedbackCard.className = 'feedback-card';
+                    const date = new Date(feedback.createdAt).toLocaleDateString();
+                    feedbackCard.innerHTML = `
+                        <div class="feedback-info">
+                            <h3><i class="fas fa-user"></i> ${feedback.username || 'Anonymous'}</h3>
+                            <p class="feedback-text">${feedback.feedback}</p>
+                            <div class="feedback-meta">
+                                <span class="feedback-date">
+                                    <i class="fas fa-clock"></i> ${date}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                    feedbackList.appendChild(feedbackCard);
+                });
+            } catch (error) {
+                console.error('Error loading feedbacks:', error);
+                const feedbackList = document.getElementById('feedbackList');
+                feedbackList.innerHTML = `
+                    <div class="no-users">
+                        <i class="fas fa-exclamation-circle" style="font-size:2.5rem;color:#ff0000;margin-bottom:1rem;"></i>
+                        <p>Error loading feedbacks: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Call loadFeedbacks when the page loads
         document.addEventListener('DOMContentLoaded', () => {
-            loadMovieRequests();
+            loadFeedbacks();
         });
 
-        // Add search functionality
-        document.getElementById('movieRequestSearch').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const requestCards = document.querySelectorAll('.movie-request-card');
-            
-            requestCards.forEach(card => {
-                const title = card.querySelector('.movie-request-title').textContent.toLowerCase();
-                const language = card.querySelector('.movie-request-info:nth-child(1) span').textContent.toLowerCase();
-                const quality = card.querySelector('.movie-request-info:nth-child(2) span').textContent.toLowerCase();
-                
-                if (title.includes(searchTerm) || language.includes(searchTerm) || quality.includes(searchTerm)) {
+        // Update search functionality
+        const feedbackSearch = document.getElementById('feedbackSearch');
+        const feedbackSearchBtn = document.getElementById('feedbackSearchBtn');
+        feedbackSearch.addEventListener('input', () => {
+            if (!feedbackSearch.value.trim()) {
+                showAllFeedbacks();
+            } else {
+                searchFeedbacks();
+            }
+        });
+        feedbackSearchBtn.addEventListener('click', () => {
+            searchFeedbacks();
+        });
+        feedbackSearch.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchFeedbacks();
+            }
+        });
+
+        function searchFeedbacks() {
+            const searchTerm = feedbackSearch.value.toLowerCase();
+            const feedbackCards = document.querySelectorAll('.feedback-card');
+            let visibleCount = 0;
+            feedbackCards.forEach(card => {
+                const username = card.querySelector('h3').textContent.toLowerCase();
+                if (searchTerm === '' || username.includes(searchTerm)) {
                     card.style.display = 'block';
+                    visibleCount++;
                 } else {
                     card.style.display = 'none';
                 }
             });
-        });
-
-        // Add filter functionality
-        document.querySelectorAll('.movie-requests-section .filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Remove active class from all buttons
-                document.querySelectorAll('.movie-requests-section .filter-btn').forEach(b => b.classList.remove('active'));
-                // Add active class to clicked button
-                btn.classList.add('active');
-                
-                const filter = btn.dataset.filter;
-                const requestCards = document.querySelectorAll('.movie-request-card');
-                
-                requestCards.forEach(card => {
-                    const status = card.querySelector('.movie-request-status').textContent.toLowerCase();
-                    if (filter === 'all' || status === filter) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
+            // Show no results message if needed
+            const feedbackList = document.getElementById('feedbackList');
+            let noResultsMsg = feedbackList.querySelector('.no-results-message');
+            if (visibleCount === 0 && !noResultsMsg) {
+                const message = document.createElement('div');
+                message.className = 'no-users no-results-message';
+                message.innerHTML = `
+                    <i class="fas fa-search" style="font-size:2.5rem;color:#ff0000;margin-bottom:1rem;"></i>
+                    <p>No feedbacks match this user</p>
+                `;
+                feedbackList.appendChild(message);
+            } else if (visibleCount > 0 && noResultsMsg) {
+                noResultsMsg.remove();
+            }
+        }
+        function showAllFeedbacks() {
+            const feedbackCards = document.querySelectorAll('.feedback-card');
+            feedbackCards.forEach(card => {
+                card.style.display = 'block';
             });
+            const feedbackList = document.getElementById('feedbackList');
+            let noResultsMsg = feedbackList.querySelector('.no-results-message');
+            if (noResultsMsg) noResultsMsg.remove();
+        }
+
+        // Go to Top button logic
+        const goTopBtn = document.getElementById('goTopBtn');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 200) {
+                goTopBtn.style.display = 'block';
+            } else {
+                goTopBtn.style.display = 'none';
+            }
+        });
+        goTopBtn.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     </script>
 </body>

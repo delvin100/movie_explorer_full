@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metflix - Feedback</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background: #141414;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .feedback-container {
+            background: #181818;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(255,0,0,0.15);
+            padding: 2.5rem 2rem 2rem 2rem;
+            max-width: 400px;
+            width: 95vw;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .feedback-container h2 {
+            color: #ff0000;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            letter-spacing: 1px;
+        }
+        .feedback-container .fa-comment-dots {
+            color: #ff9800;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .feedback-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        textarea {
+            background: #222;
+            color: #fff;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 1.1rem;
+            resize: vertical;
+            min-height: 120px;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+        textarea:focus {
+            border-color: #ff0000;
+            box-shadow: 0 0 8px #ff0000;
+            outline: none;
+        }
+        .submit-btn {
+            background: #ff9800;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.9rem 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+        }
+        .submit-btn:hover:not(:disabled) {
+            background: #ffb74d;
+            color: #222;
+        }
+        .submit-btn:disabled {
+            background: #555;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+        .spinner-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+        .spinner {
+            border: 6px solid #222;
+            border-top: 6px solid #ff0000;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .popup {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .popup-content {
+            background: #181818;
+            color: #fff;
+            border-radius: 12px;
+            padding: 2.5rem 2rem 2rem 2rem;
+            box-shadow: 0 8px 32px rgba(255,0,0,0.25);
+            text-align: center;
+            min-width: 320px;
+            max-width: 90vw;
+        }
+        .popup-content p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .popup-content .fa-check-circle {
+            color: #00e676;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .popup-content button {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0 0.5rem;
+            transition: background 0.2s;
+        }
+        .popup-content .close-btn {
+            background: #222;
+            color: #fff;
+            border: 1px solid #555;
+        }
+        .popup-content .close-btn:hover {
+            background: #ff0000;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="feedback-container">
+        <i class="fas fa-comment-dots"></i>
+        <h2>We value your feedback!</h2>
+        <form class="feedback-form" id="feedbackForm">
+            <textarea id="feedbackText" maxlength="1000" placeholder="Share your thoughts, suggestions, or issues..." required></textarea>
+            <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Submit Feedback</button>
+        </form>
+    </div>
+    <div class="spinner-overlay" id="spinnerOverlay">
+        <div class="spinner"></div>
+    </div>
+    <script>
+        document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const spinnerOverlay = document.getElementById('spinnerOverlay');
+            spinnerOverlay.style.display = 'flex';
+            const feedback = document.getElementById('feedbackText').value.trim();
+            if (!feedback || feedback.length < 3) {
+                spinnerOverlay.style.display = 'none';
+                showPopup('❌ Please enter at least 3 characters.');
+                return;
+            }
+            try {
+                const token = localStorage.getItem('metflix_jwt');
+                if (!token) {
+                    throw new Error('Please login to submit feedback');
+                }
+                const response = await fetch('http://localhost:5000/api/feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ feedback })
+                });
+                const data = await response.json();
+                spinnerOverlay.style.display = 'none';
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to submit feedback');
+                }
+                showSuccessPopup();
+                this.reset();
+            } catch (error) {
+                spinnerOverlay.style.display = 'none';
+                showPopup(`❌ ${error.message || 'There was an error submitting your feedback.'}`);
+            }
+        });
+        function showPopup(message) {
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <p>${message}</p>
+                    <button class="close-btn" id="popupCloseBtn"><i class="fas fa-times"></i> Close</button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            document.getElementById('popupCloseBtn').onclick = function() {
+                popup.remove();
+            };
+        }
+        function showSuccessPopup() {
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <i class="fas fa-check-circle"></i>
+                    <p>Thank you for your feedback!</p>
+                    <button class="close-btn" id="popupCloseBtn"><i class="fas fa-arrow-left"></i> Back to Home</button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            document.getElementById('popupCloseBtn').onclick = function() {
+                popup.remove();
+                window.location.href = 'more.html';
+            };
+        }
+    </script>
+</body>
+</html> 

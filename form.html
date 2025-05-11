@@ -11,6 +11,147 @@
             display: flex;
             justify-content: center;
             margin-top: 20px;
+            gap: 1.5rem;
+        }
+        .spinner-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+        .spinner {
+            border: 6px solid #222;
+            border-top: 6px solid #ff0000;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .popup {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .popup-content {
+            background: #181818;
+            color: #fff;
+            border-radius: 12px;
+            padding: 2.5rem 2rem 2rem 2rem;
+            box-shadow: 0 8px 32px rgba(255,0,0,0.25);
+            text-align: center;
+            min-width: 320px;
+            max-width: 90vw;
+        }
+        .popup-content p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .popup-content .fa-check-circle {
+            color: #00e676;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .popup-content .fa-comment-dots {
+            color: #ff9800;
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        .popup-content button {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .popup-content .close-btn {
+            background: #222;
+            color: #fff;
+            border: 1px solid #555;
+        }
+        .popup-content .close-btn:hover {
+            background: #ff0000;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        .popup-content .feedback-btn {
+            background: #ff9800;
+            color: #fff;
+            border: 1px solid #ff9800;
+        }
+        .popup-content .feedback-btn:hover {
+            background: #ffb74d;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        .popup-content .feedback-btn i {
+            font-size: 1.2rem;
+            color: #fff;
+        }
+        /* Spinner Overlay Styles */
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+        .spinner-container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.1);
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 0, 0, 0.1);
+            border-top: 4px solid #ff0000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+        .spinner-text {
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .spinner-text i {
+            color: #ff0000;
+            font-size: 1.4rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -50,7 +191,15 @@
 
         <button type="submit"><i class="fas fa-paper-plane"></i> Submit</button>
     </form>
-    <div class="spinner" id="formSpinner"></div>
+    <div class="spinner-overlay" id="spinnerOverlay">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <div class="spinner-text">
+                <i class="fas fa-paper-plane"></i>
+                Submitting...
+            </div>
+        </div>
+    </div>
     <button id="goBackButton"><i class="fas fa-arrow-left"></i> Go Back</button>
 
     <script>
@@ -102,8 +251,8 @@
 
         document.getElementById("userForm").addEventListener("submit", async function (event) {
             event.preventDefault();
-            const spinner = document.getElementById("formSpinner");
-            spinner.style.display = "block";
+            const spinnerOverlay = document.getElementById("spinnerOverlay");
+            spinnerOverlay.style.display = "flex";
 
             let movieName = document.getElementById("movieName").value;
             let language = document.getElementById("language").value;
@@ -111,15 +260,15 @@
             let quality = document.getElementById("quality").value;
 
             if (!movieName) {
-                spinner.style.display = "none";
+                spinnerOverlay.style.display = "none";
                 return showPopup("❌ Please select a movie before submitting.");
             }
             if (!language) {
-                spinner.style.display = "none";
+                spinnerOverlay.style.display = "none";
                 return showPopup("❌ Please select a preferred language.");
             }
             if (!quality) {
-                spinner.style.display = "none";
+                spinnerOverlay.style.display = "none";
                 return showPopup("❌ Please select a preferred quality.");
             }
 
@@ -188,12 +337,12 @@
                     requestId: serverData.requestId
                 });
 
-                spinner.style.display = "none";
-                showPopup("✅ Your request has been submitted successfully!");
+                spinnerOverlay.style.display = "none";
+                showSuccessPopup();
                 this.reset();
 
             } catch (error) {
-                spinner.style.display = "none";
+                spinnerOverlay.style.display = "none";
                 console.error('Error:', error);
                 if (error.message === 'Please login to submit a movie request') {
                     showPopup("❌ Please login to submit a movie request");
@@ -213,7 +362,7 @@
                 <div class="popup-content">
                     <p>${message}</p>
                     <div class="popup-btn-container">
-                        <button id="popupOkBtn">OK</button>
+                        <button id="popupOkBtn" class="close-btn"><i class="fas fa-times"></i> Close</button>
                     </div>
                 </div>
             `;
@@ -221,6 +370,30 @@
             document.getElementById('popupOkBtn').onclick = function() {
                 popup.remove();
                 window.location.href = 'more.html';
+            };
+        }
+
+        function showSuccessPopup() {
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <i class="fas fa-check-circle"></i>
+                    <p>Movie submitted successfully!</p>
+                    <div class="popup-btn-container">
+                        <button id="popupCloseBtn" class="close-btn"><i class="fas fa-times"></i> Close</button>
+                        <button id="popupFeedbackBtn" class="feedback-btn"><i class="fas fa-comment-dots"></i> Feedback</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            document.getElementById('popupCloseBtn').onclick = function() {
+                popup.remove();
+                window.location.href = 'more.html';
+            };
+            document.getElementById('popupFeedbackBtn').onclick = function() {
+                popup.remove();
+                window.location.href = 'feedback.html';
             };
         }
     </script>

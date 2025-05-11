@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 require('dotenv').config();
-const { sendMovieRequestApprovalEmail } = require('./emailHelper');
+const { sendMovieRequestApprovalEmail, sendMovieRequestRejectionEmail } = require('./emailHelper');
 
 const app = express();
 app.use(express.json());
@@ -84,10 +84,19 @@ const movieRequestSchema = new mongoose.Schema({
     downloadLink: { type: String }
 });
 
+// Feedback Schema
+const feedbackSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    username: { type: String, required: true },
+    feedback: { type: String, required: true, maxlength: 1000 },
+    createdAt: { type: Date, default: Date.now }
+});
+
 const User = mongoose.model('User', userSchema);
 const Watchlist = mongoose.model('Watchlist', watchlistSchema);
 const Review = mongoose.model('Review', reviewSchema);
 const MovieRequest = mongoose.model('MovieRequest', movieRequestSchema);
+const Feedback = mongoose.model('Feedback', feedbackSchema);
 
 // Middleware to verify JWT token
 const auth = async (req, res, next) => {
@@ -504,6 +513,35 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
     }
 });
 
+// Search Users (Admin)
+app.get('/api/admin/users/search', authenticateAdmin, async (req, res) => {
+    try {
+        const { username } = req.query;
+        if (!username) {
+            return res.status(400).json({ message: 'Username query parameter is required' });
+        }
+
+        const users = await User.find({
+            username: { $regex: username, $options: 'i' }
+        }).select('-password');
+
+        const userStats = await Promise.all(users.map(async (user) => {
+            const watchlistCount = await Watchlist.countDocuments({ userId: user._id });
+            const reviewCount = await Review.countDocuments({ userId: user._id });
+            return {
+                ...user.toObject(),
+                watchlistCount,
+                reviewCount
+            };
+        }));
+
+        res.json(userStats);
+    } catch (error) {
+        console.error('Error searching users:', error);
+        res.status(500).json({ message: 'Error searching users' });
+    }
+});
+
 // Get User Details (Admin)
 app.get('/api/admin/users/:id', authenticateAdmin, async (req, res) => {
     try {
@@ -616,7 +654,25 @@ app.get('/api/movie-requests/user', auth, async (req, res) => {
 // Get all movie requests (admin only)
 app.get('/api/movie-requests', authenticateAdmin, async (req, res) => {
     try {
-        const requests = await MovieRequest.find()
+        const { username, status } = req.query;
+        let query = {};
+        
+        if (username) {
+            // Find user by username
+            const user = await User.findOne({ username: { $regex: username, $options: 'i' } });
+            if (user) {
+                query.userId = user._id;
+            } else {
+                return res.json([]); // Return empty array if no user found
+            }
+        }
+
+        // Add status filter if provided
+        if (status && status !== 'all') {
+            query.status = status;
+        }
+
+        const requests = await MovieRequest.find(query)
             .sort({ createdAt: -1 })
             .populate('userId', 'username email');
         
@@ -666,6 +722,43 @@ app.patch('/api/movie-request/:id', authenticateAdmin, async (req, res) => {
             }
         }
 
+        // If status is rejected, send rejection email and delete the request
+        if (status === 'rejected') {
+            try {
+                // Get the rejection reason
+                const reason = req.body.rejectionReason || 'No reason provided';
+                
+                // Delete the request from database first
+                await MovieRequest.findByIdAndDelete(requestId);
+                
+                // Try to send email, but don't let it block the rejection
+                try {
+                    await sendMovieRequestRejectionEmail(
+                        request.userId.email,
+                        request.movie,
+                        reason
+                    );
+                    return res.json({
+                        success: true,
+                        message: 'Request rejected and deleted successfully'
+                    });
+                } catch (emailError) {
+                    console.error('Error sending rejection email:', emailError);
+                    return res.json({
+                        success: true,
+                        message: 'Request rejected and deleted, but email notification failed'
+                    });
+                }
+            } catch (error) {
+                console.error('Error in rejection process:', error);
+                return res.status(500).json({
+                    success: false,
+                    message: 'Error processing rejection'
+                });
+            }
+        }
+
+        // For other statuses, update normally
         const updatedRequest = await MovieRequest.findByIdAndUpdate(
             requestId,
             { 
@@ -733,6 +826,35 @@ app.delete('/api/profile', auth, async (req, res) => {
         // Delete the user
         await User.findByIdAndDelete(userId);
         res.json({ message: 'Account and all related data deleted permanently.' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error.' });
+    }
+});
+
+// Submit feedback (user)
+app.post('/api/feedback', auth, async (req, res) => {
+    try {
+        const { feedback } = req.body;
+        if (!feedback || feedback.length < 3) {
+            return res.status(400).json({ message: 'Feedback must be at least 3 characters.' });
+        }
+        const fb = new Feedback({
+            userId: req.user._id,
+            username: req.user.username,
+            feedback
+        });
+        await fb.save();
+        res.status(201).json({ message: 'Feedback submitted successfully.' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error.' });
+    }
+});
+
+// Get all feedbacks (admin)
+app.get('/api/feedbacks', authenticateAdmin, async (req, res) => {
+    try {
+        const feedbacks = await Feedback.find().sort({ createdAt: -1 });
+        res.json(feedbacks);
     } catch (err) {
         res.status(500).json({ message: 'Server error.' });
     }
