@@ -551,6 +551,246 @@
             color: #ff0000;
             margin-bottom: 1rem;
         }
+
+        /* Review Modal Styles */
+        .review-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .review-modal-content {
+            background: #1e1e20;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease;
+            position: relative;
+        }
+
+        .review-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .rating-input {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 1.8rem;
+            color: #ff0000;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .rating-input i {
+            cursor: pointer;
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        .rating-input i:hover {
+            transform: scale(1.2);
+            color: #ffd700;
+        }
+
+        .review-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            border: 2px solid #ff0000;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            resize: vertical;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .review-textarea:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+
+        .review-submit {
+            background: linear-gradient(90deg, #ff0000 0%, #ff3333 100%);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
+            padding: 0.9rem 2.5rem;
+            box-shadow: 0 4px 16px rgba(255,0,0,0.15);
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+            margin: 0 auto;
+            display: block;
+            letter-spacing: 1px;
+        }
+        .review-submit:hover {
+            background: linear-gradient(90deg, #cc0000 0%, #ff0000 100%);
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 8px 24px rgba(255,0,0,0.25);
+        }
+        .close-review-modal {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.2rem;
+            left: unset;
+            transform: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2.2rem;
+            cursor: pointer;
+            transition: color 0.3s, background 0.3s, transform 0.2s;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            z-index: 10;
+        }
+        .close-review-modal:hover {
+            color: #ff0000;
+            background: rgba(255,255,255,0.08);
+            transform: scale(1.1);
+        }
+        .styled-reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        .styled-reviews-list .review-item {
+            background: rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 1.2rem 1.5rem;
+            box-shadow: 0 2px 12px rgba(255,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.3s, transform 0.2s;
+            border: 1px solid rgba(255,0,0,0.10);
+        }
+        .styled-reviews-list .review-item:hover {
+            box-shadow: 0 6px 24px rgba(255,0,0,0.18);
+            transform: translateY(-2px) scale(1.01);
+        }
+        .styled-reviews-list .review-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .styled-reviews-list .review-author {
+            font-weight: bold;
+            color: #ff0000;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+        .styled-reviews-list .review-rating {
+            color: #ffd700;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+        .styled-reviews-list .review-content {
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        .styled-reviews-list .review-date {
+            color: #aaa;
+            font-size: 0.95rem;
+            text-align: right;
+        }
+
+        /* Delete Confirmation Modal */
+        .delete-confirm-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-confirm-content {
+            background: #1e1e20;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .delete-confirm-content h3 {
+            color: #ff0000;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .delete-confirm-content p {
+            color: #fff;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .delete-confirm-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .delete-confirm-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .delete-confirm-btn.confirm {
+            background: #ff0000;
+            color: #fff;
+        }
+
+        .delete-confirm-btn.confirm:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+        }
+
+        .delete-confirm-btn.cancel {
+            background: #444;
+            color: #fff;
+        }
+
+        .delete-confirm-btn.cancel:hover {
+            background: #666;
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -651,8 +891,8 @@
     <!-- Review Modal -->
     <div id="reviewModal" class="review-modal" style="display: none;">
         <div class="review-modal-content">
-            <button class="close-review-modal" onclick="closeReviewModal()">×</button>
-            <h2>Write a Review</h2>
+            <button class="close-review-modal" id="closeReviewModalBtn">×</button>
+            <h2 style="font-weight: bold; font-size: 2rem; margin-bottom: 1.5rem;">Write a Review</h2>
             <form id="reviewForm" class="review-form">
                 <div class="rating-input">
                     <i class="fas fa-star" data-rating="1"></i>
@@ -662,14 +902,13 @@
                     <i class="fas fa-star" data-rating="5"></i>
                 </div>
                 <textarea id="reviewText" class="review-textarea" placeholder="Write your review here..." required></textarea>
-                <div style="display: flex; gap: 1rem;">
-                    <button type="submit" class="review-submit">Submit Review</button>
-                    <button type="button" class="review-delete" id="deleteReviewBtn" style="display: none;">Delete Review</button>
+                <div style="display: flex; justify-content: center; margin-top: 1rem;">
+                    <button type="submit" class="review-submit stylish-btn" id="updateReviewBtn">Update Review</button>
                 </div>
             </form>
             <div class="reviews-section">
-                <h3>Reviews</h3>
-                <div id="movieReviewsList"></div>
+                <h3 style="font-size: 1.3rem; color: #fff; margin: 2rem 0 1rem 0; text-align: center; letter-spacing: 1px;">Reviews</h3>
+                <div id="movieReviewsList" class="styled-reviews-list"></div>
             </div>
         </div>
     </div>
@@ -681,6 +920,40 @@
     <button id="goToTopBtn" class="nav-button" title="Go to Top">
         <i class="fas fa-arrow-up"></i>
     </button>
+
+    <!-- Delete Confirmation Modal for Review -->
+    <div id="deleteConfirmModal" class="delete-confirm-modal">
+        <div class="delete-confirm-content">
+            <h3 style="color:#ff0000; font-size:1.7rem; margin-bottom:1.2rem; letter-spacing:1px; text-shadow:0 2px 8px rgba(255,0,0,0.15);">
+                <i class="fas fa-exclamation-triangle" style="margin-right:0.5rem;"></i>Delete Review
+            </h3>
+            <p style="color:#fff; font-size:1.15rem; background:rgba(255,0,0,0.08); border-radius:10px; padding:1.1rem 1rem; margin-bottom:2rem; box-shadow:0 2px 12px rgba(255,0,0,0.08); font-weight:500; letter-spacing:0.5px;">
+                <span style="color:#ffd700; font-size:1.2rem; font-weight:bold;">Are you sure?</span><br>
+                You are about to <span style="color:#ff0000; font-weight:bold;">delete</span> this review.<br>
+            </p>
+            <div class="delete-confirm-buttons">
+                <button class="delete-confirm-btn confirm" id="confirmDeleteReview">Yes, Delete</button>
+                <button class="delete-confirm-btn cancel" id="cancelDeleteReview">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal for Request -->
+    <div id="deleteRequestConfirmModal" class="delete-confirm-modal">
+        <div class="delete-confirm-content">
+            <h3 style="color:#ff0000; font-size:1.7rem; margin-bottom:1.2rem; letter-spacing:1px; text-shadow:0 2px 8px rgba(255,0,0,0.15);">
+                <i class="fas fa-exclamation-triangle" style="margin-right:0.5rem;"></i>Delete Request
+            </h3>
+            <p style="color:#fff; font-size:1.15rem; background:rgba(255,0,0,0.08); border-radius:10px; padding:1.1rem 1rem; margin-bottom:2rem; box-shadow:0 2px 12px rgba(255,0,0,0.08); font-weight:500; letter-spacing:0.5px;">
+                <span style="color:#ffd700; font-size:1.2rem; font-weight:bold;">Are you sure?</span><br>
+                You are about to <span style="color:#ff0000; font-weight:bold;">delete</span> this request.<br>
+            </p>
+            <div class="delete-confirm-buttons">
+                <button class="delete-confirm-btn confirm" id="confirmDeleteRequest">Yes, Delete</button>
+                <button class="delete-confirm-btn cancel" id="cancelDeleteRequest">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         let lastFlippedCard = null;
@@ -929,34 +1202,48 @@
 
         // Function to delete a review
         async function deleteReview(movieId) {
-            try {
-                const token = localStorage.getItem('metflix_jwt');
-                const response = await fetch(`http://localhost:5000/api/reviews/${movieId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
+            const deleteModal = document.getElementById('deleteConfirmModal');
+            deleteModal.style.display = 'flex';
+            const confirmBtn = document.getElementById('confirmDeleteReview');
+            const cancelBtn = document.getElementById('cancelDeleteReview');
+            const handleConfirm = async () => {
+                try {
+                    const token = localStorage.getItem('metflix_jwt');
+                    const response = await fetch(`http://localhost:5000/api/reviews/${movieId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (!response.ok) {
+                        const data = await response.json();
+                        throw new Error(`HTTP ${response.status}: ${data.message || 'Failed to delete review'}`);
                     }
-                });
-
-                if (!response.ok) {
-                    const data = await response.json();
-                    throw new Error(`HTTP ${response.status}: ${data.message || 'Failed to delete review'}`);
+                    showPopup('✅ Review deleted successfully!', 'success');
+                    deleteModal.style.display = 'none';
+                    await Promise.all([fetchReviews(), fetchWatchlist()]);
+                } catch (error) {
+                    showPopup(`Error deleting review: ${error.message}. Please try again.`, 'error');
                 }
-
-                showPopup('✅ Review deleted successfully!', 'success');
-                await Promise.all([fetchReviews(), fetchWatchlist()]);
-            } catch (error) {
-                console.error('Error deleting review:', error);
-                showPopup(`Error deleting review: ${error.message}. Please try again.`, 'error');
-            }
+                confirmBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', handleCancel);
+            };
+            const handleCancel = () => {
+                deleteModal.style.display = 'none';
+                confirmBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', handleCancel);
+            };
+            confirmBtn.addEventListener('click', handleConfirm);
+            cancelBtn.addEventListener('click', handleCancel);
         }
 
         // Function to show popup message
-        function showPopup(message, type = 'info') {
+        function showPopup(message, type = 'info', onClose) {
             const existingPopup = document.querySelector('.popup');
             if (existingPopup) existingPopup.remove();
             const popup = document.createElement('div');
             popup.className = 'popup';
+            popup.style.zIndex = '9999'; // Ensure popup is always on top
             popup.innerHTML = `
                 <div class="popup-content">
                     <p>${message}</p>
@@ -967,6 +1254,7 @@
             const closeButton = popup.querySelector('#closePopupButton');
             closeButton.addEventListener('click', () => {
                 popup.remove();
+                if (typeof onClose === 'function') onClose();
             });
         }
 
@@ -1029,12 +1317,13 @@
                     const data = await res.json();
                     throw new Error(`HTTP ${res.status}: ${data.message || 'Failed to update profile'}`);
                 }
-                showPopup('✅ Profile updated successfully!', 'success');
-                editProfileModal.classList.remove('active');
-                await fetchUserProfile();
+                // Show popup and only close modal after popup is closed
+                showPopup('✅ Profile updated successfully!', 'success', function() {
+                    editProfileModal.classList.remove('active');
+                    fetchUserProfile();
+                });
             } catch (err) {
-                console.error('Error updating profile:', err);
-                showPopup(`Error updating profile: ${err.message}. Please try again.`, 'error');
+                showPopup('❌ Failed to update profile. Please try again.', 'error');
             }
         };
 
@@ -1098,13 +1387,11 @@
                     selectedRating = userReview.rating;
                     updateRatingStars();
                     document.querySelector('.review-submit').textContent = 'Update Review';
-                    document.getElementById('deleteReviewBtn').style.display = 'block';
                 } else {
                     document.getElementById('reviewText').value = '';
                     selectedRating = 0;
                     updateRatingStars();
                     document.querySelector('.review-submit').textContent = 'Submit Review';
-                    document.getElementById('deleteReviewBtn').style.display = 'none';
                 }
             } catch (e) {
                 console.error('Error pre-filling user review:', e);
@@ -1190,30 +1477,6 @@
             } catch (error) {
                 console.error('Error processing review:', error);
                 showPopup(`Error processing review: ${error.message}. Please try again.`, 'error');
-            }
-        });
-
-        document.getElementById('deleteReviewBtn').addEventListener('click', async () => {
-            try {
-                const token = localStorage.getItem('metflix_jwt');
-                const response = await fetch(`http://localhost:5000/api/reviews/${currentMovieId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    const data = await response.json();
-                    throw new Error(`HTTP ${response.status}: ${data.message || 'Failed to delete review'}`);
-                }
-
-                showPopup('✅ Review deleted successfully!', 'success');
-                closeReviewModal();
-                await Promise.all([fetchReviews(), fetchWatchlist()]);
-            } catch (error) {
-                console.error('Error deleting review:', error);
-                showPopup(`Error deleting review: ${error.message}. Please try again.`, 'error');
             }
         });
 
@@ -1347,13 +1610,11 @@
 
                 // Add delete button event listeners
                 document.querySelectorAll('.delete-request-btn').forEach(btn => {
-                    btn.addEventListener('click', async function(e) {
+                    btn.addEventListener('click', function(e) {
                         e.stopPropagation();
                         const card = this.closest('.request-card');
                         const requestId = card.getAttribute('data-request-id');
-                        if (confirm('Are you sure you want to delete this request?')) {
-                            await deleteRequest(requestId);
-                        }
+                        deleteRequest(requestId);
                     });
                 });
 
@@ -1378,24 +1639,56 @@
             }
         }
 
-        // Add this function after loadMyRequests
+        // Update the deleteRequest logic to use a styled popup instead of a modal
         async function deleteRequest(requestId) {
-            try {
-                const token = localStorage.getItem('metflix_jwt');
-                const response = await fetch(`http://localhost:5000/api/movie-requests/${requestId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
+            const deleteModal = document.getElementById('deleteRequestConfirmModal');
+            deleteModal.style.display = 'flex';
+            // Clone buttons to remove old listeners
+            const oldConfirmBtn = document.getElementById('confirmDeleteRequest');
+            const newConfirmBtn = oldConfirmBtn.cloneNode(true);
+            oldConfirmBtn.parentNode.replaceChild(newConfirmBtn, oldConfirmBtn);
+            const oldCancelBtn = document.getElementById('cancelDeleteRequest');
+            const newCancelBtn = oldCancelBtn.cloneNode(true);
+            oldCancelBtn.parentNode.replaceChild(newCancelBtn, oldCancelBtn);
+            // Handler functions
+            const handleConfirm = async () => {
+                try {
+                    const token = localStorage.getItem('metflix_jwt');
+                    const response = await fetch(`http://localhost:5000/api/movie-requests/${requestId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (!response.ok) {
+                        throw new Error('Failed to delete request');
                     }
-                });
-                if (!response.ok) {
-                    throw new Error('Failed to delete request');
+                    showPopup('✅ Request deleted successfully!', 'success');
+                    deleteModal.style.display = 'none';
+                    loadMyRequests();
+                } catch (error) {
+                    showPopup('Error deleting request: ' + error.message, 'error');
                 }
-                // Refresh the list
-                loadMyRequests();
-            } catch (error) {
-                alert('Error deleting request: ' + error.message);
+                cleanup();
+            };
+            const handleCancel = () => {
+                deleteModal.style.display = 'none';
+                cleanup();
+            };
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    deleteModal.style.display = 'none';
+                    cleanup();
+                }
+            };
+            function cleanup() {
+                newConfirmBtn.removeEventListener('click', handleConfirm);
+                newCancelBtn.removeEventListener('click', handleCancel);
+                window.removeEventListener('keydown', handleEscape);
             }
+            newConfirmBtn.addEventListener('click', handleConfirm);
+            newCancelBtn.addEventListener('click', handleCancel);
+            window.addEventListener('keydown', handleEscape);
         }
 
         // Call loadMyRequests when the page loads
@@ -1404,6 +1697,9 @@
             loadMyRequests();
             document.getElementById('reviewModal').style.display = 'none';
         });
+
+        // Add close icon functionality for review modal
+        document.getElementById('closeReviewModalBtn').onclick = closeReviewModal;
     </script>
 </body>
 </html>

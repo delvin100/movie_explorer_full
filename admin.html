@@ -900,13 +900,58 @@
             transform: translateY(-4px) scale(1.08);
             opacity: 1;
         }
+        /* Add these styles in the <style> section */
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .popup-content {
+            background: #18181a;
+            padding: 2rem;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(255,0,0,0.18);
+            border: 2.5px solid #ff0000;
+            position: relative;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            animation: scaleIn 0.3s ease;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .popup-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
     </style>
 </head>
 <body>
     <div class="navbar">
         <div class="logo">Metflix</div>
         <div class="nav-links">
-            <span style="font-size: 1.5rem;"><b>Admin Dashboard</b></span>
+            <span style="font-size: 2.3rem;"><b>Admin Dashboard</b></span>
         </div>
         <div class="logo">
             <img src="images/logo.png" alt="Metflix Logo" id="adminLogo">
@@ -914,9 +959,6 @@
     </div>
 
     <div class="admin-container">
-        <div class="admin-header">
-            <h1>Admin Dashboard</h1>
-        </div>
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number" id="totalUsers">0</div>
@@ -1058,14 +1100,23 @@
                 }
             });
 
-            $('.filter-btn').click(function() {
-                // Remove active class from all buttons in the same section
+            $('.admin-section:has(#userList) .filter-btn').click(function() {
+                // Remove active class from all buttons in this section
                 $(this).closest('.admin-section').find('.filter-btn').removeClass('active');
                 // Add active class to clicked button
                 $(this).addClass('active');
-                
                 const filter = $(this).data('filter');
                 filterUsersByStatus(filter);
+            });
+
+            $('.movie-requests-section .filter-btn').click(function() {
+                // Remove active class from all buttons in this section
+                $(this).closest('.movie-requests-section').find('.filter-btn').removeClass('active');
+                // Add active class to clicked button
+                $(this).addClass('active');
+                // Load requests for this filter
+                const status = $(this).data('filter');
+                loadMovieRequests(status);
             });
 
             $('#confirmDelete').on('click', function() {
@@ -1194,6 +1245,9 @@
                     <button class="action-btn view-btn" onclick="window.location.href='adminreview.html?userId=${user._id}'">
                         <i class="fas fa-eye"></i> View Reviews
                     </button>
+                    <button class="action-btn delete-user-btn" title="Delete User" data-user-id="${user._id}" style="background:#ff0000; color:#fff; margin-left:0.5rem; border-radius:8px; display:flex; align-items:center; gap:0.5rem; font-weight:bold;">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             `;
 
@@ -1253,12 +1307,10 @@
             $('.user-card').each(function() {
                 const lastActiveAt = $(this).data('last-active-at');
                 let isActive = false;
-                
                 if (lastActiveAt) {
                     const lastActive = new Date(lastActiveAt);
                     isActive = lastActive >= fifteenDaysAgo;
                 }
-
                 if (status === 'all') {
                     $(this).show();
                     visibleCount++;
@@ -1282,10 +1334,22 @@
             // Show/hide the no users message without replacing the user list
             if (visibleCount === 0) {
                 if ($('#noUsersMessage').length === 0) {
+                    let messageText = 'No users found';
+                    let icon = 'fa-user-slash';
+                    if (status === 'active') {
+                        messageText = 'No active users found';
+                        icon = 'fa-user-check';
+                    } else if (status === 'inactive') {
+                        messageText = 'No inactive users found';
+                        icon = 'fa-user-slash';
+                    } else if (status === 'all') {
+                        messageText = 'No users found';
+                        icon = 'fa-user';
+                    }
                     const message = `
                         <div id="noUsersMessage" class="no-users">
-                            <i class="fas fa-user-slash" style="font-size:2.5rem;color:#ff0000;margin-bottom:1rem;"></i>
-                            <p>No ${status} users found</p>
+                            <i class="fas ${icon}" style="font-size:2.5rem;color:#ff0000;margin-bottom:1rem;"></i>
+                            <p>${messageText}</p>
                         </div>
                     `;
                     userList.prepend(message);
@@ -1758,9 +1822,12 @@
             const popup = document.createElement('div');
             popup.className = 'popup success-popup';
             popup.innerHTML = `
-                <div class="popup-content">
-                    <i class="fas fa-check-circle"></i>
-                    <p>${message}</p>
+                <div class="popup-content" style="max-width: 400px; background: #1a1a1a; border: 2px solid #00ff00;">
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="fas fa-check-circle" style="color: #00ff00; font-size: 3rem; margin-bottom: 15px;"></i>
+                        <h3 style="color: #00ff00; margin-bottom: 10px;">Success</h3>
+                        <p style="color: #fff; font-size: 1.1rem;">${message}</p>
+                    </div>
                 </div>
             `;
             document.body.appendChild(popup);
@@ -1772,9 +1839,12 @@
             const popup = document.createElement('div');
             popup.className = 'popup error-popup';
             popup.innerHTML = `
-                <div class="popup-content">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <p>${message}</p>
+                <div class="popup-content" style="max-width: 400px; background: #1a1a1a; border: 2px solid #ff0000;">
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="fas fa-exclamation-circle" style="color: #ff0000; font-size: 3rem; margin-bottom: 15px;"></i>
+                        <h3 style="color: #ff0000; margin-bottom: 10px;">Error</h3>
+                        <p style="color: #fff; font-size: 1.1rem;">${message}</p>
+                    </div>
                 </div>
             `;
             document.body.appendChild(popup);
@@ -1920,6 +1990,116 @@
         goTopBtn.addEventListener('click', function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
+
+        // Add event delegation for delete-user-btn
+        $(document).on('click', '.delete-user-btn', function() {
+            const userId = $(this).data('user-id');
+            showDeleteUserPopup(userId);
+        });
+
+        // Stylish delete user popup (like movie.html)
+        function showDeleteUserPopup(userId) {
+            document.querySelectorAll('.popup.delete-account-popup').forEach(p => p.remove());
+            const popup = document.createElement('div');
+            popup.className = 'popup delete-account-popup';
+            popup.innerHTML = `
+                <div class="popup-content" style="max-width: 420px; text-align: center; background: #18181a; border-radius: 18px; box-shadow: 0 4px 24px rgba(255,0,0,0.18); border: 2.5px solid #ff0000; position: relative; animation: fadeIn 0.3s;">
+                    <div style="margin-bottom: 1.2rem;">
+                        <i class="fas fa-user-slash" style="color: #ff0000; font-size: 2.8rem;"></i>
+                    </div>
+                    <h2 style="color: #ff0000; font-size: 2rem; font-weight: bold; margin-bottom: 1.2rem; letter-spacing: 1px; text-shadow: none;">Delete User</h2>
+                    <p style="color: #fff; font-size: 1.15rem; background: rgba(255,0,0,0.08); border-radius: 10px; padding: 1.1rem 1rem; margin-bottom: 2rem; box-shadow: 0 2px 12px rgba(255,0,0,0.08); font-weight: 500; letter-spacing: 0.5px;">
+                        <span style="color: #ffd700; font-size: 1.2rem; font-weight: bold;">Are you sure?</span><br>
+                        You are about to <span style="color: #ff0000; font-weight: bold;">permanently delete</span> this user and all their data.<br>
+                        <span style="color: #ffea80;">This action cannot be undone and all their reviews, requests, feedbacks, etc. will be removed.</span>
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button id="confirmDeleteUserAdmin" style="background: #ff0000; color: #fff; font-weight: bold; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1.1rem; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem;"><i class='fas fa-trash'></i> <span id="deleteUserBtnText">Delete</span></button>
+                        <button id="cancelDeleteUserAdmin" style="background: #444; color: #fff; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1.1rem; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem;"><i class='fas fa-times'></i> Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            document.getElementById('cancelDeleteUserAdmin').onclick = () => popup.remove();
+            let deleting = false;
+            document.getElementById('confirmDeleteUserAdmin').onclick = async () => {
+                if (deleting) return;
+                deleting = true;
+                const btn = document.getElementById('confirmDeleteUserAdmin');
+                const btnText = document.getElementById('deleteUserBtnText');
+                btn.disabled = true;
+                btnText.innerHTML = `<span class='spinner' style='display:inline-block;width:18px;height:18px;border:2.5px solid #fff;border-top:2.5px solid #ff0000;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;'></span>`;
+                try {
+                    await deleteUserPermanently(userId, popup);
+                } finally {
+                    deleting = false;
+                    btn.disabled = false;
+                    btnText.textContent = 'Delete';
+                }
+            };
+        }
+        // Add spinner animation
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }`;
+        document.head.appendChild(style);
+        // Robust deleteUserPermanently
+        async function deleteUserPermanently(userId, popup) {
+            try {
+                const token = localStorage.getItem('admin_token');
+                if (!token) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to delete user');
+                }
+
+                // Remove the user card from the UI
+                const userCard = document.getElementById(`user-card-${userId}`);
+                if (userCard) {
+                    userCard.remove();
+                }
+
+                // Show success message
+                showSuccess('User and all related data deleted successfully');
+
+                // Close the popup
+                if (popup) {
+                    popup.remove();
+                }
+
+                // Update stats
+                await updateStats();
+
+                // If no users left, show the no users message
+                const userList = document.getElementById('userList');
+                if (userList && userList.children.length === 0) {
+                    userList.innerHTML = `
+                        <div class="no-users">
+                            <i class="fas fa-user-slash" style="font-size:2.5rem;color:#ff0000;margin-bottom:1rem;"></i>
+                            <p>No users found</p>
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                showError(error.message || 'Failed to delete user. Please try again.');
+                if (popup) {
+                    popup.remove();
+                }
+            }
+        }
     </script>
 </body>
 </html>

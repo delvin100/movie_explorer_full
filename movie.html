@@ -563,18 +563,24 @@
     <script src="script.js"></script>
     <script>
         // Function to show popup messages with enhanced styles
-        function showPopup(message, type = 'info') {
+        function showPopup(message, type = 'info', onClose) {
+            const existingPopup = document.querySelector('.popup');
+            if (existingPopup) existingPopup.remove();
             const popup = document.createElement('div');
             popup.className = 'popup';
+            popup.style.zIndex = '9999';
             popup.innerHTML = `
                 <div class="popup-content">
-                    <p style="color: #ffea80; font-size: 1.1rem; margin-bottom: 1.5rem;">${message}</p>
-                    <button id="closePopupButton" style="background: linear-gradient(45deg, #ff4040, #ff8080); color: #ffe066; font-weight: 600; border: none; padding: 0.75rem 1.875rem; border-radius: 50px; cursor: pointer; transition: all 0.4s ease;">Close</button>
+                    <p>${message}</p>
+                    <button id="closePopupButton">Close</button>
                 </div>
             `;
             document.body.appendChild(popup);
-            const closeButton = document.getElementById('closePopupButton');
-            closeButton.addEventListener('click', () => popup.remove());
+            const closeButton = popup.querySelector('#closePopupButton');
+            closeButton.addEventListener('click', () => {
+                popup.remove();
+                if (typeof onClose === 'function') onClose();
+            });
         }
 
         // Function to smoothly scroll to a section
@@ -882,14 +888,16 @@
                     })
                 });
                 if (res.ok) {
-                    editProfileModal.classList.remove('active');
-                    await fetchProfileDropdown();
-                    dropdownAvatar.src = avatarUrl;
+                    showPopup('✅ Profile updated successfully!', 'success', async function() {
+                        editProfileModal.classList.remove('active');
+                        await fetchProfileDropdown();
+                        dropdownAvatar.src = avatarUrl;
+                    });
                 } else {
-                    alert('Failed to update profile');
+                    showPopup('❌ Failed to update profile. Please try again.', 'error');
                 }
             } catch (err) {
-                alert('Error updating profile');
+                showPopup('❌ Error updating profile', 'error');
             }
         };
 
@@ -920,22 +928,84 @@
                 const popup = document.createElement('div');
                 popup.className = 'popup help-popup';
                 popup.innerHTML = `
-                    <div class="popup-content">
-                        <h2>How to Use Metflix</h2>
-                        <ul style="text-align:left; color:#ffea80; font-size:1.1rem; margin:1.5rem 0; line-height:1.7;">
-                            <li><b>Browse Movies:</b> Scroll through trending and featured movies on the homepage.</li>
-                            <li><b>Search:</b> Use the search bar to find movies by title.</li>
-                            <li><b>Flip Cards:</b> Click on a movie card to flip and see more details and actions.</li>
-                            <li><b>Add to Watchlist:</b> Click the Add to Watchlist button on the card back to save a movie for later.</li>
-                            <li><b>Review:</b> Click the Review button to write or edit your review for a movie.</li>
-                            <li><b>More Info:</b> Click the More button for a detailed overview of the movie.</li>
-                            <li><b>Remove from Watchlist:</b> Click the Remove button to remove a movie from your watchlist.</li>
-                            <li><b>Profile:</b> Access your profile from the dashboard to view and edit your info, watchlist, and reviews.</li>
-                            <li><b>Edit Profile:</b> In your profile, click "Edit Profile" to change your username, bio, or avatar.</li>
-                            <li><b>Genre & Language Filters:</b> Use the language buttons and genre filters to quickly find movies in your preferred language or genre.</li>
-                            <li><b>Submit Feedback:</b> After watching a movie, you can submit feedback from the form page to help us improve Metflix.</li>
-                        </ul>
-                        <button id="closeHelpPopup" style="margin-top:1rem;">Close</button>
+                    <div class="popup-content" style="max-width: 900px; background: rgba(0, 0, 0, 0.95); border-radius: 20px; padding: 2.5rem; box-shadow: 0 0 30px rgba(255, 0, 0, 0.2);">
+                        <h2 style="color: #ff0000; font-size: 3rem; margin-bottom: 2.5rem; text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); font-family: 'Arial', sans-serif;">
+                            <i class="fas fa-film" style="margin-right: 1rem;"></i>Metflix Help Guide
+                        </h2>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2.5rem;">
+                            <!-- Movie Discovery Section -->
+                            <div class="help-section" style="background: rgba(255, 0, 0, 0.1); padding: 1.5rem; border-radius: 15px; border: 1px solid rgba(255, 0, 0, 0.2);">
+                                <h3 style="color: #ffea80; font-size: 1.8rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.8rem;">
+                                    <i class="fas fa-film"></i> Movie Discovery
+                                </h3>
+                                <ul style="color: #fff; font-size: 1.2rem; line-height: 1.8;">
+                                    <li><b style="color: #ffea80;">Browse Movies:</b> Explore trending and featured movies on the homepage</li>
+                                    <li><b style="color: #ffea80;">Search:</b> Find movies instantly using the search bar</li>
+                                    <li><b style="color: #ffea80;">Language Filters:</b> Switch between Malayalam, Tamil, Hindi, and English movies</li>
+                                    <li><b style="color: #ffea80;">Genre Filters:</b> Filter movies by your favorite genres</li>
+                                    <li><b style="color: #ffea80;">Trending Section:</b> Discover what's popular right now</li>
+                                </ul>
+                            </div>
+
+                            <!-- Movie Interactions Section -->
+                            <div class="help-section" style="background: rgba(255, 0, 0, 0.1); padding: 1.5rem; border-radius: 15px; border: 1px solid rgba(255, 0, 0, 0.2);">
+                                <h3 style="color: #ffea80; font-size: 1.8rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.8rem;">
+                                    <i class="fas fa-star"></i> Movie Interactions
+                                </h3>
+                                <ul style="color: #fff; font-size: 1.2rem; line-height: 1.8;">
+                                    <li><b style="color: #ffea80;">Flip Cards:</b> Click movie cards to reveal details and actions</li>
+                                    <li><b style="color: #ffea80;">Watchlist:</b> Save movies to watch later</li>
+                                    <li><b style="color: #ffea80;">Reviews:</b> Rate and review movies you've watched</li>
+                                    <li><b style="color: #ffea80;">Trailers:</b> Watch official movie trailers</li>
+                                    <li><b style="color: #ffea80;">Songs:</b> Listen to movie soundtracks and songs</li>
+                                    <li><b style="color: #ffea80;">Movie Requests:</b> Request movies you'd like to see added to our collection</li>
+                                    <li><b style="color: #ffea80;">More Info:</b> Get detailed movie information</li>
+                                </ul>
+                            </div>
+
+                            <!-- Profile Management Section -->
+                            <div class="help-section" style="background: rgba(255, 0, 0, 0.1); padding: 1.5rem; border-radius: 15px; border: 1px solid rgba(255, 0, 0, 0.2);">
+                                <h3 style="color: #ffea80; font-size: 1.8rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.8rem;">
+                                    <i class="fas fa-user"></i> Profile Management
+                                </h3>
+                                <ul style="color: #fff; font-size: 1.2rem; line-height: 1.8;">
+                                    <li><b style="color: #ffea80;">Dashboard:</b> Access your profile, watchlist, and reviews</li>
+                                    <li><b style="color: #ffea80;">Edit Profile:</b> Update username, bio, and avatar</li>
+                                    <li><b style="color: #ffea80;">Movie Requests:</b> Request movies you'd like to see</li>
+                                    <li><b style="color: #ffea80;">Feedback:</b> Help improve Metflix with your suggestions</li>
+                                    <li><b style="color: #ffea80;">Account Settings:</b> Manage your account preferences</li>
+                                    <li><b style="color: #ffea80;">Email Notifications:</b> Receive welcome emails upon registration and updates about your movie requests</li>
+                                </ul>
+                            </div>
+
+                            <!-- Advanced Features Section -->
+                            <div class="help-section" style="background: rgba(255, 0, 0, 0.1); padding: 1.5rem; border-radius: 15px; border: 1px solid rgba(255, 0, 0, 0.2);">
+                                <h3 style="color: #ffea80; font-size: 1.8rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.8rem;">
+                                    <i class="fas fa-magic"></i> Advanced Features
+                                </h3>
+                                <ul style="color: #fff; font-size: 1.2rem; line-height: 1.8;">
+                                    <li><b style="color: #ffea80;">Quick Navigation:</b> Use the "Go to Top" button for easy scrolling</li>
+                                    <li><b style="color: #ffea80;">Movie Details:</b> View ratings and reviews from other users</li>
+                                    <li><b style="color: #ffea80;">Watchlist:</b> Save movies you want to watch later</li>
+                                    <li><b style="color: #ffea80;">Movie Requests:</b> Request movies to be added to our collection</li>
+                                    <li><b style="color: #ffea80;">Profile Management:</b> Update your profile information and preferences</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2.5rem; padding: 1.5rem 2rem; background: #18181a; border-radius: 18px; box-shadow: 0 4px 18px rgba(255,0,0,0.12); display: flex; align-items: center; gap: 1.2rem; justify-content: center; border: 2.5px solid #ff0000;">
+                            <i class="fas fa-exclamation-circle" style="color: #ffd700; font-size: 2.2rem;"></i>
+                            <div style="color: #fff; font-size: 1.15rem; text-align: left;">
+                                <b style="color: #ffd700; font-size: 1.2rem;">Disclaimer:</b><br>
+                                When you click on <b style='color:#ffea80;'>More</b> or encounter <b style='color:#ffea80;'>Error loading trailer/movie/songs</b>, it may be because the <span style='color:#ffea80;'>YouTube API daily limit</span> has been exceeded.<br>
+                                <span style="color: #ffea80;">This site is purely made for educational purposes. Sorry for the inconvenience.</span>
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 3rem;">
+                            <button id="closeHelpPopup" style="background: linear-gradient(45deg, #ff4040, #ff8080); color: #fff; font-weight: 600; border: none; padding: 1.2rem 3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);">Close</button>
+                        </div>
                     </div>
                 `;
                 document.body.appendChild(popup);
@@ -956,11 +1026,20 @@
             const popup = document.createElement('div');
             popup.className = 'popup delete-account-popup';
             popup.innerHTML = `
-                <div class="popup-content" style="max-width: 400px; text-align: center;">
-                    <h2 style="color: #000; margin-bottom: 1rem; text-shadow: none;">Delete Account</h2>
-                    <p style="color: #fff; margin-bottom: 1.5rem;">Are you sure you want to <b>permanently delete</b> your account? <br>This action <b>cannot be undone</b> and all your data will be removed.</p>
-                    <button id="confirmDeleteAccount" style="background: #ff0000; color: #fff; font-weight: bold; border: none; padding: 0.75rem 2rem; border-radius: 30px; margin-right: 1rem; cursor: pointer;">Delete</button>
-                    <button id="cancelDeleteAccount" style="background: #444; color: #fff; border: none; padding: 0.75rem 2rem; border-radius: 30px; cursor: pointer;">Cancel</button>
+                <div class="popup-content" style="max-width: 420px; text-align: center; background: #18181a; border-radius: 18px; box-shadow: 0 4px 24px rgba(255,0,0,0.18); border: 2.5px solid #ff0000; position: relative; animation: fadeIn 0.3s;">
+                    <div style="margin-bottom: 1.2rem;">
+                        <i class="fas fa-user-slash" style="color: #ff0000; font-size: 2.8rem;"></i>
+                    </div>
+                    <h2 style="color: #ff0000; font-size: 2rem; font-weight: bold; margin-bottom: 1.2rem; letter-spacing: 1px; text-shadow: none;">Delete Account</h2>
+                    <p style="color: #fff; font-size: 1.15rem; background: rgba(255,0,0,0.08); border-radius: 10px; padding: 1.1rem 1rem; margin-bottom: 2rem; box-shadow: 0 2px 12px rgba(255,0,0,0.08); font-weight: 500; letter-spacing: 0.5px;">
+                        <span style="color: #ffd700; font-size: 1.2rem; font-weight: bold;">Are you sure?</span><br>
+                        You are about to <span style="color: #ff0000; font-weight: bold;">permanently delete</span> your account.<br>
+                        <span style="color: #ffea80;">This action cannot be undone and all your data will be removed.</span>
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button id="confirmDeleteAccount" style="background: #ff0000; color: #fff; font-weight: bold; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1.1rem; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem;"><i class='fas fa-trash'></i> Delete</button>
+                        <button id="cancelDeleteAccount" style="background: #444; color: #fff; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1.1rem; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem;"><i class='fas fa-times'></i> Cancel</button>
+                    </div>
                 </div>
             `;
             document.body.appendChild(popup);

@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 require('dotenv').config();
-const { sendMovieRequestApprovalEmail, sendMovieRequestRejectionEmail } = require('./emailHelper');
+const { sendMovieRequestApprovalEmail, sendMovieRequestRejectionEmail, sendWelcomeEmail, sendAccountDeletionEmail } = require('./emailHelper');
 
 const app = express();
 app.use(express.json());
@@ -163,7 +163,14 @@ app.post('/api/register', async (req, res) => {
         const defaultAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(username)}`;
         const user = new User({ username, email, password: hashedPassword, profile: { avatar: defaultAvatar } });
         await user.save();
+
+        // Respond to client immediately
         res.status(201).json({ message: 'Registration successful.' });
+
+        // Send welcome email in the background (non-blocking)
+        sendWelcomeEmail(email, username).catch(emailError => {
+            console.error('Error sending welcome email:', emailError);
+        });
     } catch (err) {
         if (err.name === 'ValidationError') {
             return res.status(400).json({ message: 'Validation error: ' + err.message });
@@ -856,6 +863,53 @@ app.get('/api/feedbacks', authenticateAdmin, async (req, res) => {
         const feedbacks = await Feedback.find().sort({ createdAt: -1 });
         res.json(feedbacks);
     } catch (err) {
+        res.status(500).json({ message: 'Server error.' });
+    }
+});
+
+// Admin: Permanently delete a user and all related data
+app.delete('/api/admin/users/:id', authenticateAdmin, async (req, res) => {
+    try {
+        const userId = req.params.id;
+        
+        // Get user details before deletion for email notification
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Store user details for email
+        const userEmail = user.email;
+        const username = user.username;
+
+        // Delete all watchlist items
+        await Watchlist.deleteMany({ userId });
+        
+        // Delete all reviews
+        await Review.deleteMany({ userId });
+        
+        // Delete all movie requests
+        await MovieRequest.deleteMany({ userId });
+        
+        // Delete all feedbacks
+        if (typeof Feedback !== 'undefined') {
+            await Feedback.deleteMany({ userId });
+        }
+        
+        // Delete the user
+        await User.findByIdAndDelete(userId);
+
+        // Send deletion email notification
+        try {
+            await sendAccountDeletionEmail(userEmail, username);
+        } catch (emailError) {
+            console.error('Error sending deletion email:', emailError);
+            // Continue with the deletion process even if email fails
+        }
+
+        res.json({ message: 'User and all related data deleted permanently.' });
+    } catch (err) {
+        console.error('Error deleting user:', err);
         res.status(500).json({ message: 'Server error.' });
     }
 });
