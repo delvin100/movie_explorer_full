@@ -8,8 +8,56 @@ const { sendMovieRequestApprovalEmail, sendMovieRequestRejectionEmail, sendWelco
 
 const app = express();
 app.use(express.json());
-app.use(cors());
-app.use(express.static('.')); // Serve static files from the current directory
+
+// Configure CORS to allow both localhost and deployed URL
+const allowedOrigins = [
+    'http://localhost:5000',
+    'http://localhost:3000',
+    'http://localhost:5500',  // Live Server default port
+    'http://127.0.0.1:5000',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5500',  // Live Server default port
+    'https://movie-explorer-95ea.onrender.com',
+    'https://movie-explorer-frontend.onrender.com'
+];
+
+app.use(cors({
+    origin: function(origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) {
+            console.log('Request with no origin - allowing');
+            return callback(null, true);
+        }
+        
+        // Check if the origin is in our allowedOrigins list
+        if (allowedOrigins.indexOf(origin) === -1) {
+            console.log('Blocked by CORS:', origin);
+            console.log('Allowed origins:', allowedOrigins);
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    maxAge: 86400 // 24 hours
+}));
+
+// Serve static files with proper caching headers
+app.use(express.static('.', {
+    maxAge: '1h',
+    setHeaders: (res, path) => {
+        if (path.endsWith('.html')) {
+            // Don't cache HTML files
+            res.setHeader('Cache-Control', 'no-cache');
+        } else {
+            // Cache other static files
+            res.setHeader('Cache-Control', 'public, max-age=3600');
+        }
+    }
+}));
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI)

@@ -562,6 +562,16 @@
 
     <script src="script.js"></script>
     <script>
+        // Base URL configuration
+        const BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:5000'
+            : 'https://movie-explorer-95ea.onrender.com';
+
+        // Helper function to get API URL
+        function getApiUrl(endpoint) {
+            return `${BASE_URL}${endpoint}`;
+        }
+
         // Function to show popup messages with enhanced styles
         function showPopup(message, type = 'info', onClose) {
             const existingPopup = document.querySelector('.popup');
@@ -613,7 +623,7 @@
             const token = localStorage.getItem('metflix_jwt');
             if (!token) return;
             try {
-                const res = await fetch(`http://localhost:5000/api/reviews/${movieId}`);
+                const res = await fetch(getApiUrl(`/api/reviews/${movieId}`));
                 const reviews = await res.json();
                 const username = localStorage.getItem('metflix_username');
                 // Find the user's review
@@ -674,7 +684,7 @@
                 let response;
                 if (userReview) {
                     // Update existing review
-                    response = await fetch(`http://localhost:5000/api/reviews/${currentMovieId}`, {
+                    response = await fetch(getApiUrl(`/api/reviews/${currentMovieId}`), {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',
@@ -684,7 +694,7 @@
                     });
                 } else {
                     // Create new review
-                    response = await fetch('http://localhost:5000/api/reviews', {
+                    response = await fetch(getApiUrl('/api/reviews'), {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -724,7 +734,7 @@
         // Fetch reviews for a movie
         async function fetchReviews(movieId) {
             try {
-                const response = await fetch(`http://localhost:5000/api/reviews/${movieId}`);
+                const response = await fetch(getApiUrl(`/api/reviews/${movieId}`));
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: Failed to fetch movie reviews`);
                 }
@@ -779,7 +789,7 @@
         async function fetchProfileDropdown() {
             if (!token) return;
             try {
-                const res = await fetch('http://localhost:5000/api/profile', {
+                const res = await fetch(getApiUrl('/api/profile'), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await res.json();
@@ -797,8 +807,8 @@
             if (!token) return;
             try {
                 const [wRes, rRes] = await Promise.all([
-                    fetch('http://localhost:5000/api/watchlist', { headers: { 'Authorization': `Bearer ${token}` } }),
-                    fetch('http://localhost:5000/api/user/reviews', { headers: { 'Authorization': `Bearer ${token}` } })
+                    fetch(getApiUrl('/api/watchlist'), { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(getApiUrl('/api/user/reviews'), { headers: { 'Authorization': `Bearer ${token}` } })
                 ]);
                 const wData = await wRes.json();
                 const rData = await rRes.json();
@@ -875,7 +885,7 @@
             const bio = document.getElementById('editBio').value.trim();
             let avatarUrl = avatarPreview.src;
             try {
-                const res = await fetch('http://localhost:5000/api/profile', {
+                const res = await fetch(getApiUrl('/api/profile'), {
                     method: 'PATCH',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -1053,7 +1063,7 @@
         async function deleteAccount() {
             try {
                 const token = localStorage.getItem('metflix_jwt');
-                const response = await fetch('http://localhost:5000/api/profile', {
+                const response = await fetch(getApiUrl('/api/profile'), {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });

@@ -168,6 +168,11 @@
         <div class="spinner"></div>
     </div>
     <script>
+        // API URL Configuration
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'http://localhost:5000' 
+            : 'https://movie-explorer-95ea.onrender.com';
+
         document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const spinnerOverlay = document.getElementById('spinnerOverlay');
@@ -183,7 +188,7 @@
                 if (!token) {
                     throw new Error('Please login to submit feedback');
                 }
-                const response = await fetch('http://localhost:5000/api/feedback', {
+                const response = await fetch(`${API_URL}/api/feedback`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

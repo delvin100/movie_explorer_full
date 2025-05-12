@@ -1057,6 +1057,76 @@
     </button>
 
     <script>
+        // Base URL configuration
+        const BASE_URL = (() => {
+            const hostname = window.location.hostname;
+            const protocol = window.location.protocol;
+            const port = window.location.port;
+            
+            // Development environment
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return `${protocol}//${hostname}:5000`;
+            }
+            
+            // Production environment
+            return 'https://movie-explorer-95ea.onrender.com';
+        })();
+
+        // Helper function to get API URL with error handling
+        function getApiUrl(endpoint) {
+            try {
+                if (!endpoint) {
+                    throw new Error('Endpoint is required');
+                }
+                if (!endpoint.startsWith('/')) {
+                    endpoint = '/' + endpoint;
+                }
+                return `${BASE_URL}${endpoint}`;
+            } catch (error) {
+                console.error('Error constructing API URL:', error);
+                showError('Error constructing API URL. Please check your connection.');
+                throw error;
+            }
+        }
+
+        // Helper function to make API requests with proper error handling
+        async function makeApiRequest(endpoint, options = {}) {
+            try {
+                const token = localStorage.getItem('admin_token');
+                if (!token) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                const defaultOptions = {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                const response = await fetch(getApiUrl(endpoint), {
+                    ...defaultOptions,
+                    ...options,
+                    headers: {
+                        ...defaultOptions.headers,
+                        ...options.headers
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API request error:', error);
+                showError(error.message || 'An error occurred while making the request');
+                throw error;
+            }
+        }
+
         // Ensure jQuery is loaded
         if (typeof $ !== 'function') {
             alert('jQuery is not loaded! The admin panel will not work.');
@@ -1151,30 +1221,15 @@
             });
         });
 
+        // Update loadUsers function to use makeApiRequest
         async function loadUsers() {
-            const token = localStorage.getItem('admin_token');
-            if (!token) {
-                window.location.href = 'index.html';
-                return;
-            }
-
             try {
-                const response = await fetch('http://localhost:5000/api/admin/users', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch users: ${response.status}`);
-                }
-
-                const users = await response.json();
+                const users = await makeApiRequest('/api/admin/users');
                 console.log('Users fetched:', users);
                 const userList = $('#userList');
                 userList.empty();
                 
-                if (users.length === 0) {
+                if (!Array.isArray(users) || users.length === 0) {
                     userList.html('<div class="no-users"><i class="fas fa-user-slash" style="font-size:2.5rem;color:#ff0000;margin-bottom:1rem;"></i>No users found</div>');
                     return;
                 }
@@ -1192,7 +1247,13 @@
                 await updateStats();
             } catch (error) {
                 console.error('Error loading users:', error);
-                $('#userList').html('<p style="text-align: center; color: #ff0000;">Error loading users. Please try again.</p>');
+                showError(`Error loading users: ${error.message}`);
+                $('#userList').html(`
+                    <div class="no-users">
+                        <i class="fas fa-exclamation-circle" style="font-size:2.5rem;color:#ff0000;margin-bottom:1rem;"></i>
+                        <p>Error loading users. Please try again.</p>
+                    </div>
+                `);
             }
         }
 
@@ -1254,31 +1315,22 @@
             return card;
         }
 
+        // Update updateStats function to use makeApiRequest
         async function updateStats() {
-            const token = localStorage.getItem('admin_token');
-            if (!token) {
-                window.location.href = 'index.html';
-                return;
-            }
-
             try {
-                const response = await fetch('http://localhost:5000/api/admin/stats', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch stats: ${response.status}`);
+                const stats = await makeApiRequest('/api/admin/stats');
+                console.log('Stats fetched:', stats);
+                
+                if (!stats || typeof stats !== 'object') {
+                    throw new Error('Invalid stats data received');
                 }
 
-                const stats = await response.json();
-                console.log('Stats fetched:', stats);
                 $('#totalUsers').text(stats.totalUsers || 0);
                 $('#totalRequests').text(stats.totalRequests || 0);
                 $('#totalReviews').text(stats.totalReviews || 0);
             } catch (error) {
                 console.error('Error updating stats:', error);
+                showError(`Error updating stats: ${error.message}`);
                 $('#totalUsers').text('0');
                 $('#totalRequests').text('0');
                 $('#totalReviews').text('0');
@@ -1367,25 +1419,25 @@
                 return;
             }
 
-            // Remove any existing reviews container
-            $(`#reviews-container-${userId}`).remove();
-
-            // Create and show loading state
-            const loadingHtml = `
-                <div id="reviews-container-${userId}" class="reviews-container">
-                    <div class="loading-spinner">
-                        <div class="spinner"></div>
-                        <p>Loading reviews...</p>
-                    </div>
-                </div>
-            `;
-            $(`#user-card-${userId}`).after(loadingHtml);
-
             try {
-                const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                // Remove any existing reviews container
+                $(`#reviews-container-${userId}`).remove();
+
+                // Create and show loading state
+                const loadingHtml = `
+                    <div id="reviews-container-${userId}" class="reviews-container">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                            <p>Loading reviews...</p>
+                        </div>
+                    </div>
+                `;
+                $(`#user-card-${userId}`).after(loadingHtml);
+
+                const response = await fetch(getApiUrl(`/api/admin/users/${userId}`), {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
 
                 if (!response.ok) {
@@ -1437,6 +1489,7 @@
                 $(`#reviews-container-${userId}`).replaceWith(reviewsHtml);
             } catch (error) {
                 console.error('Error loading user details:', error);
+                showError(`Error loading user details: ${error.message}`);
                 $(`#reviews-container-${userId}`).replaceWith(`
                     <div id="reviews-container-${userId}" class="reviews-container">
                         <div class="error-message">
@@ -1455,32 +1508,31 @@
                 window.location.href = 'index.html';
                 return;
             }
-            $('#reviewsModal').data('user-id', userId);
-            $('#reviewsContent').html(`
-                <div class="loading-spinner">
-                    <div class="spinner"></div>
-                    <p>Loading reviews...</p>
-                </div>
-            `);
-            $('#reviewsModal').show();
-            setTimeout(function() {
-                if (!$('#reviewsModal').is(':visible')) {
-                    $('#reviewsModal').show();
-                    $('#reviewsContent').prepend('<div style="color:yellow;font-weight:bold;">[DEBUG] Modal was hidden, forced to show.</div>');
-                }
-            }, 500);
+
             try {
-                const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+                $('#reviewsModal').data('user-id', userId);
+                $('#reviewsContent').html(`
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Loading reviews...</p>
+                    </div>
+                `);
+                $('#reviewsModal').show();
+
+                const response = await fetch(getApiUrl(`/api/admin/users/${userId}`), {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+
                 if (!response.ok) {
                     throw new Error(`Failed to fetch user details: ${response.status}`);
                 }
+
                 const user = await response.json();
                 console.log('User details fetched:', user);
                 console.log('user.reviews:', user.reviews);
+
                 let reviewsHtml = '';
                 if (Array.isArray(user.reviews) && user.reviews.length > 0) {
                     reviewsHtml = `
@@ -1507,33 +1559,23 @@
                             `).join('')}
                         </div>
                     `;
-                } else if (Array.isArray(user.reviews) && user.reviews.length === 0) {
+                } else {
                     reviewsHtml = `
                         <div class="no-reviews">
                             <i class="fas fa-comment-slash"></i>
-                            <p>No reviews found for this user.</p>
+                            <p>No reviews found</p>
                         </div>
                     `;
-                } else {
-                    reviewsHtml = `
-                        <div class="error-message">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <p>Could not load reviews. Unexpected response format.</p>
-                        </div>
-                        <pre style="color:#ff0000; background:rgba(0,0,0,0.2); padding:1rem; border-radius:8px; max-height:200px; overflow:auto;">${JSON.stringify(user, null, 2)}</pre>
-                    `;
                 }
-                console.log('reviewsHtml to render:', reviewsHtml);
-                if (!reviewsHtml || reviewsHtml.trim() === '') {
-                    reviewsHtml = '<div style="color:lime;font-size:2rem;">TEST RENDER (no reviewsHtml generated)</div>';
-                }
+
                 $('#reviewsContent').html(reviewsHtml);
             } catch (error) {
                 console.error('Error loading user reviews:', error);
+                showError(`Error loading user reviews: ${error.message}`);
                 $('#reviewsContent').html(`
                     <div class="error-message">
                         <i class="fas fa-exclamation-circle"></i>
-                        <p>Error loading reviews. Please try again.<br><small>${error.message}</small></p>
+                        <p>Error loading reviews. Please try again.</p>
                     </div>
                 `);
             }
@@ -1547,10 +1589,11 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+                const response = await fetch(getApiUrl(`/api/admin/users/${userId}`), {
                     method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
                     }
                 });
 
@@ -1574,8 +1617,8 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:5000/api/admin/reviews/${reviewId}/approve`, {
-                    method: 'PUT',
+                const response = await fetch(getApiUrl(`/api/admin/reviews/${reviewId}/approve`), {
+                    method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -1585,15 +1628,15 @@
                     throw new Error(`Failed to approve review: ${response.status}`);
                 }
 
-                alert('Review approved successfully!');
+                showSuccess('Review approved successfully!');
                 // Refresh reviews in the modal
                 const userId = $('#reviewsModal').data('user-id');
                 if (userId) {
-                    viewUserReviews(userId);
+                    await viewUserReviews(userId);
                 }
             } catch (error) {
                 console.error('Error approving review:', error);
-                alert('Failed to approve review. Please try again.');
+                showError(`Failed to approve review: ${error.message}`);
             }
         }
 
@@ -1605,7 +1648,7 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:5000/api/admin/reviews/${reviewId}`, {
+                const response = await fetch(getApiUrl(`/api/admin/reviews/${reviewId}`), {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -1616,15 +1659,15 @@
                     throw new Error(`Failed to delete review: ${response.status}`);
                 }
 
-                alert('Review deleted successfully!');
+                showSuccess('Review deleted successfully!');
                 // Refresh reviews in the modal
                 const userId = $('#reviewsModal').data('user-id');
                 if (userId) {
-                    viewUserReviews(userId);
+                    await viewUserReviews(userId);
                 }
             } catch (error) {
                 console.error('Error deleting review:', error);
-                alert('Failed to delete review. Please try again.');
+                showError(`Failed to delete review: ${error.message}`);
             }
         }
 
@@ -1662,7 +1705,7 @@
                 }
 
                 const username = movieRequestSearch.value.trim();
-                let url = `http://localhost:5000/api/movie-requests?status=${status}`;
+                let url = getApiUrl(`/api/movie-requests?status=${status}`);
                 if (username) {
                     url += `&username=${encodeURIComponent(username)}`;
                 }
@@ -1751,12 +1794,15 @@
             try {
                 const token = localStorage.getItem('admin_token');
                 if (!token) {
-                    throw new Error('Admin authentication required');
+                    window.location.href = 'index.html';
+                    return;
                 }
 
-                let url = 'http://localhost:5000/api/admin/users';
+                let url;
                 if (username) {
-                    url += `/search?username=${encodeURIComponent(username)}`;
+                    url = getApiUrl('/api/admin/users/search') + `?username=${encodeURIComponent(username)}`;
+                } else {
+                    url = getApiUrl('/api/admin/users');
                 }
 
                 const response = await fetch(url, {
@@ -1766,14 +1812,24 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to fetch users');
+                    throw new Error(`Failed to fetch users: ${response.status}`);
                 }
 
                 const users = await response.json();
+                if (!Array.isArray(users)) {
+                    throw new Error('Invalid response format');
+                }
+
                 displayUsers(users);
             } catch (error) {
                 console.error('Error searching users:', error);
-                showError(error.message);
+                showError(`Error searching users: ${error.message}`);
+                $('#userList').html(`
+                    <div class="no-users">
+                        <i class="fas fa-exclamation-circle" style="font-size:2.5rem;color:#ff0000;margin-bottom:1rem;"></i>
+                        <p>Error searching users. Please try again.</p>
+                    </div>
+                `);
             }
         }
 
@@ -1859,7 +1915,7 @@
                     throw new Error('Admin authentication required');
                 }
 
-                const response = await fetch('http://localhost:5000/api/feedbacks', {
+                const response = await fetch(getApiUrl('/api/feedbacks'), {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -2051,7 +2107,7 @@
                     return;
                 }
 
-                const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+                const response = await fetch(getApiUrl(`/api/admin/users/${userId}`), {
                     method: 'DELETE',
                     headers: { 
                         'Authorization': `Bearer ${token}`,
@@ -2098,6 +2154,37 @@
                 if (popup) {
                     popup.remove();
                 }
+            }
+        }
+
+        async function toggleUserStatus(userId, currentStatus) {
+            try {
+                const token = localStorage.getItem('admin_token');
+                if (!token) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                const response = await fetch(getApiUrl(`/api/admin/users/${userId}`), {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: currentStatus === 'active' ? 'inactive' : 'active'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to toggle user status: ${response.status}`);
+                }
+
+                // Refresh the user list
+                loadUsers();
+            } catch (error) {
+                console.error('Error toggling user status:', error);
+                showError(error.message || 'Failed to toggle user status. Please try again.');
             }
         }
     </script>

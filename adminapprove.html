@@ -439,6 +439,16 @@
             }, 5000);
         }
 
+        // Base URL configuration
+        const BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:5000'
+            : 'https://movie-explorer-95ea.onrender.com';
+
+        // Helper function to get API URL
+        function getApiUrl(endpoint) {
+            return `${BASE_URL}${endpoint}`;
+        }
+
         async function loadRequestDetails() {
             try {
                 const token = localStorage.getItem('admin_token');
@@ -447,7 +457,7 @@
                     return;
                 }
 
-                const response = await fetch(`http://localhost:5000/api/movie-request/${requestId}`, {
+                const response = await fetch(getApiUrl(`/api/movie-request/${requestId}`), {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -499,7 +509,7 @@
                 }
 
                 const token = localStorage.getItem('admin_token');
-                const response = await fetch(`http://localhost:5000/api/movie-request/${requestId}`, {
+                const response = await fetch(getApiUrl(`/api/movie-request/${requestId}`), {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -557,7 +567,7 @@
                 }
 
                 const token = localStorage.getItem('admin_token');
-                const response = await fetch(`http://localhost:5000/api/movie-request/${requestId}`, {
+                const response = await fetch(getApiUrl(`/api/movie-request/${requestId}`), {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',

@@ -292,6 +292,14 @@
         const emailRegex = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
         return emailRegex.test(email);
     };
+    // Base URL configuration
+    const BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5000'
+        : 'https://movie-explorer-95ea.onrender.com';
+    // Helper function to get API URL
+    function getApiUrl(endpoint) {
+        return `${BASE_URL}${endpoint}`;
+    }
     // Backend integration for Register
     $('#registerForm').submit(async function(e) {
         e.preventDefault();
@@ -335,7 +343,7 @@
         const password = passwordRaw.trim();
 
         try {
-            const res = await fetch('http://localhost:5000/api/register', {
+            const res = await fetch(getApiUrl('/api/register'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password })
@@ -387,7 +395,7 @@
         const password = passwordRaw.trim();
 
         try {
-            const res = await fetch('http://localhost:5000/api/login', {
+            const res = await fetch(getApiUrl('/api/login'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })

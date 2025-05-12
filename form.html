@@ -208,6 +208,16 @@
         const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
         const ADMIN_DASHBOARD_URL = 'admin.html'; // URL for the admin dashboard
 
+        // Base URL configuration
+        const BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:5000'
+            : 'https://movie-explorer-95ea.onrender.com';
+
+        // Helper function to get API URL
+        function getApiUrl(endpoint) {
+            return `${BASE_URL}${endpoint}`;
+        }
+
         function getSelectedLanguage() {
             const language = document.getElementById("language").value;
             const customLanguage = document.getElementById("customLanguage").value.trim();
@@ -289,7 +299,7 @@
                 }
 
                 // Send to server
-                const serverResponse = await fetch('http://localhost:5000/api/movie-request', {
+                const serverResponse = await fetch(getApiUrl('/api/movie-request'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

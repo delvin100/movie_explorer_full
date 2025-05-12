@@ -346,7 +346,7 @@ function addToWatchlist(event) {
         return;
     }
 
-    fetch('http://localhost:5000/api/watchlist', {
+    fetch(getApiUrl('/api/watchlist'), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

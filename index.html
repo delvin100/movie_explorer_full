@@ -379,6 +379,47 @@
 
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
     <script>
+        // Base URL configuration
+        const BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:5000'
+            : 'https://movie-explorer-95ea.onrender.com';
+
+        // Helper function to get API URL
+        function getApiUrl(endpoint) {
+            return `${BASE_URL}${endpoint}`;
+        }
+
+        // Update all fetch calls to use getApiUrl
+        async function login(username, password) {
+            try {
+                const response = await fetch(getApiUrl('/api/login'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                // ... existing code ...
+            } catch (error) {
+                // ... existing code ...
+            }
+        }
+
+        async function register(username, email, password) {
+            try {
+                const response = await fetch(getApiUrl('/api/register'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, email, password })
+                });
+                // ... existing code ...
+            } catch (error) {
+                // ... existing code ...
+            }
+        }
+
         $(document).ready(function() {
             // Get Started Button
             $('#getStartedBtn').click(function() {
@@ -438,7 +479,7 @@
                 const password = $('#adminPassword').val();
                 const $errorMessage = $('#adminError');
                 
-                fetch('http://localhost:5000/api/admin/login', {
+                fetch(getApiUrl('/api/admin/login'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -506,7 +547,7 @@
             $('#submitAdminPassword').click(function() {
                 const enteredPassword = $adminPasswordInput.val().trim();
                 $.ajax({
-                    url: '/admin-login',
+                    url: getApiUrl('/admin-login'),
                     method: 'POST',
                     data: { password: enteredPassword },
                     success: function(response) {
