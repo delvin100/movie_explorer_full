@@ -71,6 +71,25 @@
             transform: scale(1.2);
         }
 
+        .error-message {
+            display: none;
+            color: #ff0000;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 1rem;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
@@ -352,6 +371,7 @@
             <div class="admin-login-form">
                 <input type="password" id="adminPassword" placeholder="Enter Admin Password">
                 <button id="adminLoginBtn">Login</button>
+                <div id="adminError" class="error-message"></div>
             </div>
             <i class="fas fa-times close-icon" id="closeAdminLoginBtn"></i>
         </div>
@@ -416,12 +436,17 @@
 
             $('#adminLoginBtn').click(function() {
                 const password = $('#adminPassword').val();
+                const $errorMessage = $('#adminError');
+                
                 fetch('http://localhost:5000/api/admin/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ password })
+                    body: JSON.stringify({ 
+                        username: 'admin',
+                        password: password 
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -429,17 +454,26 @@
                         localStorage.setItem('admin_token', data.token);
                         window.location.href = 'admin.html';
                     } else {
-                        alert('Invalid admin password!');
+                        $errorMessage.text('Invalid admin credentials!').fadeIn(300);
+                        $('#adminPassword').val('').focus();
                     }
                 })
                 .catch(error => {
                     console.error('Login error:', error);
-                    alert('Login failed. Please try again.');
+                    $errorMessage.text('Invalid admin credentials!').fadeIn(300);
+                    $('#adminPassword').val('').focus();
                 });
             });
 
+            // Clear error message when input changes
+            $('#adminPassword').on('input', function() {
+                $('#adminError').fadeOut(300);
+            });
+
+            // Add Enter key functionality
             $('#adminPassword').keypress(function(e) {
-                if (e.which === 13) {
+                if (e.which === 13) { // Enter key
+                    e.preventDefault();
                     $('#adminLoginBtn').click();
                 }
             });

@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, minlength: 3, maxlength: 32 },
     email: { type: String, required: true, unique: true, match: /.+@.+\..+/ },
     password: { type: String, required: true, minlength: 6 },
+    isAdmin: { type: Boolean, default: false },
     profile: {
         bio: { type: String, default: '' },
         avatar: { type: String, default: '' },
@@ -102,7 +103,7 @@ const Feedback = mongoose.model('Feedback', feedbackSchema);
 const auth = async (req, res, next) => {
     try {
         const token = req.header('Authorization').replace('Bearer ', '');
-        const decoded = jwt.verify(token, 'metflix_secret');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findOne({ _id: decoded.id });
         if (!user || user.isDeleted) {
             throw new Error('Invalid user or user is deleted');
@@ -210,7 +211,7 @@ app.post('/api/login', async (req, res) => {
         }
         // Update activity and generate token
         await updateUserActivity(user._id);
-        const token = jwt.sign({ id: user._id, username: user.username }, 'metflix_secret', { expiresIn: '2h' });
+        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '2h' });
         res.json({ message: 'Login successful.', token, username: user.username });
     } catch (err) {
         res.status(500).json({ message: 'Server error.' });
@@ -458,12 +459,14 @@ const authenticateAdmin = async (req, res, next) => {
             return res.status(401).json({ message: 'No token provided' });
         }
 
-        const decoded = jwt.verify(token, 'metflix_secret');
-        if (!decoded.isAdmin) {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+        
+        if (!user || !user.isAdmin) {
             return res.status(403).json({ message: 'Not authorized as admin' });
         }
 
-        req.admin = decoded;
+        req.admin = user;
         next();
     } catch (error) {
         res.status(401).json({ message: 'Invalid token' });
@@ -473,18 +476,57 @@ const authenticateAdmin = async (req, res, next) => {
 // Admin Login
 app.post('/api/admin/login', async (req, res) => {
     try {
-        const { password } = req.body;
-        if (password === 'admin123') {
-            const token = jwt.sign(
-                { isAdmin: true },
-                'metflix_secret',
-                { expiresIn: '24h' }
-            );
-            res.json({ token });
-        } else {
-            res.status(401).json({ message: 'Invalid admin password' });
+        const { username, password } = req.body;
+        
+        if (!username || !password) {
+            return res.status(400).json({ message: 'Username and password are required' });
         }
+
+        // Find admin user
+        const admin = await User.findOne({ 
+            username: username,
+            isAdmin: true,
+            isDeleted: false,
+            isActive: true
+        });
+
+        if (!admin) {
+            return res.status(401).json({ message: 'Invalid admin credentials' });
+        }
+
+        // Verify password
+        try {
+            const isMatch = await bcrypt.compare(password, admin.password);
+            if (!isMatch) {
+                return res.status(401).json({ message: 'Invalid admin credentials' });
+            }
+        } catch (bcryptError) {
+            console.error('Password verification error');
+            return res.status(401).json({ message: 'Invalid admin credentials' });
+        }
+
+        // Update last active timestamp
+        admin.lastActiveAt = new Date();
+        await admin.save();
+
+        // Generate JWT token
+        const token = jwt.sign(
+            { 
+                id: admin._id,
+                username: admin.username,
+                isAdmin: true 
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({ 
+            token,
+            username: admin.username,
+            message: 'Admin login successful'
+        });
     } catch (error) {
+        console.error('Admin login error');
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -503,7 +545,8 @@ app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
             { isActive: true }
         );
 
-        const users = await User.find().select('-password');
+        // Find all users except admins
+        const users = await User.find({ isAdmin: { $ne: true } }).select('-password');
         const userStats = await Promise.all(users.map(async (user) => {
             const watchlistCount = await Watchlist.countDocuments({ userId: user._id });
             const reviewCount = await Review.countDocuments({ userId: user._id });
@@ -528,8 +571,10 @@ app.get('/api/admin/users/search', authenticateAdmin, async (req, res) => {
             return res.status(400).json({ message: 'Username query parameter is required' });
         }
 
+        // Search users except admins
         const users = await User.find({
-            username: { $regex: username, $options: 'i' }
+            username: { $regex: username, $options: 'i' },
+            isAdmin: { $ne: true }
         }).select('-password');
 
         const userStats = await Promise.all(users.map(async (user) => {
@@ -574,7 +619,7 @@ app.get('/api/admin/users/:id', authenticateAdmin, async (req, res) => {
 // Get Dashboard Statistics (Admin)
 app.get('/api/admin/stats', authenticateAdmin, async (req, res) => {
     try {
-        const totalUsers = await User.countDocuments();
+        const totalUsers = await User.countDocuments({ isAdmin: { $ne: true } });
         const totalRequests = await MovieRequest.countDocuments();
         const totalReviews = await Review.countDocuments();
 
